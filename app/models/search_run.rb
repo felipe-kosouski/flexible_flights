@@ -9,7 +9,7 @@ class SearchRun < ApplicationRecord
   }
 
   validates :search_intent, presence: true
-  validates :status, presence: true, inclusion: { in: status.keys }
+  validates :status, presence: true, inclusion: { in: statuses.keys }
   validates :started_at, presence: true
   validates :completed_at, presence: true
 end

@@ -22,8 +22,14 @@ group :development, :test do
   gem "bundler-audit", require: false
   gem "brakeman", require: false
   gem "rubocop-rails-omakase", require: false
+  gem 'factory_bot_rails'
+  gem 'faker'
 end
 
 group :development do
   gem "web-console"
+end
+
+group :test do
+  gem "shoulda-matchers"
 end

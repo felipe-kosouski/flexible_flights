@@ -8,7 +8,7 @@ class AnalysisSnapshot < ApplicationRecord
   }
 
   validates :search_run, presence: true
-  validates :confidence_level, presence: true, inclusion: { in: confidence_level.keys }
+  validates :confidence_level, presence: true, inclusion: { in: confidence_levels.keys }
   validates :route_median_duration_minutes, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :price_p25_cents, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :price_p50_cents, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
