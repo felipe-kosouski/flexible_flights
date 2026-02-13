@@ -203,6 +203,8 @@ Rules:
 ## 7. Technical Architecture (MVP)
 
 - Ruby on Rails monolith
+- Hotwire + turbo for front end
+- Tailwind Css
 - PostgreSQL
 - Background jobs for sampling and analysis
 - Domain logic in plain Ruby objects (POROs)

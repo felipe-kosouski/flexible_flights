@@ -15,6 +15,6 @@ class CreateFlightSamples < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
-    add_index :price_cents
+    add_index :flight_samples, :price_cents
   end
 end

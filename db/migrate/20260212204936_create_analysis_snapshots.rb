@@ -12,6 +12,5 @@ class CreateAnalysisSnapshots < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
-    add_index :search_run_id
   end
 end

@@ -13,6 +13,6 @@ class CreateSearchIntents < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
-    add_index :origin_airport, :destination_airport
+    add_index :search_intents, [ :origin_airport, :destination_airport ], unique: true
   end
 end
