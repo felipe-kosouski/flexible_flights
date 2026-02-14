@@ -1,6 +1,5 @@
 # 📄 Domain Spec — Sampling Candidate Selector (MVP)
 
-**Location:** docs/domain/sampling_candidate_selector.md  
 **Governing documents:**
 
 - PRODUCT_GUIDE.md
