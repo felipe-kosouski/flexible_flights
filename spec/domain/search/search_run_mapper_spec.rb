@@ -7,7 +7,7 @@ RSpec.describe Search::SearchRunMapper do
     SearchRun.new(
       state: :initialized,
       started_at: nil,
-      completed_at: nil
+      finished_at: nil
     )
   end
 
@@ -29,7 +29,7 @@ RSpec.describe Search::SearchRunMapper do
     end
 
     it "maps domain state to record status" do
-      expect(search_run_record.state).to eq(:completed)
+      expect(search_run_record.state).to eq("completed")
     end
 
     it "maps started_at timestamp" do
@@ -66,7 +66,7 @@ RSpec.describe Search::SearchRunMapper do
     it "maps failed state to record status" do
       described_class.apply(domain_run, search_run_record)
 
-      expect(search_run_record.state).to eq(:failed)
+      expect(search_run_record.state).to eq("failed")
     end
   end
 end

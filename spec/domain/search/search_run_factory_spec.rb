@@ -23,7 +23,7 @@ RSpec.describe Search::SearchRunFactory do
       search_intent: search_intent,
       state: :initialized,
       started_at: nil,
-      completed_at: nil
+      finished_at: nil
     )
   end
 
@@ -64,8 +64,30 @@ RSpec.describe Search::SearchRunFactory do
       expect(domain_run.instance_variable_get(:@provider)).to eq(provider)
     end
 
-    it "does not mutate the ActiveRecord object" do
-      expect(search_run_record.changed?).to be(false)
+    it "does not mutate domain-relevant fields on the ActiveRecord object" do
+      before_attributes = search_run_record.attributes.slice(
+        "state",
+        "started_at",
+        "finished_at",
+        "search_intent_id"
+      )
+
+      described_class.from_record(
+        search_run_record,
+        max_candidates: 30,
+        passengers: 2,
+        cabin_class: :economy,
+        provider: provider
+      )
+
+      after_attributes = search_run_record.attributes.slice(
+        "state",
+        "started_at",
+        "finished_at",
+        "search_intent_id"
+      )
+
+      expect(after_attributes).to eq(before_attributes)
     end
 
     it "does not persist the domain object" do
