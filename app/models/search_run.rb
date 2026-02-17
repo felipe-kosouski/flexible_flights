@@ -11,5 +11,5 @@ class SearchRun < ApplicationRecord
   validates :search_intent, presence: true
   validates :state, presence: true, inclusion: { in: states.keys }
   validates :started_at, presence: true
-  validates :completed_at, presence: true
+  validates :finished_at, presence: true
 end
