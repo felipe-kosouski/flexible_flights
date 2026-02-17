@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_12_204936) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_17_111918) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -63,12 +63,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_12_204936) do
   end
 
   create_table "search_runs", force: :cascade do |t|
-    t.datetime "completed_at"
     t.datetime "created_at", null: false
     t.datetime "data_fresh_until"
+    t.text "error_message"
+    t.datetime "finished_at"
     t.bigint "search_intent_id", null: false
     t.datetime "started_at"
-    t.integer "status"
+    t.integer "state"
     t.datetime "updated_at", null: false
     t.index ["search_intent_id"], name: "index_search_runs_on_search_intent_id"
   end
