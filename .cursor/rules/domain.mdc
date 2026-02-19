@@ -1,62 +1,268 @@
 ---
-description: Domain modeling rules and constraints
-globs:
-  - "app/domain/**/*"
+description: Domain rules, invariants, responsibilities, and modeling guidelines
+alwaysApply: true
 ---
+
+# Domain Rules
 
 ## Domain Philosophy
 
-- Domain objects model **business behavior**, not data storage
-- They are deterministic, explicit, and testable
+The domain layer represents **business truth**, not technical implementation.
+
+It answers:
+- What is the business rule?
+- What decision is being made?
+- What invariants must always hold?
+
+The domain is:
+- Pure Ruby
+- Deterministic
+- Explicit
+- Test-driven
 
 ---
 
-## Allowed in Domain Objects
+## What the Domain IS
 
-- Plain Ruby
-- Value objects
-- Explicit state transitions
-- Raising domain-relevant exceptions
-- Deterministic algorithms
+The domain:
+- Models business concepts
+- Encapsulates rules and calculations
+- Owns state transitions
+- Is ignorant of persistence and infrastructure
 
----
-
-## Forbidden in Domain Objects
-
-- ActiveRecord
-- Database access
-- Transactions
-- External services (HTTP, APIs)
-- Background jobs
-- Logging frameworks
+Examples:
+- Search runs
+- Sampling strategies
+- Scoring logic
+- Decision thresholds
 
 ---
 
-## Initialization Rules
+## What the Domain is NOT
 
-- Domain objects must be initialized with everything they need
-- No hidden dependencies
-- No global state
+The domain must NEVER:
+- Use ActiveRecord
+- Use Rails APIs
+- Perform I/O
+- Read or write databases
+- Call repositories
+- Rescue infrastructure exceptions
+- Know about jobs, controllers, or background execution
 
----
-
-## Error Handling
-
-- Domain objects may raise
-- They do NOT rescue infrastructure errors
-- Repositories decide how to persist failures
-
----
-
-## Specs as Contracts
-
-- Domain specs are authoritative
-- If specs are unclear, STOP and ask
-- Never "fix" specs by loosening behavior
+Violations are architectural bugs.
 
 ---
 
-## Determinism Guarantee
+## Bounded Context: Search
 
-- Same input → same output
-- No randomness unless explicitly specified
+The **Search** bounded context is responsible for:
+
+- Exploring flight possibilities
+- Sampling candidate routes
+- Scoring and ranking results
+- Producing insights from volatile pricing data
+
+All Search logic lives under: `app/domain/search/`
+
+---
+
+## Core Domain Objects
+
+### Search::SearchRun
+
+**Central aggregate root.**
+
+Responsibilities:
+- Represents one execution of a search
+- Tracks lifecycle and outcome
+- Coordinates sampling and scoring
+- Exposes results and errors
+
+Characteristics:
+- Has explicit state transitions
+- Is immutable after completion
+- Does not persist itself
+
+---
+
+## Subdomains
+
+### 1. Sampling
+
+Path: `app/domain/search/sampling/`
+
+Purpose:
+- Generate candidate flight combinations
+- Explore date ranges and stop constraints
+- Produce raw samples for scoring
+
+Typical responsibilities:
+- Date grid generation
+- Candidate selection
+- Sampling strategies
+- Execution orchestration
+
+Rules:
+- Sampling must be deterministic given inputs
+- No API calls
+- No persistence
+- No randomness without explicit seed
+
+---
+
+### 2. Scoring
+
+Path: `app/domain/search/scoring/`
+
+Purpose:
+- Evaluate sampled flights
+- Rank options based on business value
+- Produce normalized scores
+
+Responsibilities:
+- Price normalization
+- Duration penalties
+- Stop penalties
+- Volatility adjustments
+
+Rules:
+- Scoring must be pure and repeatable
+- No knowledge of persistence
+- All weights must be explicit
+
+---
+
+## Domain Factories
+
+Path: `app/domain/search/factories/`
+
+Factories are responsible for:
+- Constructing valid domain objects
+- Translating from input DTOs or primitives
+- Applying defaults and invariants
+
+Factories:
+- May validate inputs
+- Must not persist
+- Must not depend on ActiveRecord
+
+---
+
+## Domain Mappers
+
+Path: `app/domain/search/mappers/`
+
+Mappers:
+- Translate between ActiveRecord models and domain objects
+- Are **not** part of the domain logic
+- Are adapters at the domain boundary
+
+Rules:
+- No business logic
+- No validations
+- No side effects
+
+---
+
+## Domain Repositories
+
+Path: `app/domain/search/repositories/`
+
+Repositories:
+- Are domain-facing interfaces to persistence
+- Coordinate:
+  - Transactions
+  - Mapping
+  - Error handling
+- Return domain objects
+
+Rules:
+- Repositories may depend on ActiveRecord
+- Domain must never depend on repositories
+- Repositories own transactional boundaries
+
+---
+
+## State & Lifecycle Rules
+
+- Domain objects manage in-memory state
+- State transitions are explicit
+- Terminal states cannot be exited
+- Errors are part of the domain outcome
+
+Example states:
+- initialized
+- running
+- finished
+- failed
+
+---
+
+## Error Handling Philosophy
+
+- Domain raises meaningful domain errors
+- Domain does not rescue infrastructure errors
+- Repositories decide what to persist on failure
+- Failed executions may still produce partial insights
+
+---
+
+## Validation Strategy
+
+- Domain validates **business invariants**
+- ActiveRecord validates **data constraints**
+- Overlap is allowed but intentional
+
+Example:
+- Domain: "max_stops must be >= 0"
+- AR: "max_stops must be present"
+
+---
+
+## Spec Rules
+
+- Domain specs:
+  - No database
+  - No Rails
+  - No stubbing ActiveRecord
+- Deterministic and fast
+- Express business intent, not implementation
+
+---
+
+## Naming Rules
+
+- Use ubiquitous language
+- Avoid technical suffixes (`Service`, `Manager`)
+- Prefer nouns for entities, verbs for behaviors
+
+Good:
+- `SearchRun`
+- `Sampler`
+- `Scorer`
+
+Bad:
+- `SearchRunService`
+- `SearchManager`
+
+---
+
+## MVP Discipline
+
+- Prefer simple models
+- Avoid speculative abstractions
+- Add complexity only when behavior demands it
+- Refactor only with green specs
+
+---
+
+## Authority
+
+If conflicts exist, precedence is:
+
+1. architecture.mdc
+2. domain.mdc
+3. Specs
+4. Implementation
+
+Domain rules override convenience.
