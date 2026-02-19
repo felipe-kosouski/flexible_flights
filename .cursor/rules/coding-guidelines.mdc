@@ -1,0 +1,66 @@
+---
+description: Coding style, refactoring, and quality standards
+alwaysApply: true
+---
+
+## General Code Quality Rules
+
+- Prefer clarity over cleverness
+- Small methods
+- Single responsibility
+- Explicit naming
+
+---
+
+## DRY (But Not Prematurely)
+
+- Duplicate code is acceptable until intent is clear
+- Refactor ONLY when duplication represents the same concept
+
+---
+
+## Refactoring Rules
+
+- Refactors must not change behavior
+- Specs must remain green
+- Prefer extracting objects over conditionals
+
+---
+
+## Naming
+
+- Names must reflect business intent
+- Avoid technical names in domain code
+- Prefer:
+  - `SearchRun`
+  - `CandidateSelector`
+  - `AnalysisSnapshot`
+
+---
+
+## Method Length
+
+- Aim for ≤ 10 lines
+- If longer, extract
+
+---
+
+## Conditionals
+
+- Prefer guard clauses
+- Avoid nested conditionals
+
+---
+
+## Comments
+
+- Explain WHY, not WHAT
+- Code should explain WHAT
+
+---
+
+## When in Doubt
+
+- Ask before implementing
+- Do not invent behavior
+- Follow domain specs strictly

@@ -30,7 +30,7 @@ The repository MUST:
 - Load persistence records needed to run a search
 - Instantiate the domain object via `SearchRunFactory`
 - Execute the domain object
-- Persist state transitions via `SearchRunMapper`
+- Persist state transitions via `Search::Mappers::SearchRunMapper`
 - Persist produced samples
 - Guarantee transactional integrity
 
@@ -82,14 +82,14 @@ Returned value is the same as the domain execution output.
 
 **Step 1 — Build domain object**
 
-- Use `SearchRunFactory.from_record`
+- Use `Search::Factories::SearchRunFactory.from_record`
 - Factory MUST NOT mutate the record
 
 ---
 
 **Step 2 — Persist initial state**
 
-- Apply `SearchRunMapper` to persist:
+- Apply `Search::Mappers::SearchRunMapper` to persist:
   - `state`
   - `started_at`
 - Save the record
@@ -105,7 +105,7 @@ Returned value is the same as the domain execution output.
 
 **Step 4 — Persist final state**
 
-- Apply `SearchRunMapper` again
+- Apply `Search::Mappers::SearchRunMapper` again
 - Persist:
   - `state`
   - `finished_at`
@@ -168,7 +168,7 @@ The repository MUST NOT swallow exceptions.
 **Namespace**
 
 ```
-Search::SearchRunRepository
+Search::Repositories::SearchRunRepository
 ```
 
 **Public API**

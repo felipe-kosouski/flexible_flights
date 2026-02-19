@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Search::SearchRunRepository do
+RSpec.describe Search::Repositories::SearchRunRepository do
   describe ".execute" do
     let(:user) { User.create!(email: "test@example.com") }
 
@@ -65,8 +65,8 @@ RSpec.describe Search::SearchRunRepository do
     end
 
     before do
-      allow(Search::SearchRunFactory).to receive(:from_record).and_return(search_run)
-      allow(Search::SearchRunMapper).to receive(:apply).and_call_original
+      allow(Search::Factories::SearchRunFactory).to receive(:from_record).and_return(search_run)
+      allow(Search::Mappers::SearchRunMapper).to receive(:apply).and_call_original
     end
 
     def execute_repository
@@ -121,7 +121,7 @@ RSpec.describe Search::SearchRunRepository do
           results: []
         )
         allow(failing_search_run).to receive(:execute).and_raise(RuntimeError, "provider error")
-        allow(Search::SearchRunFactory).to receive(:from_record).and_return(failing_search_run)
+        allow(Search::Factories::SearchRunFactory).to receive(:from_record).and_return(failing_search_run)
 
         expect {
           execute_repository rescue nil
@@ -173,7 +173,7 @@ RSpec.describe Search::SearchRunRepository do
           results: []
         )
         allow(failing_run).to receive(:execute).and_raise(StandardError, "provider timeout")
-        allow(Search::SearchRunFactory).to receive(:from_record).and_return(failing_run)
+        allow(Search::Factories::SearchRunFactory).to receive(:from_record).and_return(failing_run)
 
         expect { execute_repository }.to raise_error(StandardError, "provider timeout")
       end

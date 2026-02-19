@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Search::SearchRunFactory do
+RSpec.describe Search::Factories::SearchRunFactory do
   let(:provider) { double("Provider") }
 
   let(:search_intent) do

@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Search::SearchRunMapper do
+RSpec.describe Search::Mappers::SearchRunMapper do
   let(:search_run_record) do
     SearchRun.new(
       state: :initialized,

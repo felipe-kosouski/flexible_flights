@@ -1,0 +1,62 @@
+---
+description: Domain modeling rules and constraints
+globs:
+  - "app/domain/**/*"
+---
+
+## Domain Philosophy
+
+- Domain objects model **business behavior**, not data storage
+- They are deterministic, explicit, and testable
+
+---
+
+## Allowed in Domain Objects
+
+- Plain Ruby
+- Value objects
+- Explicit state transitions
+- Raising domain-relevant exceptions
+- Deterministic algorithms
+
+---
+
+## Forbidden in Domain Objects
+
+- ActiveRecord
+- Database access
+- Transactions
+- External services (HTTP, APIs)
+- Background jobs
+- Logging frameworks
+
+---
+
+## Initialization Rules
+
+- Domain objects must be initialized with everything they need
+- No hidden dependencies
+- No global state
+
+---
+
+## Error Handling
+
+- Domain objects may raise
+- They do NOT rescue infrastructure errors
+- Repositories decide how to persist failures
+
+---
+
+## Specs as Contracts
+
+- Domain specs are authoritative
+- If specs are unclear, STOP and ask
+- Never "fix" specs by loosening behavior
+
+---
+
+## Determinism Guarantee
+
+- Same input → same output
+- No randomness unless explicitly specified

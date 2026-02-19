@@ -1,0 +1,55 @@
+---
+description: Testing philosophy and RSpec conventions
+alwaysApply: true
+---
+
+## Testing Philosophy
+
+- Specs define behavior, not implementation
+- Failing specs indicate either:
+  - A bug
+  - Or unclear requirements
+
+---
+
+## Domain Specs
+
+- Test behavior, not internals
+- No stubbing of domain methods
+- Deterministic expectations
+
+---
+
+## Repository Specs
+
+- Stub domain execution
+- Use real ActiveRecord models
+- Assert transactional behavior
+- Assert persistence side effects
+
+---
+
+## What to Stub vs Real
+
+| Layer      | Stub  | Real  |
+|------------|-------|-------|
+| Domain     | ❌    | ✅    |
+| Repository | Domain| AR    |
+| Controllers| Repository | ❌ |
+
+---
+
+## Anti-patterns
+
+- Over-mocking
+- Testing private methods
+- Testing Rails internals
+- Letting specs "pass by coincidence"
+
+---
+
+## Pending Specs
+
+- Pending specs represent future behavior
+- DO NOT remove them
+- DO NOT implement beyond MVP unless instructed

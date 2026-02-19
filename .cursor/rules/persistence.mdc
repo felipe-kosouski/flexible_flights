@@ -1,0 +1,62 @@
+---
+description: Persistence, repositories, factories, and mappers
+globs:
+  - "app/domain/**/repositories/**/*"
+  - "app/domain/**/factories/**/*"
+  - "app/domain/**/mappers/**/*"
+---
+
+## Persistence Pattern
+
+Each domain module owns its own persistence adapters.
+We use **Repository + Factory + Mapper**.
+
+**Example:**
+
+- Search::Factories::SearchRunFactory
+- Search::Mappers::SearchRunMapper
+- Search::Repositories::SearchRunRepository
+
+No global repositories or factories.
+
+---
+
+### Factory
+
+- One-way
+- ActiveRecord → Domain
+- MUST NOT mutate ActiveRecord objects
+- No saving
+- No transactions
+
+---
+
+### Mapper
+
+- Applies domain state to ActiveRecord
+- Domain → ActiveRecord
+- No domain logic
+- No persistence side effects beyond assignment
+
+---
+
+### Repository
+
+- Owns transactions
+- Coordinates:
+  - Domain execution
+  - Persistence
+  - Error handling
+- Returns domain results, never ActiveRecord objects
+
+---
+
+## Dependency Rules
+
+- Repositories may depend on:
+  - Domain
+  - ActiveRecord
+- Domain must never depend on persistence
+- ActiveRecord must never depend on domain
+
+Persistence is an implementation detail.

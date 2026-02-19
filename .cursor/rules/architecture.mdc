@@ -1,0 +1,196 @@
+---
+description: Core system architecture, module boundaries, and dependency rules
+alwaysApply: true
+---
+
+## Architecture Overview
+
+This application is a **modular monolith** built with Rails.
+
+- Business logic lives in **explicit domain modules**
+- Rails is used for delivery, persistence, and infrastructure
+- Each domain owns its behavior and its persistence adapters
+
+The primary bounded context is **Search**.
+
+---
+
+## Canonical Folder Structure (Authoritative)
+
+```
+app/
+├── domain/
+│   └── search/
+│       ├── search_run.rb
+│       │
+│       ├── sampling/
+│       │   ├── date_grid.rb
+│       │   ├── candidate_selector.rb
+│       │   ├── sampler.rb
+│       │   └── runner.rb
+│       │
+│       ├── scoring/
+│       │   ├── scorer.rb
+│       │   └── score_calculator.rb
+│       │
+│       ├── factories/
+│       │   └── search_run_factory.rb
+│       │
+│       ├── mappers/
+│       │   └── search_run_mapper.rb
+│       │
+│       └── repositories/
+│           └── search_run_repository.rb
+│
+├── models/
+│   ├── user.rb
+│   ├── search_intent.rb
+│   ├── search_run.rb
+│   ├── flight_sample.rb
+│   └── analysis_snapshot.rb
+```
+
+This structure is **intentional and enforced**.
+
+---
+
+## Layer Responsibilities
+
+### 1. Domain Layer (`app/domain/**`)
+
+- Plain Ruby
+- Business rules and behavior
+- Deterministic logic
+- Explicit state transitions
+
+**Must NOT:**
+- Use ActiveRecord
+- Use Rails APIs
+- Perform I/O
+- Call external services
+- Persist data
+
+---
+
+### 2. Persistence Layer (inside each domain)
+
+**Located at:**
+
+```
+app/domain//
+├── factories/
+├── mappers/
+└── repositories/
+```
+
+**Responsibilities:**
+
+- Translate between ActiveRecord and domain
+- Own transactions
+- Persist results and failures
+- Coordinate execution
+
+Persistence is **context-owned**, not global.
+
+---
+
+### 3. ActiveRecord Models (`app/models/**`)
+
+- Represent database schema
+- Contain:
+  - Associations
+  - Validations
+  - Enums
+- No business logic
+- No orchestration
+
+ActiveRecord models are **dumb data holders**.
+
+---
+
+## Dependency Direction (Strict, Non-Negotiable)
+
+```
+Controllers / Jobs
+↓
+Repositories
+↓
+Domain
+```
+
+**Rules:**
+
+- Domain must NEVER depend on:
+  - ActiveRecord
+  - Repositories
+  - Rails
+- Repositories MAY depend on:
+  - Domain
+  - ActiveRecord
+- ActiveRecord must NEVER depend on domain
+
+Any violation is a bug.
+
+---
+
+## State Management
+
+- Domain objects manage **in-memory state**
+- ActiveRecord models reflect state **after execution**
+- State transitions are explicit and spec-driven
+
+**Example:**
+
+- Domain: `Search::SearchRun#execute`
+- Persistence: `Search::Mappers::SearchRunMapper.apply`
+
+---
+
+## Transactions & Error Handling
+
+- Repositories own transactions
+- Domain may raise errors
+- Repositories decide:
+  - What gets persisted
+  - What rolls back
+  - What is re-raised
+
+Failure persistence happens **outside failed transactions**.
+
+---
+
+## Naming & Ownership Rules
+
+- Namespaces mirror folders
+- Files live where their responsibility belongs
+- No cross-domain persistence helpers
+- No shared repositories across contexts
+
+Each bounded context is self-contained.
+
+---
+
+## Evolution Rule (MVP-friendly)
+
+- Prefer clarity over abstraction
+- New domains follow the same structure
+- No premature extraction into engines or services
+
+Refactoring is allowed **only with green specs**.
+
+---
+
+## Authority
+
+If conflicts exist between documents:
+
+1. `architecture.mdc`
+2. Domain specs in `docs/domain/**`
+3. PRD.md
+4. Implementation
+
+Higher-level documents prevail.
+
+---
+
+Violations of this architecture are considered bugs, not style issues.
