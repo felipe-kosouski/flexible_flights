@@ -9,7 +9,7 @@ This application is a **modular monolith** built with Rails.
 
 - Business logic lives in **explicit domain modules**
 - Rails is used for delivery, persistence, and infrastructure
-- Each domain owns its behavior and its persistence adapters
+- Domains operate on **domain-owned representations**, not ActiveRecord
 
 The primary bounded context is **Search**.
 
@@ -23,6 +23,10 @@ app/
 │   └── search/
 │       ├── search_run.rb
 │       │
+│       ├── models/                # Domain read models (NOT AR)
+│       │   ├── flight_sample.rb
+│       │   └── search_intent.rb
+│       │
 │       ├── sampling/
 │       │   ├── date_grid.rb
 │       │   ├── candidate_selector.rb
@@ -30,8 +34,10 @@ app/
 │       │   └── runner.rb
 │       │
 │       ├── scoring/
-│       │   ├── scorer.rb
-│       │   └── score_calculator.rb
+│       │   ├── price_score.rb
+│       │   ├── time_comfort_score.rb
+│       │   ├── trip_fit.rb
+│       │   └── final_score.rb
 │       │
 │       ├── factories/
 │       │   └── search_run_factory.rb
@@ -59,42 +65,59 @@ This structure is **intentional and enforced**.
 ### 1. Domain Layer (`app/domain/**`)
 
 - Plain Ruby
-- Business rules and behavior
-- Deterministic logic
+- Business rules and decision logic
+- Deterministic behavior
 - Explicit state transitions
+
+Includes:
+- Core domain entities
+- Scoring and sampling logic
+- Domain read models
 
 **Must NOT:**
 - Use ActiveRecord
 - Use Rails APIs
 - Perform I/O
-- Call external services
 - Persist data
+- Depend on repositories
 
 ---
 
-### 2. Persistence Layer (inside each domain)
+### 2. Domain Read Models (`app/domain/**/models`)
+
+Domain read models are **read-only projections** of persisted data.
+
+They:
+- Wrap ActiveRecord models or hashes
+- Expose domain semantics
+- Are safe to use in scoring and decision logic
+- Contain no validations or callbacks
+- Never persist data
+
+They are **not** ActiveRecord models.
+
+---
+
+### 3. Persistence Coordination (inside each domain)
 
 **Located at:**
 
 ```
-app/domain//
+app/domain/**/
 ├── factories/
 ├── mappers/
 └── repositories/
 ```
 
-**Responsibilities:**
-
-- Translate between ActiveRecord and domain
+Responsibilities:
+- Translate persistence → domain
+- Translate domain → persistence
 - Own transactions
-- Persist results and failures
 - Coordinate execution
-
-Persistence is **context-owned**, not global.
 
 ---
 
-### 3. ActiveRecord Models (`app/models/**`)
+### 4. ActiveRecord Models (`app/models/**`)
 
 - Represent database schema
 - Contain:
@@ -115,7 +138,7 @@ Controllers / Jobs
 ↓
 Repositories
 ↓
-Domain
+Domain (incl. domain read models)
 ```
 
 **Rules:**
@@ -136,13 +159,8 @@ Any violation is a bug.
 ## State Management
 
 - Domain objects manage **in-memory state**
-- ActiveRecord models reflect state **after execution**
+- ActiveRecord reflects state **after execution**
 - State transitions are explicit and spec-driven
-
-**Example:**
-
-- Domain: `Search::SearchRun#execute`
-- Persistence: `Search::Mappers::SearchRunMapper.apply`
 
 ---
 
@@ -151,8 +169,8 @@ Any violation is a bug.
 - Repositories own transactions
 - Domain may raise errors
 - Repositories decide:
-  - What gets persisted
   - What rolls back
+  - What is persisted
   - What is re-raised
 
 Failure persistence happens **outside failed transactions**.
@@ -162,21 +180,17 @@ Failure persistence happens **outside failed transactions**.
 ## Naming & Ownership Rules
 
 - Namespaces mirror folders
-- Files live where their responsibility belongs
-- No cross-domain persistence helpers
-- No shared repositories across contexts
-
-Each bounded context is self-contained.
+- Domain models are NOT ActiveRecord
+- No shared persistence helpers across domains
+- Each bounded context is self-contained
 
 ---
 
-## Evolution Rule (MVP-friendly)
+## Evolution Rule (MVP-Friendly)
 
 - Prefer clarity over abstraction
-- New domains follow the same structure
-- No premature extraction into engines or services
-
-Refactoring is allowed **only with green specs**.
+- Introduce new domain models explicitly
+- Refactor only with green specs
 
 ---
 
@@ -193,4 +207,4 @@ Higher-level documents prevail.
 
 ---
 
-Violations of this architecture are considered bugs, not style issues.
+Violations of this architecture are bugs, not style issues.

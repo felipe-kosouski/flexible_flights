@@ -1,9 +1,9 @@
-# 📄 Domain Spec — Scoring & Ranking (MVP)
+# Domain Spec — Scoring & Ranking (MVP)
 
 **Governing documents:**
 
-- PRODUCT_GUIDE.md
-- PRD.md — Smart Search Execution
+- [PRODUCT_GUIDE.md](../PRODUCT_GUIDE.md)
+- [PRD.md](../PRD.md) — Smart Search Execution
 - Domain Spec — Analysis & Market Stats
 
 If conflicts exist, higher-level documents prevail.
@@ -14,15 +14,16 @@ If conflicts exist, higher-level documents prevail.
 
 Scoring is responsible for ranking flight options in a way that reflects:
 
-- Price attractiveness
-- Travel comfort
-- Trip fit for flexible travelers
+- Price attractiveness relative to the market
+- Travel comfort and fatigue
+- Fitness for the intended type of trip
 
-Scoring produces relative ordering, not absolute truth.
+Scoring produces **relative ordering**, not absolute recommendations.
 
-Scoring does not:
+Scoring does **not**:
 
-- Predict prices
+- Predict future prices
+- Enforce hard constraints
 - Generate booking advice
 - Persist results
 - Override confidence rules
@@ -33,24 +34,42 @@ Scoring does not:
 
 Scoring receives:
 
-- A list of flight_samples
-- One analysis_snapshot
+- A list of `flight_samples`
+- One `analysis_snapshot`
+- One `search_intent` (read-only)
 
-Each flight sample provides:
+### Flight sample fields
 
-- Price
-- Stops
-- Duration
-- Airlines
-- Luggage inclusion
-- Dates
+| Field               | Description          |
+| ------------------- | -------------------- |
+| `price_cents`       | Price in cents       |
+| `stops`             | Number of stops      |
+| `air_time_minutes`  | Air time             |
+| `layover_time_minutes` | Layover time     |
+| `airlines`          | Airline codes        |
+| `luggage_included`  | Luggage flag         |
+| `departure_datetime`| Departure timestamp  |
+| `return_datetime`   | Return timestamp     |
 
-Analysis snapshot provides:
+### Analysis snapshot fields
 
-- Price percentiles
-- Route median duration
-- Volatility
-- Confidence level
+| Field                         | Description            |
+| ----------------------------- | ---------------------- |
+| `price_p25_cents`             | 25th percentile price  |
+| `price_p50_cents`             | Median price           |
+| `price_p75_cents`             | 75th percentile price  |
+| `route_median_duration_minutes` | Route median duration |
+| `volatility_index`            | Volatility metric      |
+| `confidence_level`            | Confidence level       |
+
+### Search intent fields
+
+| Field                | Description        |
+| -------------------- | ------------------- |
+| `min_stay_days`      | Minimum stay days   |
+| `max_stay_days`      | Maximum stay days   |
+| `luggage_requirement`| Luggage requirement |
+| `max_stops`          | Maximum stops       |
 
 ---
 
@@ -58,12 +77,13 @@ Analysis snapshot provides:
 
 For each flight sample, scoring produces:
 
-- final_score (float, 0–100)
+- `final_score` (Float, 0–100)
 - Per-dimension component scores (for explainability)
 
 Scores are:
 
 - Computed on demand
+- Deterministic
 - Not persisted
 - Used only for sorting and explanation
 
@@ -73,11 +93,11 @@ Scores are:
 
 Final score is a weighted combination of three dimensions:
 
-| Dimension             | Weight |
-|-----------------------|--------|
-| Price Score           | 45%    |
+| Dimension            | Weight |
+| -------------------- | ------ |
+| Price Score          | 45%    |
 | Time & Comfort Score  | 35%    |
-| Trip Fit Score        | 20%    |
+| Trip Fit Score       | 20%    |
 
 Weights are constants in MVP.
 
@@ -87,111 +107,99 @@ Weights are constants in MVP.
 
 ### 5.1 Purpose
 
-Measure how attractive a flight's price is relative to the market, not in absolute terms.
+Measure how attractive a flight's price is **relative to the observed market**, not in absolute terms.
 
----
+Inputs
+	•	flight_sample
+	•	price_cents
+	•	analysis_snapshot
+	•	price_p25_cents
+	•	price_p50_cents
+	•	price_p75_cents
+
+Output
+	•	A numeric score (Integer or Float is fine)
+	•	Range: 0–100
 
 ### 5.2 Inputs
 
-- Flight price_cents
-- Market percentiles (p25, p50, p75)
+- `price_cents`
+- `price_p25_cents`
+- `price_p50_cents`
+- `price_p75_cents`
 
----
+### 5.3 Price banding
 
-### 5.3 Price Positioning
+| Price position   | Definition   |
+| ---------------- | ------------ |
+| `cheap`          | ≤ p25        |
+| `below_median`   | p25 – p50    |
+| `above_median`   | p50 – p75    |
+| `expensive`     | ≥ p75        |
 
-Define price band:
+### 5.4 Score mapping
 
-- ≤ p25 → cheap
-- p25–p50 → below_median
-- p50–p75 → above_median
-- ≥ p75 → expensive
-
----
-
-### 5.4 Price Score Mapping
-
-| Band         | Score |
-|--------------|-------|
-| cheap        | 100   |
-| below_median | 80    |
-| above_median | 50    |
-| expensive    | 20    |
-
----
+| Band           | Score |
+| -------------- | ----- |
+| `cheap`        | 100   |
+| `below_median` | 80    |
+| `above_median` | 50    |
+| `expensive`    | 20    |
 
 ### 5.5 Notes
 
 - No smoothing in MVP
-- No airline-specific normalization
-- Extreme outliers are scored normally
+- No airline normalization
+- Outliers are scored normally
 
 ---
 
 ## 6. Dimension 2 — Time & Comfort Score
 
-This dimension balances convenience and fatigue.
-
----
+This dimension balances simplicity and fatigue.
 
 ### 6.1 Subcomponents
 
-Time & Comfort Score is composed of:
-
 | Component       | Weight |
-|-----------------|--------|
+| --------------- | ------ |
 | Stops Score     | 60%    |
 | Duration Score  | 40%    |
 
----
-
-### 6.2 Stops Score
-
-Stops score reflects itinerary simplicity.
+### 6.2 Stops score
 
 | Stops | Score |
-|-------|-------|
+| ----- | ----- |
 | 0     | 100   |
 | 1     | 80    |
 | 2     | 50    |
 | ≥3    | 20    |
 
-Max stops allowed by SearchIntent are enforced earlier.
+Hard `max_stops` enforcement occurs earlier.
 
----
+### 6.3 Duration score
 
-### 6.3 Duration Score
-
-Duration score is relative, not absolute.
-
-**Step 1 — Effective Duration**
+**Step 1 — Effective duration**
 
 ```
-effective_duration = air_time_minutes +(layover_time_minutes * layover_penalty)
+effective_duration = air_time_minutes + (layover_time_minutes × 1.3)
 ```
 
-Where:
-
-- layover_penalty = 1.3
-
-**Step 2 — Relative Duration**
+**Step 2 — Relative duration**
 
 ```
-relative_duration = effective_duration / route_median_duration
+relative_duration = effective_duration / route_median_duration_minutes
 ```
 
-**Step 3 — Duration Score Mapping**
+**Step 3 — Score mapping**
 
-| Relative Duration | Score |
-|-------------------|-------|
+| Relative duration | Score |
+| ----------------- | ----- |
 | ≤ 0.9             | 100   |
-| 0.9~1.1           | 80    |
-| 1.1~1.3           | 50    |
+| 0.9 – 1.1         | 80    |
+| 1.1 – 1.3         | 50    |
 | > 1.3             | 20    |
 
----
-
-### 6.4 Final Time & Comfort Score
+### 6.4 Final time & comfort score
 
 ```
 time_comfort_score = (stops_score × 0.6) + (duration_score × 0.4)
@@ -201,131 +209,191 @@ time_comfort_score = (stops_score × 0.6) + (duration_score × 0.4)
 
 ## 7. Dimension 3 — Trip Fit Score
 
-### 7.1 Purpose
+### 7.1 What trip fit is (and is not)
 
-Trip Fit evaluates how well the flight aligns with flexible, long-stay travel.
+**Trip Fit is:**
 
-This is intentionally simple in MVP.
+- A measure of how well a flight matches the **intent of the trip**
+- A guardrail against useless results
+- A light personalization layer
+
+**Trip Fit is not:**
+
+- Preference-learning AI
+- A replacement for hard filters
+- A place to be clever
+
+Hard constraints always win. Trip Fit applies **only after constraints pass**.
+
+### 7.2 Core components (MVP)
+
+Trip Fit is composed of:
+
+1. Trip Length Fit (most important)
+2. Luggage Fit
+3. Departure / Arrival Time Fit
+4. Stay Pattern Fit (nomads only, bonus)
+
+Each component returns a score between **0.0 and 1.0**.
+
+### 7.3 Component 1 — Trip length fit
+
+**Purpose:** Evaluate alignment between actual stay length and user intent.
+
+**Definitions:**
+
+```
+L_min = min_stay_days
+L_max = max_stay_days
+L_mid = (L_min + L_max) / 2
+```
+
+**Scoring shape (non-linear):**
+
+| Stay length position        | Fit      |
+| --------------------------- | -------- |
+| Exactly L_mid                | 1.0      |
+| Within ±20% of range        | 0.9      |
+| Near L_min or L_max         | 0.7      |
+| Slightly outside (±2–3 days)| 0.4      |
+| Far outside                 | 0.0 (discard) |
+
+### 7.4 Component 2 — Luggage fit (strict)
+
+| Condition              | Luggage included | Luggage not included |
+| ---------------------- | ---------------- | -------------------- |
+| Luggage required        | 1.0              | 0.0 (discard)         |
+| Luggage optional        | 1.0              | 0.8                  |
+
+Luggage cost is never hidden inside price.
+
+### 7.5 Component 3 — Departure / arrival time fit
+
+**Reasonable windows (defaults):**
+
+- Departure: 06:00–22:00
+- Arrival: 07:00–23:00
+
+**Scoring:**
+
+| Situation                  | Fit   |
+| -------------------------- | ----- |
+| Both within window         | 1.0   |
+| One slightly outside       | 0.85  |
+| Red-eye or very late arrival | 0.6 |
+| Multiple bad timings       | 0.4   |
+
+### 7.6 Component 4 — Stay pattern fit (nomads only)
+
+Soft bonus only.
+
+**Examples:**
+
+- Monthly-aligned stays (30 / 60 / 90 days)
+- Return near month end
+
+**Scoring:**
+
+- Pattern match → +0.1
+- No match → neutral
+
+Never a penalty.
+
+### 7.7 Trip fit combination
+
+```
+trip_fit_score = (length_fit × 0.5) + (luggage_fit × 0.3) + (time_fit × 0.2)
+trip_fit_score += stay_pattern_bonus  # if applicable
+```
+
+Normalized to 0–100 when combined into final score.
 
 ---
 
-### 7.2 Inputs
-
-- Luggage inclusion
-- Arrival & departure timing
-- Stay length alignment
-
----
-
-### 7.3 Subcomponents
-
-| Factor                        | Score Impact |
-|-------------------------------|--------------|
-| Luggage included              | +20          |
-| Reasonable arrival time       | +10          |
-| Stay length near midpoint     | +10          |
-
-Max Trip Fit Score: 40
-
----
-
-### 7.4 Normalization
-
-Trip Fit Score is normalized to 0–100.
-
----
-
-## 8. Final Score Calculation
+## 8. Final score calculation
 
 ```
 final_score = (price_score × 0.45) + (time_comfort_score × 0.35) + (trip_fit_score × 0.20)
 ```
 
-Final scores are capped between 0 and 100.
+Scores are capped between 0 and 100.
 
 ---
 
-## 9. Confidence Interaction
+## 9. Confidence interaction
 
-Confidence does not change scores.
+Confidence does not modify scores.
 
 Confidence affects:
 
-- How results are labeled
-- Whether strong recommendations are shown
+- Messaging tone
+- Strength of recommendations
 
 Low confidence → neutral language only.
 
 ---
 
-## 10. Sorting Rules
+## 10. Sorting rules
 
 Flights are sorted by:
 
-1. final_score DESC
-2. price_cents ASC (tie-breaker)
-3. stops ASC
+1. `final_score` DESC
+2. `price_cents` ASC
+3. `stops` ASC
 
 ---
 
-## 11. What Scoring Must NOT Do
+## 11. What scoring must NOT do
 
-- 🚫 Persist scores
-- 🚫 Filter out flights
-- 🚫 Generate booking advice
-- 🚫 Override confidence
-- 🚫 Mutate data
-
-Scoring ranks only.
+- Persist scores
+- Filter flights
+- Enforce constraints
+- Generate advice
+- Mutate input data
 
 ---
 
-## 12. Determinism
+## 12. Determinism guarantee
 
-Given the same inputs:
+Given identical inputs:
 
 - Scores must be identical
-- No randomness is allowed
+- Ordering must be identical
+- No randomness allowed
 
 ---
 
-## 13. Domain Objects (To Be Implemented)
+## 13. Domain objects
 
-Scoring logic will live in:
+| Object                          | Purpose              |
+| -------------------------------- | -------------------- |
+| `Search::Scoring::PriceScore`    | Price dimension      |
+| `Search::Scoring::TimeComfortScore` | Time & comfort    |
+| `Search::Scoring::TripFit`       | Trip fit dimension    |
+| `Search::Scoring::FinalScore`    | Final weighted score |
 
-```
-Search::Scoring::PriceScore
-Search::Scoring::TimeComfortScore
-Search::Scoring::TripFitScore
-Search::Scoring::FinalScore
-```
+All objects:
 
-Each object:
-
-- Accepts plain Ruby input
-- Returns numeric scores
-- Has no Rails dependencies
+- Plain Ruby
+- No Rails dependencies
+- No persistence
 
 ---
 
-## 14. Future (Explicitly Out of Scope)
+## 14. Future (explicitly out of scope)
 
 - Personalized weights
 - Learning-based ranking
 - Airline preferences
-- User profile adjustments
+- User profile modeling
 
 ---
 
-## 15. Cursor Instruction
+## 15. Cursor instruction
 
-When implementing scoring logic:
+When implementing scoring:
 
 - Follow this document strictly
-- Do not invent new factors
+- Do not invent factors
 - Do not persist results
 - Ask if unclear
-
----
-
-End of document.

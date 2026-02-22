@@ -22,6 +22,7 @@ This application follows a **Modular Monolith** architecture with a **rich domai
 - Persistence is an implementation detail
 - Deterministic, testable business logic
 - No "smart" ActiveRecord models
+- Domain logic operates on **domain representations**, not AR models
 
 ---
 
@@ -32,6 +33,11 @@ app/
 ├── domain/
 │   └── search/
 │       ├── search_run.rb
+│       │
+│       ├── models/                # Domain read models (NOT ActiveRecord)
+│       │   ├── flight_sample.rb
+│       │   └── search_intent.rb
+│       │
 │       ├── sampling/
 │       ├── scoring/
 │       ├── factories/
@@ -55,14 +61,39 @@ app/
 - No ActiveRecord
 - No database access
 - No callbacks
-- No side effects outside explicit collaborators
-- May raise domain errors
+- No implicit side effects
+- Deterministic and synchronous
+- Operates on **domain-owned representations**
+
+**Includes:**
+
+- Core domain entities
+- Scoring and sampling logic
+- Domain read models (projections of persisted data)
 
 **Examples:**
 
 - `Search::SearchRun`
-- `Search::Sampling::*`
 - `Search::Scoring::*`
+- `Search::Models::FlightSample`
+- `Search::Models::SearchIntent`
+
+---
+
+### Domain Read Models (`app/domain/**/models`)
+
+Domain read models are **read-only representations** of persisted data, shaped for business logic.
+
+They:
+
+- Wrap ActiveRecord models or hashes
+- Expose domain semantics (e.g. `stay_length_days`)
+- Hide persistence concerns
+- Contain **no validations**
+- Contain **no persistence logic**
+- Are safe to use inside scoring and decision logic
+
+They are **not** ActiveRecord models.
 
 ---
 
@@ -102,6 +133,9 @@ Search::Mappers::SearchRunMapper.apply
 Persist FlightSamples
 ```
 
+**Note:**  
+Scoring and decision logic operate on **domain read models**, not on ActiveRecord instances.
+
 ---
 
 ## 5. Repositories
@@ -117,10 +151,7 @@ Repositories are the **only place** where:
 - Repositories may call domain objects
 - Domain objects must never call repositories
 - Repositories translate domain state → database state
-
-**Example:**
-
-- `Search::Repositories::SearchRunRepository`
+- Repositories may construct domain read models
 
 ---
 
@@ -129,7 +160,7 @@ Repositories are the **only place** where:
 ### Factories
 
 - One-way
-- Create **domain objects from persistence**
+- Create **domain objects and domain read models** from persistence
 - Never mutate ActiveRecord objects
 
 **Example:**
