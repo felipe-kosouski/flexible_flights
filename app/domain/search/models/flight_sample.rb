@@ -10,16 +10,34 @@ module Search
         departure_datetime:,
         return_datetime:,
         luggage_included:,
-        price_cents: nil
+        price_cents: nil,
+        stops: nil,
+        air_time_minutes: nil,
+        layover_time_minutes: nil
       )
-        @departure_datetime = departure_datetime
-        @return_datetime   = return_datetime
-        @luggage_included  = luggage_included
-        @price_cents       = price_cents
+        @departure_datetime  = departure_datetime
+        @return_datetime     = return_datetime
+        @luggage_included    = luggage_included
+        @price_cents         = price_cents
+        @stops               = stops
+        @air_time_minutes    = air_time_minutes
+        @layover_time_minutes = layover_time_minutes
       end
 
       def price_cents
         @price_cents
+      end
+
+      def stops
+        @stops
+      end
+
+      def air_time_minutes
+        @air_time_minutes
+      end
+
+      def layover_time_minutes
+        @layover_time_minutes
       end
 
       def luggage_included?
