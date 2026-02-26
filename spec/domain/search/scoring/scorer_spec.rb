@@ -1,87 +1,34 @@
-# # frozen_string_literal: true
+# frozen_string_literal: true
 
-# RSpec.describe Search::Scoring::Scorer do
-#   subject(:scorer) { described_class.new(samples) }
+require "rails_helper"
 
-#   let(:samples) do
-#     [
-#       {
-#         price_cents: 100_000,
-#         air_time_minutes: 600,
-#         layover_time_minutes: 120,
-#         stops_count: 1,
-#         baggage_included: true
-#       },
-#       {
-#         price_cents: 80_000,
-#         air_time_minutes: 900,
-#         layover_time_minutes: 300,
-#         stops_count: 2,
-#         baggage_included: false
-#       }
-#     ]
-#   end
+RSpec.describe Search::Scoring::Scorer do
+  let(:flight)   { instance_double("Search::Models::FlightSample") }
+  let(:intent)   { instance_double("Search::Models::SearchIntent") }
+  let(:snapshot) { instance_double("Search::Models::AnalysisSnapshot") }
+  let(:final_score_result) { 72.5 }
 
-#   describe "#score" do
-#     it "returns a score for each sample" do
-#       results = scorer.score
+  subject(:scorer) { described_class.new(flight: flight, intent: intent, snapshot: snapshot) }
 
-#       expect(results.size).to eq(2)
-#       expect(results.first).to include(:score)
-#     end
+  before do
+    final_score_instance = instance_double(Search::Scoring::FinalScore, call: final_score_result)
+    allow(Search::Scoring::FinalScore)
+      .to receive(:new)
+      .with(flight: flight, intent: intent, snapshot: snapshot)
+      .and_return(final_score_instance)
+  end
 
-#     it "returns numeric scores" do
-#       results = scorer.score
+  describe "#call" do
+    it "delegates to FinalScore and returns its result" do
+      expect(scorer.call).to eq(final_score_result)
+    end
 
-#       expect(results.map { |r| r[:score] }).to all(be_a(Numeric))
-#     end
+    it "passes nil through when FinalScore returns nil" do
+      allow(Search::Scoring::FinalScore)
+        .to receive(:new)
+        .and_return(instance_double(Search::Scoring::FinalScore, call: nil))
 
-#     it "does not mutate input samples" do
-#       original = Marshal.load(Marshal.dump(samples))
-
-#       scorer.score
-
-#       expect(samples).to eq(original)
-#     end
-#   end
-
-#   describe "relative scoring" do
-#     it "gives better score to cheaper flights" do
-#       results = scorer.score
-
-#       cheaper = results.find { |r| r[:price_cents] == 80_000 }
-#       expensive = results.find { |r| r[:price_cents] == 100_000 }
-
-#       expect(cheaper[:score]).to be > expensive[:score]
-#     end
-
-#     it "penalizes longer total travel time" do
-#       results = scorer.score
-
-#       shorter = results.find { |r| r[:air_time_minutes] == 600 }
-#       longer = results.find { |r| r[:air_time_minutes] == 900 }
-
-#       expect(shorter[:score]).to be > longer[:score]
-#     end
-#   end
-
-#   describe "stops and baggage penalties" do
-#     it "penalizes flights with more stops" do
-#       results = scorer.score
-
-#       fewer_stops = results.find { |r| r[:stops_count] == 1 }
-#       more_stops = results.find { |r| r[:stops_count] == 2 }
-
-#       expect(fewer_stops[:score]).to be > more_stops[:score]
-#     end
-
-#     it "penalizes missing baggage" do
-#       results = scorer.score
-
-#       with_baggage = results.find { |r| r[:baggage_included] }
-#       without_baggage = results.find { |r| !r[:baggage_included] }
-
-#       expect(with_baggage[:score]).to be > without_baggage[:score]
-#     end
-#   end
-# end
+      expect(scorer.call).to be_nil
+    end
+  end
+end

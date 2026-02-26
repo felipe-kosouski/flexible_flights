@@ -1,9 +1,11 @@
-# 📄 Domain Spec — Analysis & Market Stats (MVP)
+# 📄 Domain Spec — Analysis Snapshot (MVP)
 
 **Governing documents:**
 
 - PRODUCT_GUIDE.md
 - PRD.md — Smart Search Execution
+- Architecture.md
+- Scoring Domain Spec
 
 If conflicts exist, higher-level documents prevail.
 
@@ -11,275 +13,212 @@ If conflicts exist, higher-level documents prevail.
 
 ## 1. Purpose
 
-Analysis is responsible for deriving market context from sampled flight data so that:
+Analysis derives **market context** from sampled flight data.
 
-- Prices can be interpreted (cheap vs normal vs expensive)
-- Recommendations are confidence-aware
-- Insights are explainable in plain language
+It exists to answer questions such as:
+- “Is this price cheap or expensive for this route?”
+- “What is a typical duration?”
+- “How reliable is this comparison?”
 
-Analysis does not:
-
-- Rank flights
-- Select "best" options
-- Decide booking actions
-
-It produces facts, not opinions.
+Analysis produces **facts**, not recommendations.
 
 ---
 
-## 2. Inputs
+## 2. Responsibilities
+
+Analysis MUST:
+
+- Aggregate statistics from flight samples
+- Produce a single immutable AnalysisSnapshot
+- Be deterministic and explainable
+- Be reusable by scoring and presentation layers
+
+Analysis MUST NOT:
+
+- Rank or score flights
+- Filter results
+- Persist data
+- Perform I/O
+- Depend on Rails or ActiveRecord
+- Know about SearchRun orchestration
+
+---
+
+## 3. Inputs
 
 Analysis receives:
 
-- A completed SearchRun
-- A collection of flight_samples associated with the run
+- A collection of FlightSample domain objects
 
-Each sample contains:
+Each sample may expose:
+- price_cents
+- air_time_minutes
+- layover_time_minutes
+- stops
 
-- Price
-- Duration
-- Stops
-- Airlines
-- Dates
-
----
-
-## 3. Outputs
-
-Analysis produces exactly one analysis_snapshot containing:
-
-- Price percentiles
-- Route median duration
-- Volatility index
-- Sample size
-- Confidence level
-
-No per-flight scores are persisted.
+Invalid or incomplete samples may be ignored.
 
 ---
 
-## 4. Pre-Conditions
+## 4. Output — AnalysisSnapshot
 
-Analysis may run if:
+Analysis produces **one** snapshot object: 
+```
+Search::Models::AnalysisSnapshot
+```
 
-- At least 1 flight_sample exists
+### Snapshot Attributes (MVP)
 
-Analysis does not fail due to insufficient data.
-Insufficient data is reflected in confidence, not errors.
+- price_p25_cents
+- price_p50_cents
+- price_p75_cents
+- route_median_duration_minutes
+- sample_count
+- volatility (:low, :medium, :high)
+- confidence (:low, :medium, :high)
 
----
-
-## 5. Market Price Statistics
-
-### 5.1 Price Set Definition
-
-- Prices are taken from price_cents
-- Currency normalization must already have occurred
-- Invalid or zero prices must be ignored
-
----
-
-### 5.2 Percentile Calculations
-
-Compute:
-
-- p25 — 25th percentile
-- p50 — 50th percentile (median)
-- p75 — 75th percentile
-
-**Rules:**
-
-- Percentiles are computed across all samples
-- No date segmentation in MVP
-- Use deterministic percentile logic
+The snapshot is:
+- Immutable
+- Serializable
+- Passed into scoring components
 
 ---
 
-### 5.3 Interpretation Bands
-
-Percentiles are used later to classify prices:
-
-- ≤ p25 → cheap
-- p25–p75 → normal
-- ≥ p75 → expensive
-
-Classification itself is not stored here.
-
----
-
-## 6. Route Duration Statistics
-
-### 6.1 Duration Definition
+## 5. Effective Duration Definition
 
 Effective duration is defined as:
 
 ```
-effective_duration_minutes = air_time_minutes + (layover_time_minutes * layover_penalty)
+effective_duration_minutes = air_time_minutes + (layover_time_minutes × layover_penalty)
 ```
 
 Where:
-
 - layover_penalty = 1.3 (MVP constant)
 
----
-
-### 6.2 Route Median Duration
-
-- Compute the median effective duration across all samples
-- Store as route_median_duration_minutes
-
-This value is used later for comfort scoring and explainability.
+This definition must be consistent with TimeComfortScore.
 
 ---
 
-## 7. Volatility Index
+## 6. Price Statistics
 
-### 7.1 Purpose
+### 6.1 Price Set Rules
 
-Volatility measures price dispersion, not price level.
+- Use price_cents
+- Ignore missing or zero prices
+- Sort prices ascending
+- No currency normalization occurs here
 
 ---
 
-### 7.2 Calculation (MVP)
+### 6.2 Percentiles
 
-Volatility index is defined as:
+Compute:
+- 25th percentile (p25)
+- 50th percentile (median)
+- 75th percentile (p75)
 
+Rules:
+- Deterministic, rank-based selection
+- No interpolation
+- Works with small sample sizes
+
+---
+
+## 7. Duration Statistics
+
+- Compute effective duration per valid sample
+- Use the median effective duration
+- Ignore samples missing duration data
+
+---
+
+## 8. Volatility (MVP)
+
+Volatility reflects **price dispersion**, not price level.
+
+Calculation:
 ```
-volatility_index = (p75 - p25) / p50
+spread_ratio = (p75 - p25) / p50
 ```
 
-**Rules:**
+Mapping:
 
-- If p50 == 0 → volatility_index = 0
-- Values typically range from 0.1 to 0.6
-- Higher = less stable market
-
----
-
-## 8. Sample Size
-
-- sample_size = number of valid flight samples
-- Stored explicitly for explainability
+| Spread Ratio | Volatility |
+|-------------|------------|
+| ≤ 0.20 | :low |
+| 0.20–0.40 | :medium |
+| > 0.40 | :high |
 
 ---
 
-## 9. Confidence Level
+## 9. Confidence Level (MVP)
 
-Analysis computes inputs to confidence, not final advice.
+Confidence reflects **data reliability**, not advice.
 
-Confidence is categorized as:
+Rules:
 
-- low
-- medium
-- high
+| Condition | Confidence |
+|----------|------------|
+| sample_count < 10 | :low |
+| volatility == :high | :low |
+| sample_count ≥ 20 AND volatility == :low | :high |
+| otherwise | :medium |
 
----
-
-### 9.1 Confidence Factors
-
-Factors considered:
-
-| Factor         | Measurement              |
-|----------------|--------------------------|
-| Sample size    | Count of samples         |
-| Date coverage  | Derived from sampling    |
-| Volatility     | volatility_index         |
-| Freshness      | search_run.data_fresh_until |
+Confidence does not affect scoring weights directly.
 
 ---
 
-### 9.2 MVP Confidence Rules
+## 10. Failure Semantics
 
-Use the lowest dominating factor.
+Analysis returns `nil` when:
+- No valid prices exist
+- No valid durations exist
+- Sample list is empty
 
-Suggested thresholds (MVP):
-
-- **Low confidence** if any:
-  - sample_size < 15
-  - volatility_index > 0.5
-  - data freshness expired
-- **High confidence** if all:
-  - sample_size ≥ 30
-  - volatility_index < 0.3
-  - data is fresh
-- **Medium confidence** otherwise
-
-Thresholds may be adjusted later.
+These are **non-exceptional outcomes**.
 
 ---
 
-## 10. What Analysis Must NOT Do
+## 11. Determinism
 
-- 🚫 Rank flights
-- 🚫 Score flights
-- 🚫 Generate recommendations
-- 🚫 Produce user-facing language
-- 🚫 Mutate flight_samples
-
-Analysis produces neutral aggregates only.
-
----
-
-## 11. Failure Handling
-
-Analysis fails only if:
-
-- System-level error occurs
-
-If analysis fails:
-
-- SearchRun is marked failed
-- No partial snapshot is saved
-
----
-
-## 12. Determinism
-
-Given the same flight samples:
-
-- Analysis results must be deterministic
+Given the same inputs:
+- Snapshot results must be identical
 - No randomness is allowed
 
-This is critical for debugging and trust.
+---
+
+## 12. Domain Objects
+
+### Snapshot Builder
+```
+Search::Analysis::SnapshotBuilder
+```
+
+- Accepts flight samples
+- Filters invalid data
+- Computes snapshot
+- Returns AnalysisSnapshot or nil
 
 ---
 
-## 13. Domain Objects (To Be Implemented)
-
-Analysis logic will live in:
-
+### Snapshot Model
 ```
-Search::Analysis::MarketStats
-Search::Analysis::DurationStats
-Search::Analysis::Volatility
-Confidence::Evaluator
+Search::Models::AnalysisSnapshot
 ```
 
-Each object:
-
-- Accepts plain Ruby data
-- Returns plain Ruby values
-- Has no Rails dependencies
+- Holds computed values only
+- Enforces immutability
+- No business logic
 
 ---
 
-## 14. Future (Explicitly Out of Scope)
+## 13. Explicit Non-Goals (MVP)
 
-- Time-series price trends
-- Seasonal modeling
-- Airline-specific normalization
+- Seasonality
+- Trends
+- Airline normalization
 - Historical comparisons
-
----
-
-## 15. Cursor Instruction
-
-When implementing analysis logic:
-
-- Follow this document strictly
-- Do not infer user intent
-- Do not generate recommendations
-- Ask if unclear
+- ML or learning
 
 ---
 
