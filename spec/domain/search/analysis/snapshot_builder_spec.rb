@@ -3,10 +3,6 @@
 require "rails_helper"
 
 RSpec.describe Search::Analysis::SnapshotBuilder do
-  # --------------------------------------------------------------------------
-  # Helpers
-  # --------------------------------------------------------------------------
-
   let(:base_datetime) { Time.zone.parse("2026-06-01 10:00") }
 
   def build_sample(price_cents: 10_000, air_time_minutes: 120, layover_time_minutes: 30)
@@ -20,10 +16,6 @@ RSpec.describe Search::Analysis::SnapshotBuilder do
       layover_time_minutes: layover_time_minutes
     )
   end
-
-  # --------------------------------------------------------------------------
-  # Failure semantics — nil returns
-  # --------------------------------------------------------------------------
 
   describe ".build" do
     context "when the sample list is empty" do
@@ -75,10 +67,6 @@ RSpec.describe Search::Analysis::SnapshotBuilder do
     end
   end
 
-  # --------------------------------------------------------------------------
-  # Price percentiles
-  # --------------------------------------------------------------------------
-
   describe "price percentile calculation" do
     # Four prices: [2_000, 4_000, 6_000, 8_000] (sorted ascending)
     # Indices 0..3; n-1 = 3
@@ -86,7 +74,7 @@ RSpec.describe Search::Analysis::SnapshotBuilder do
     # p50 = floor(0.50 * 3) = 1 → 4_000
     # p75 = floor(0.75 * 3) = 2 → 6_000
     let(:samples) do
-      [8_000, 2_000, 6_000, 4_000].map { |p| build_sample(price_cents: p) }
+      [ 8_000, 2_000, 6_000, 4_000 ].map { |p| build_sample(price_cents: p) }
     end
 
     subject(:snapshot) { described_class.build(samples) }
@@ -104,7 +92,7 @@ RSpec.describe Search::Analysis::SnapshotBuilder do
     end
 
     context "with a single valid price" do
-      let(:samples) { [build_sample(price_cents: 5_000)] }
+      let(:samples) { [ build_sample(price_cents: 5_000) ] }
 
       it "returns that single price for all three percentiles" do
         expect(snapshot.price_p25_cents).to eq(5_000)
@@ -130,10 +118,6 @@ RSpec.describe Search::Analysis::SnapshotBuilder do
     end
   end
 
-  # --------------------------------------------------------------------------
-  # Duration median (effective duration formula)
-  # --------------------------------------------------------------------------
-
   describe "route_median_duration_minutes" do
     # effective = air + (layover * 1.3)
     # Sample A: 100 + (20 * 1.3) = 126
@@ -154,15 +138,11 @@ RSpec.describe Search::Analysis::SnapshotBuilder do
     end
 
     it "ignores samples with missing duration data" do
-      samples_with_gaps = samples + [build_sample(air_time_minutes: nil)]
+      samples_with_gaps = samples + [ build_sample(air_time_minutes: nil) ]
       snapshot = described_class.build(samples_with_gaps)
       expect(snapshot.route_median_duration_minutes).to eq(252.0)
     end
   end
-
-  # --------------------------------------------------------------------------
-  # Sample count
-  # --------------------------------------------------------------------------
 
   describe "sample_count" do
     it "equals the total number of samples passed in, not just those with valid data" do
@@ -176,16 +156,12 @@ RSpec.describe Search::Analysis::SnapshotBuilder do
     end
   end
 
-  # --------------------------------------------------------------------------
-  # Volatility mapping
-  # --------------------------------------------------------------------------
-
   describe "volatility" do
     # Builds 5-sample sets with controlled prices to drive specific spread ratios.
     # For [p25_val, p50_val, p75_val] we need a sorted 5-element array where:
     #   index 1 = p25, index 2 = p50, index 3 = p75
     def samples_for_prices(a, b, c, d, e)
-      [a, b, c, d, e].map { |p| build_sample(price_cents: p) }
+      [ a, b, c, d, e ].map { |p| build_sample(price_cents: p) }
     end
 
     context "when spread_ratio ≤ 0.20" do
@@ -213,16 +189,12 @@ RSpec.describe Search::Analysis::SnapshotBuilder do
     end
   end
 
-  # --------------------------------------------------------------------------
-  # Confidence mapping
-  # --------------------------------------------------------------------------
-
   describe "confidence" do
     # Use prices with a tight spread (→ :low volatility) by default.
     # [900, 950, 1000, 1050, 1100] gives volatility :low.
-    let(:low_vol_prices) { [900, 950, 1_000, 1_050, 1_100] }
+    let(:low_vol_prices) { [ 900, 950, 1_000, 1_050, 1_100 ] }
     # [500, 700, 1000, 1500, 2000] gives volatility :high.
-    let(:high_vol_prices) { [500, 700, 1_000, 1_500, 2_000] }
+    let(:high_vol_prices) { [ 500, 700, 1_000, 1_500, 2_000 ] }
 
     def make_samples(prices, count)
       cycle = prices.cycle
@@ -258,7 +230,7 @@ RSpec.describe Search::Analysis::SnapshotBuilder do
       # n=12 → p25=index 2=800, p50=index 5=1000, p75=index 8=1200
       # spread = (1200-800)/1000 = 0.40 → :medium volatility
       let(:samples) do
-        [500, 600, 800, 900, 1_000, 1_000, 1_100, 1_200, 1_200, 1_300, 1_400, 1_500]
+        [ 500, 600, 800, 900, 1_000, 1_000, 1_100, 1_200, 1_200, 1_300, 1_400, 1_500 ]
           .map { |p| build_sample(price_cents: p) }
       end
 
@@ -266,13 +238,9 @@ RSpec.describe Search::Analysis::SnapshotBuilder do
     end
   end
 
-  # --------------------------------------------------------------------------
-  # Determinism
-  # --------------------------------------------------------------------------
-
   describe "determinism" do
     let(:samples) do
-      [8_000, 2_000, 6_000, 4_000].map { |p| build_sample(price_cents: p) }
+      [ 8_000, 2_000, 6_000, 4_000 ].map { |p| build_sample(price_cents: p) }
     end
 
     it "returns identical snapshots for the same inputs on repeated calls" do
