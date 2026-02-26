@@ -15,6 +15,7 @@ RSpec.describe Search::SearchRun do
   let(:provider) { double("Provider") }
 
   let(:runner) { class_double(Search::Sampling::Runner) }
+  let(:snapshot_builder) { class_double(Search::Analysis::SnapshotBuilder) }
 
   let(:search_run) do
     described_class.new(
@@ -33,6 +34,21 @@ RSpec.describe Search::SearchRun do
 
   before do
     stub_const("Search::Sampling::Runner", runner)
+    stub_const("Search::Analysis::SnapshotBuilder", snapshot_builder)
+    allow(snapshot_builder).to receive(:build).and_return(instance_double(Search::Models::AnalysisSnapshot))
+  end
+
+  describe "PHASES" do
+    it "declares the full ordered lifecycle" do
+      expect(described_class::PHASES).to eq(%i[
+        initialized
+        sampling
+        analyzing
+        scoring
+        completed
+        failed
+      ])
+    end
   end
 
   describe "initial state" do
@@ -52,6 +68,10 @@ RSpec.describe Search::SearchRun do
     it "has empty results" do
       expect(search_run.results).to eq([])
     end
+
+    it "has no analysis snapshot" do
+      expect(search_run.analysis_snapshot).to be_nil
+    end
   end
 
   describe "#execute — happy path" do
@@ -66,7 +86,7 @@ RSpec.describe Search::SearchRun do
       allow(runner).to receive(:call).and_return(samples)
     end
 
-    it "transitions state from initialized → sampling → completed" do
+    it "transitions state through sampling and analysis to completed" do
       search_run.execute
 
       expect(search_run.state).to eq(:completed)
@@ -162,6 +182,41 @@ RSpec.describe Search::SearchRun do
 
     it "re-raises the exception" do
       expect { search_run.execute }.to raise_error(StandardError, "sampling failed")
+    end
+  end
+
+  describe "#execute — nil analysis (insufficient data)" do
+    let(:samples) do
+      [
+        { price_cents: 10_000, departure_date: earliest_departure_date }
+      ]
+    end
+
+    before do
+      allow(runner).to receive(:call).and_return(samples)
+      allow(snapshot_builder).to receive(:build).and_return(nil)
+    end
+
+    it "completes successfully when analysis cannot be built" do
+      expect { search_run.execute }.not_to raise_error
+    end
+
+    it "sets state to completed" do
+      search_run.execute
+
+      expect(search_run.state).to eq(:completed)
+    end
+
+    it "preserves results" do
+      search_run.execute
+
+      expect(search_run.results).to eq(samples)
+    end
+
+    it "leaves analysis_snapshot as nil" do
+      search_run.execute
+
+      expect(search_run.analysis_snapshot).to be_nil
     end
   end
 

@@ -2,7 +2,16 @@
 
 module Search
   class SearchRun
-    attr_reader :state, :started_at, :finished_at, :error, :results
+    PHASES = %i[
+      initialized
+      sampling
+      analyzing
+      scoring
+      completed
+      failed
+    ].freeze
+
+    attr_reader :state, :started_at, :finished_at, :error, :results, :analysis_snapshot
 
     def initialize(
       origin:,
@@ -32,6 +41,7 @@ module Search
       @finished_at = nil
       @error = nil
       @results = []
+      @analysis_snapshot = nil
     end
 
     def execute
@@ -53,6 +63,9 @@ module Search
           cabin_class: @cabin_class,
           provider: @provider
         )
+
+        @state = :analyzing
+        @analysis_snapshot = Analysis::SnapshotBuilder.build(@results)
 
         @finished_at = now
         @state = :completed
@@ -76,5 +89,13 @@ module Search
     def now
       Time.now
     end
+    # TODO: Time source should be injectable
+    # def initialize(..., clock: Time)
+    #   @clock = clock
+    # end
+    #
+    # def now
+    #  @clock.now
+    # end
   end
 end
