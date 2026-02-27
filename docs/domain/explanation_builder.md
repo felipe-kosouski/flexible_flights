@@ -140,34 +140,61 @@ Strengths and weaknesses are selected deterministically.
 
 ---
 
-## 8. Tradeoff Detection
+## 8. Thresholds and Constants
 
-### 8.1 Tradeoff Eligibility
+### 8.1 MATERIALITY_THRESHOLD (0.15)
 
-A tradeoff exists when:
-- One dimension is materially above baseline
-- Another dimension is materially below baseline
-- Both dimensions materially affect final score
+A dimension must deviate more than 15% from the market baseline to be considered meaningfully different. This threshold governs:
 
-Baseline definitions come from AnalysisSnapshot.
+- **Tradeoff eligibility**: only dimensions that cross this threshold qualify as a "gain" (deviation < -0.15) or "sacrifice" (deviation > +0.15).
+- **Baseline position tagging**: each score breakdown entry is tagged `:better`, `:worse`, or `:neutral` based on whether the deviation crosses this threshold.
+
+Without this threshold, near-baseline flights would produce noisy explanations.
+
+### 8.2 STRONG_DEVIATION_THRESHOLD (0.35)
+
+Determines tradeoff severity once a tradeoff has been detected:
+
+| Condition | Severity |
+| --- | --- |
+| Both dimensions deviate >= 35% from baseline | `:high` |
+| One dimension deviates >= 35%, the other does not | `:medium` |
+| Neither crosses 35% (but both crossed 15%) | `:low` |
+
+### 8.3 LAYOVER_PENALTY (1.3)
+
+Layover time is inflated by 30% when computing effective travel duration for baseline comparisons:
+
+```
+effective_duration = air_time_minutes + (layover_time_minutes * 1.3)
+```
+
+This reflects that layover time is subjectively worse than flying time.
+
+This constant is intentionally kept in sync with `TimeComfortScore::LAYOVER_PENALTY`. Both must use the same value to ensure the Builder's baseline comparisons agree with scoring's duration calculations.
 
 ---
 
-### 8.2 Tradeoff Severity
+## 9. Tradeoff Detection
 
-Severity mapping (MVP):
+### 9.1 Tradeoff Eligibility
 
-| Condition                        | Severity  |
-| -------------------------------- | --------- |
-| Minor contribution imbalance    | `:low`    |
-| Clear but acceptable compromise | `:medium` |
-| Strong sacrifice for gain       | `:high`   |
+A tradeoff exists when:
+- One dimension deviates below -MATERIALITY_THRESHOLD (a gain)
+- Another dimension deviates above +MATERIALITY_THRESHOLD (a sacrifice)
+- Both dimensions have a recognized tradeoff key (e.g. price vs time_comfort)
+
+Baseline definitions come from AnalysisSnapshot:
+- Price baseline: median price (p50)
+- Duration baseline: median effective duration
+
+### 9.2 Tradeoff Severity
+
+See STRONG_DEVIATION_THRESHOLD rules in Section 8.2.
 
 Severity rules must be deterministic and explicit.
 
----
-
-### 8.3 Tradeoff Output
+### 9.3 Tradeoff Output
 
 Each detected tradeoff MUST include:
 - gained_dimension
@@ -179,17 +206,26 @@ The Builder must not generate human-readable text directly.
 
 ---
 
-## 9. Baseline Interpretation
+## 10. Baseline Interpretation
+
+The Builder computes baseline deviations as:
+
+```
+price_deviation = (flight.price_cents - snapshot.price_p50_cents) / snapshot.price_p50_cents
+duration_deviation = (effective_duration - snapshot.route_median_duration_minutes) / snapshot.route_median_duration_minutes
+```
+
+Negative deviation = better than baseline. Positive deviation = worse than baseline.
 
 The Builder MAY rely on:
 - Price baseline (median price)
 - Duration baseline (median effective duration)
 
 The Builder MUST NOT:
-- Recompute baselines
+- Recompute baselines from raw samples
 - Perform statistical calculations
 
-Scoring components must expose baseline-relative context.
+Baselines originate exclusively from AnalysisSnapshot.
 
 ---
 

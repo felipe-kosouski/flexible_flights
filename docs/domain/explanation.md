@@ -129,9 +129,11 @@ A tradeoff represents a **meaningful compromise** between dimensions.
 ### 7.1 Tradeoff Definition
 
 A tradeoff exists when:
-- One dimension scores significantly above baseline
-- Another dimension scores significantly below baseline
-- Both materially affect the final score
+- One dimension deviates more than 15% below baseline (a gain)
+- Another dimension deviates more than 15% above baseline (a sacrifice)
+- Both dimensions have a recognized tradeoff pair
+
+"Significantly" is defined by `MATERIALITY_THRESHOLD` (0.15). See [Explanation Builder](explanation_builder.md) Section 8 for full threshold definitions.
 
 ---
 
@@ -159,14 +161,17 @@ Example:
 Baselines are derived from AnalysisSnapshot:
 
 - Price baseline: median price (p50)
-- Duration baseline: median effective duration
+- Duration baseline: median effective duration (with layover inflated at 1.3x)
 
-Scoring components are responsible for exposing whether they are:
-- above baseline
-- near baseline
-- below baseline
+Deviation from baseline is computed as a ratio: `(actual - baseline) / baseline`.
+Negative values mean better than the market; positive values mean worse.
 
-Explanation must not recompute baselines.
+The Builder classifies each dimension as:
+- `:better` — deviation below -0.15
+- `:neutral` — deviation between -0.15 and +0.15
+- `:worse` — deviation above +0.15
+
+Explanation must not recompute baselines from raw samples.
 
 ---
 
