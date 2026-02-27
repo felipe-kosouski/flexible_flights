@@ -42,10 +42,10 @@ The Builder depends on the following domain inputs, all of which must be stubbed
 - FlightSample
 - SearchIntent
 - AnalysisSnapshot
-- FinalScore
-- Component scores (e.g. PriceScore, TimeComfortScore, TripFit)
+- ScoreResult (containing final score value and component scores)
 
 No real providers, repositories, or Rails objects are allowed.
+The Builder does not call scoring classes directly — component scores come from the ScoreResult.
 
 ---
 

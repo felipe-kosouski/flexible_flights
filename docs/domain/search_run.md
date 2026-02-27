@@ -71,7 +71,7 @@ The array may be empty.
 A Search Run has one of the following states:
 
 - `initialized`
-- `running`
+- `sampling`
 - `completed`
 - `failed`
 
@@ -80,7 +80,7 @@ A Search Run has one of the following states:
 ### 5.2 Lifecycle Rules (Normative)
 
 1. A newly created Search Run starts in `initialized`
-2. Calling `execute` transitions state to `running`
+2. Calling `execute` transitions state to `sampling`
 3. On successful completion, state becomes `completed`
 4. If any error is raised, state becomes `failed`
 5. A completed or failed run MUST NOT be executed again
@@ -92,13 +92,12 @@ A Search Run has one of the following states:
 When `execute` is called:
 
 1. Record `started_at`
-2. Transition state to `running`
+2. Transition state to `sampling`
 3. Call `Search::Sampling::Runner.call` with stored inputs
-4. Capture returned samples
-5. Persist execution metadata
-6. Record `finished_at`
-7. Transition state to `completed`
-8. Return samples
+4. Capture returned samples in `results`
+5. Record `finished_at`
+6. Transition state to `completed`
+7. Return `self`
 
 If an error occurs at any step:
 
@@ -154,7 +153,6 @@ It delegates all domain logic.
 SearchRun depends on:
 
 - `Search::Sampling::Runner`
-- Persistence layer (e.g., ActiveRecord)
 
 No other collaborators are allowed.
 
@@ -180,11 +178,9 @@ Search::SearchRun
 **Public API**
 
 ```ruby
-def self.create(...)
-end
-
 def execute
-  # returns Array<Hash>
+  # executes sampling, returns self
+  # results accessible via #results reader
 end
 ```
 

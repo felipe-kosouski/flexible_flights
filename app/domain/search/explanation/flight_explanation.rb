@@ -3,13 +3,17 @@
 module Search
   module Explanation
     class FlightExplanation
-      attr_reader :flight, :score_breakdown, :tradeoffs, :summary
+      attr_reader :flight, :final_score, :score_breakdown, :tradeoffs, :summary,
+                  :baselines, :metadata
 
-      def initialize(flight:, score_breakdown:, tradeoffs:, summary:)
+      def initialize(flight:, final_score:, score_breakdown:, tradeoffs:, summary:, baselines:, metadata:)
         @flight = flight
+        @final_score = final_score
         @score_breakdown = deep_freeze(score_breakdown)
         @tradeoffs = deep_freeze(tradeoffs)
         @summary = deep_freeze(summary)
+        @baselines = deep_freeze(baselines)
+        @metadata = deep_freeze(metadata)
         freeze
       end
 

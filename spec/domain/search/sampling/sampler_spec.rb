@@ -11,10 +11,10 @@ RSpec.describe Search::Sampling::Sampler do
       price_cents: 12_500,
       currency: "USD",
       airline_codes: [ "AA" ],
-      stops_count: 1,
+      stops: 1,
       air_time_minutes: 420,
       layover_time_minutes: 90,
-      baggage_included: true,
+      luggage_included: true,
       raw_provider: "test"
     }
   end
@@ -132,8 +132,8 @@ RSpec.describe Search::Sampling::Sampler do
 
         expect(result).to eq([
           valid_sample.merge(
-            departure_date: departure_date,
-            return_date: return_date
+            departure_datetime: departure_date.to_time,
+            return_datetime: return_date.to_time
           )
         ])
       end
@@ -194,9 +194,9 @@ RSpec.describe Search::Sampling::Sampler do
         result = sampler.call
 
         expect(result.map { |s| s[:price_cents] }).to eq([ 100, 200 ])
-        expect(result.map { |s| s[:departure_date] }).to eq([
-          departure_date,
-          departure_date + 1
+        expect(result.map { |s| s[:departure_datetime] }).to eq([
+          departure_date.to_time,
+          (departure_date + 1).to_time
         ])
       end
     end

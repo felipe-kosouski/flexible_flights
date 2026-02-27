@@ -8,7 +8,7 @@ RSpec.describe Search::Explanation::Builder do
       flight: flight,
       intent: intent,
       snapshot: snapshot,
-      final_score: final_score
+      score_result: score_result
     )
   end
 
@@ -44,23 +44,20 @@ RSpec.describe Search::Explanation::Builder do
     )
   end
 
-  let(:final_score) do
-    Search::Scoring::FinalScore.new(flight: flight, intent: intent, snapshot: snapshot)
-  end
-
   let(:price_score_value) { 100 }
   let(:time_comfort_score_value) { 80 }
   let(:trip_fit_score_value) { 75 }
 
-  before do
-    allow(Search::Scoring::PriceScore)
-      .to receive(:call).and_return(price_score_value)
+  let(:components) do
+    { price: price_score_value, time_comfort: time_comfort_score_value, trip_fit: trip_fit_score_value }
+  end
 
-    allow(Search::Scoring::TimeComfortScore)
-      .to receive(:call).and_return(time_comfort_score_value)
+  let(:final_score_value) do
+    (price_score_value * 0.45) + (time_comfort_score_value * 0.35) + (trip_fit_score_value * 0.20)
+  end
 
-    allow(Search::Scoring::TripFit)
-      .to receive(:call).and_return(trip_fit_score_value)
+  let(:score_result) do
+    Search::Scoring::ScoreResult.new(value: final_score_value, components: components)
   end
 
   describe "happy path" do
@@ -77,6 +74,18 @@ RSpec.describe Search::Explanation::Builder do
       expect(result.tradeoffs).to be_an(Array)
       expect(result.summary).to be_a(Hash)
     end
+
+    it "exposes the final score" do
+      expect(result.final_score).to eq(final_score_value)
+    end
+
+    it "does not call scoring classes directly" do
+      expect(Search::Scoring::PriceScore).not_to receive(:call)
+      expect(Search::Scoring::TimeComfortScore).not_to receive(:call)
+      expect(Search::Scoring::TripFit).not_to receive(:call)
+
+      result
+    end
   end
 
   describe "score breakdown" do
@@ -85,7 +94,7 @@ RSpec.describe Search::Explanation::Builder do
     end
 
     it "includes all required fields in each entry" do
-      required_keys = %i[dimension raw_score normalized_score weight weighted_contribution]
+      required_keys = %i[dimension raw_score normalized_score weight weighted_contribution relative_to_baseline]
 
       result.score_breakdown.each do |entry|
         expect(entry.keys).to include(*required_keys)
@@ -111,19 +120,15 @@ RSpec.describe Search::Explanation::Builder do
     end
 
     it "has a sum of weighted_contributions matching expected final score" do
-      expected = (price_score_value * 0.45) +
-                 (time_comfort_score_value * 0.35) +
-                 (trip_fit_score_value * 0.20)
-
       actual_sum = result.score_breakdown.sum { |e| e[:weighted_contribution] }
-      expect(actual_sum).to be_within(0.0001).of(expected)
+      expect(actual_sum).to be_within(0.0001).of(final_score_value)
     end
 
     it "orders entries deterministically" do
       dimensions_a = result.score_breakdown.map { |e| e[:dimension] }
 
       second_result = described_class.call(
-        flight: flight, intent: intent, snapshot: snapshot, final_score: final_score
+        flight: flight, intent: intent, snapshot: snapshot, score_result: score_result
       )
       dimensions_b = second_result.score_breakdown.map { |e| e[:dimension] }
 
@@ -136,13 +141,58 @@ RSpec.describe Search::Explanation::Builder do
         expect(valid_dimensions).to include(entry[:dimension])
       end
     end
+
+    it "includes relative_to_baseline for each entry" do
+      result.score_breakdown.each do |entry|
+        expect(%i[better worse neutral]).to include(entry[:relative_to_baseline])
+      end
+    end
+
+    context "when price is well below median" do
+      it "marks price as :better relative to baseline" do
+        price_entry = result.score_breakdown.find { |e| e[:dimension] == :price }
+        expect(price_entry[:relative_to_baseline]).to eq(:better)
+      end
+    end
+
+    context "when duration is well above median" do
+      it "marks time_comfort as :worse relative to baseline" do
+        tc_entry = result.score_breakdown.find { |e| e[:dimension] == :time_comfort }
+        expect(tc_entry[:relative_to_baseline]).to eq(:worse)
+      end
+    end
+  end
+
+  describe "baselines" do
+    it "exposes baselines from the snapshot" do
+      expect(result.baselines).to eq(
+        price_median_cents: 50_000,
+        duration_median_minutes: 400,
+        volatility: :medium,
+        confidence: :high
+      )
+    end
+
+    it "freezes baselines" do
+      expect(result.baselines).to be_frozen
+    end
+  end
+
+  describe "metadata" do
+    it "includes a version" do
+      expect(result.metadata[:version]).to eq("1.0")
+    end
+
+    it "freezes metadata" do
+      expect(result.metadata).to be_frozen
+    end
   end
 
   describe "summary" do
     it "is deterministic across calls" do
       summary_a = result.summary
       summary_b = described_class.call(
-        flight: flight, intent: intent, snapshot: snapshot, final_score: final_score
+        flight: flight, intent: intent, snapshot: snapshot, score_result: score_result
       ).summary
 
       expect(summary_a).to eq(summary_b)
@@ -289,7 +339,7 @@ RSpec.describe Search::Explanation::Builder do
       it "is deterministic" do
         severity_a = result.tradeoffs.map { |t| t[:severity] }
         severity_b = described_class.call(
-          flight: flight, intent: intent, snapshot: snapshot, final_score: final_score
+          flight: flight, intent: intent, snapshot: snapshot, score_result: score_result
         ).tradeoffs.map { |t| t[:severity] }
 
         expect(severity_a).to eq(severity_b)
@@ -364,47 +414,45 @@ RSpec.describe Search::Explanation::Builder do
   end
 
   describe "failure semantics" do
-    context "when final_score is nil" do
-      let(:final_score) { nil }
+    context "when score_result is nil" do
+      let(:score_result) { nil }
 
       it "returns nil" do
         expect(result).to be_nil
       end
     end
 
-    context "when a component score is missing" do
-      let(:price_score_value) { nil }
+    context "when a component score is nil in the ScoreResult" do
+      let(:components) { { price: nil, time_comfort: 80, trip_fit: 75 } }
 
       it "returns nil" do
         expect(result).to be_nil
       end
     end
 
-    context "when all component scores are missing" do
-      let(:price_score_value) { nil }
-      let(:time_comfort_score_value) { nil }
-      let(:trip_fit_score_value) { nil }
+    context "when all component scores are nil in the ScoreResult" do
+      let(:components) { { price: nil, time_comfort: nil, trip_fit: nil } }
 
       it "returns nil" do
         expect(result).to be_nil
       end
     end
 
-    it "never raises for nil final_score" do
+    it "never raises for nil score_result" do
       expect {
-        described_class.call(flight: flight, intent: intent, snapshot: snapshot, final_score: nil)
+        described_class.call(flight: flight, intent: intent, snapshot: snapshot, score_result: nil)
       }.not_to raise_error
     end
 
     it "never raises for nil flight" do
       expect {
-        described_class.call(flight: nil, intent: intent, snapshot: snapshot, final_score: final_score)
+        described_class.call(flight: nil, intent: intent, snapshot: snapshot, score_result: score_result)
       }.not_to raise_error
     end
 
     it "never raises for nil snapshot" do
       expect {
-        described_class.call(flight: flight, intent: intent, snapshot: nil, final_score: final_score)
+        described_class.call(flight: flight, intent: intent, snapshot: nil, score_result: score_result)
       }.not_to raise_error
     end
   end
@@ -412,15 +460,17 @@ RSpec.describe Search::Explanation::Builder do
   describe "determinism" do
     it "produces identical output for identical inputs" do
       result_a = described_class.call(
-        flight: flight, intent: intent, snapshot: snapshot, final_score: final_score
+        flight: flight, intent: intent, snapshot: snapshot, score_result: score_result
       )
       result_b = described_class.call(
-        flight: flight, intent: intent, snapshot: snapshot, final_score: final_score
+        flight: flight, intent: intent, snapshot: snapshot, score_result: score_result
       )
 
       expect(result_a.score_breakdown).to eq(result_b.score_breakdown)
       expect(result_a.tradeoffs).to eq(result_b.tradeoffs)
       expect(result_a.summary).to eq(result_b.summary)
+      expect(result_a.final_score).to eq(result_b.final_score)
+      expect(result_a.baselines).to eq(result_b.baselines)
     end
   end
 
@@ -445,6 +495,14 @@ RSpec.describe Search::Explanation::Builder do
 
     it "freezes summary" do
       expect(result.summary).to be_frozen
+    end
+
+    it "freezes baselines" do
+      expect(result.baselines).to be_frozen
+    end
+
+    it "freezes metadata" do
+      expect(result.metadata).to be_frozen
     end
 
     it "does not mutate the flight input" do

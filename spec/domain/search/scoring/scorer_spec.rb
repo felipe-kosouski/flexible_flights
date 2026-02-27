@@ -6,12 +6,18 @@ RSpec.describe Search::Scoring::Scorer do
   let(:flight)   { instance_double("Search::Models::FlightSample") }
   let(:intent)   { instance_double("Search::Models::SearchIntent") }
   let(:snapshot) { instance_double("Search::Models::AnalysisSnapshot") }
-  let(:final_score_result) { 72.5 }
+
+  let(:score_result) do
+    Search::Scoring::ScoreResult.new(
+      value: 72.5,
+      components: { price: 80, time_comfort: 60, trip_fit: 75 }
+    )
+  end
 
   subject(:scorer) { described_class.new(flight: flight, intent: intent, snapshot: snapshot) }
 
   before do
-    final_score_instance = instance_double(Search::Scoring::FinalScore, call: final_score_result)
+    final_score_instance = instance_double(Search::Scoring::FinalScore, call: score_result)
     allow(Search::Scoring::FinalScore)
       .to receive(:new)
       .with(flight: flight, intent: intent, snapshot: snapshot)
@@ -19,8 +25,12 @@ RSpec.describe Search::Scoring::Scorer do
   end
 
   describe "#call" do
+    it "returns a ScoreResult" do
+      expect(scorer.call).to be_a(Search::Scoring::ScoreResult)
+    end
+
     it "delegates to FinalScore and returns its result" do
-      expect(scorer.call).to eq(final_score_result)
+      expect(scorer.call).to eq(score_result)
     end
 
     it "passes nil through when FinalScore returns nil" do

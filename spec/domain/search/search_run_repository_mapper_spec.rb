@@ -14,7 +14,9 @@ RSpec.describe Search::Repositories::SearchRunRepository do
         earliest_departure: Date.new(2025, 3, 1),
         latest_return: Date.new(2025, 3, 15),
         min_stay_days: 5,
-        max_stay_days: 10
+        max_stay_days: 10,
+        luggage_requirement: :carry_on,
+        max_stops: 2
       )
     end
 
@@ -39,33 +41,87 @@ RSpec.describe Search::Repositories::SearchRunRepository do
     let(:samples) do
       [
         {
-          departure_date: Date.new(2025, 3, 1),
-          return_date: Date.new(2025, 3, 6),
+          departure_datetime: Time.new(2025, 3, 1),
+          return_datetime: Time.new(2025, 3, 6),
           price_cents: 10_000,
           currency: "USD",
           airline_codes: [ "AA" ],
-          stops_count: 1,
+          stops: 1,
           air_time_minutes: 420,
           layover_time_minutes: 90,
-          baggage_included: true,
+          luggage_included: true,
           raw_provider: "test"
         }
       ]
     end
 
-    let(:search_run) do
+    let(:domain_search_run) do
       instance_double(Search::SearchRun,
         state: :completed,
         started_at: Time.new(2025, 2, 10, 10, 0, 0),
         finished_at: Time.new(2025, 2, 10, 10, 5, 0),
         error: nil,
+        results: samples
+      )
+    end
+
+    let(:domain_intent) do
+      Search::Models::SearchIntent.new(
+        min_stay_days: 5,
+        max_stay_days: 10,
+        luggage_requirement: :carry_on,
+        max_stops: 2
+      )
+    end
+
+    let(:flight_sample) do
+      Search::Models::FlightSample.new(
+        departure_datetime: Time.new(2025, 3, 1),
+        return_datetime: Time.new(2025, 3, 6),
+        price_cents: 10_000,
+        stops: 1,
+        air_time_minutes: 420,
+        layover_time_minutes: 90,
+        luggage_included: true
+      )
+    end
+
+    let(:analysis_snapshot) do
+      Search::Models::AnalysisSnapshot.new(
+        price_p25_cents: 8_000,
+        price_p50_cents: 10_000,
+        price_p75_cents: 15_000,
+        route_median_duration_minutes: 500,
+        sample_count: 1,
+        volatility: :low,
+        confidence: :low
+      )
+    end
+
+    let(:score_result) do
+      Search::Scoring::ScoreResult.new(
+        value: 82.5,
+        components: { price: 100, time_comfort: 80, trip_fit: 75 }
+      )
+    end
+
+    let(:execution) do
+      instance_double(Search::SearchExecution,
         results: samples,
-        execute: samples
+        flight_samples: [ flight_sample ],
+        analysis_snapshot: analysis_snapshot,
+        scored_results: [ score_result ],
+        explanations: [],
+        state: :completed,
+        error: nil
       )
     end
 
     before do
-      allow(Search::Factories::SearchRunFactory).to receive(:from_record).and_return(search_run)
+      allow(Search::Factories::SearchRunFactory).to receive(:from_record).and_return(domain_search_run)
+      allow(Search::Factories::SearchRunFactory).to receive(:intent_from_record).and_return(domain_intent)
+      allow(Search::SearchExecution).to receive(:new).and_return(execution)
+      allow(execution).to receive(:execute).and_return(execution)
       allow(Search::Mappers::SearchRunMapper).to receive(:apply).and_call_original
     end
 
@@ -74,10 +130,10 @@ RSpec.describe Search::Repositories::SearchRunRepository do
     end
 
     context "happy path" do
-      it "executes the domain search run" do
+      it "executes via SearchExecution" do
         execute_repository
 
-        expect(search_run).to have_received(:execute).once
+        expect(execution).to have_received(:execute).once
       end
 
       it "persists the search run state transitions" do
@@ -98,10 +154,43 @@ RSpec.describe Search::Repositories::SearchRunRepository do
         expect(sample.provider).to eq("test")
       end
 
-      it "returns the domain results" do
+      it "persists the analysis snapshot" do
+        expect { execute_repository }.to change { AnalysisSnapshot.count }.by(1)
+
+        snapshot = AnalysisSnapshot.last
+        expect(snapshot.search_run).to eq(search_run_record)
+        expect(snapshot.price_p25_cents).to eq(8_000)
+        expect(snapshot.price_p50_cents).to eq(10_000)
+        expect(snapshot.price_p75_cents).to eq(15_000)
+        expect(snapshot.confidence_level).to eq("low")
+      end
+
+      it "returns the execution object" do
         result = execute_repository
 
-        expect(result).to eq(samples)
+        expect(result).to eq(execution)
+      end
+    end
+
+    context "when analysis snapshot is nil" do
+      let(:execution) do
+        instance_double(Search::SearchExecution,
+          results: samples,
+          flight_samples: [ flight_sample ],
+          analysis_snapshot: nil,
+          scored_results: [],
+          explanations: [],
+          state: :completed,
+          error: nil
+        )
+      end
+
+      it "does not persist an analysis snapshot" do
+        expect { execute_repository }.not_to change { AnalysisSnapshot.count }
+      end
+
+      it "still persists flight samples" do
+        expect { execute_repository }.to change { FlightSample.count }.by(1)
       end
     end
 
@@ -112,16 +201,17 @@ RSpec.describe Search::Repositories::SearchRunRepository do
         execute_repository
       end
 
-      it "rolls back all persistence if domain execution fails" do
-        failing_search_run = instance_double(Search::SearchRun,
+      it "rolls back all persistence if execution fails" do
+        allow(execution).to receive(:execute).and_raise(RuntimeError, "provider error")
+
+        failing_run = instance_double(Search::SearchRun,
           state: :failed,
           started_at: Time.now,
           finished_at: Time.now,
           error: RuntimeError.new("provider error"),
           results: []
         )
-        allow(failing_search_run).to receive(:execute).and_raise(RuntimeError, "provider error")
-        allow(Search::Factories::SearchRunFactory).to receive(:from_record).and_return(failing_search_run)
+        allow(Search::Factories::SearchRunFactory).to receive(:from_record).and_return(failing_run)
 
         expect {
           execute_repository rescue nil
@@ -130,16 +220,16 @@ RSpec.describe Search::Repositories::SearchRunRepository do
     end
 
     context "error handling" do
-      let(:search_run) do
-        failing_search_run = instance_double(Search::SearchRun,
+      before do
+        failing_run = instance_double(Search::SearchRun,
           state: :failed,
           started_at: Time.now,
           finished_at: Time.now,
           error: RuntimeError.new("sampling failed"),
           results: []
         )
-        allow(failing_search_run).to receive(:execute).and_raise(RuntimeError, "sampling failed")
-        failing_search_run
+        allow(Search::Factories::SearchRunFactory).to receive(:from_record).and_return(failing_run)
+        allow(execution).to receive(:execute).and_raise(RuntimeError, "sampling failed")
       end
 
       it "re-raises domain errors" do
@@ -155,15 +245,6 @@ RSpec.describe Search::Repositories::SearchRunRepository do
     end
 
     context "repository boundaries" do
-      it "does not expose ActiveRecord objects in return value" do
-        result = execute_repository
-
-        expect(result).to be_an(Array)
-        result.each do |item|
-          expect(item).not_to be_a(ActiveRecord::Base)
-        end
-      end
-
       it "does not swallow provider errors" do
         failing_run = instance_double(Search::SearchRun,
           state: :failed,
@@ -174,6 +255,7 @@ RSpec.describe Search::Repositories::SearchRunRepository do
         )
         allow(failing_run).to receive(:execute).and_raise(StandardError, "provider timeout")
         allow(Search::Factories::SearchRunFactory).to receive(:from_record).and_return(failing_run)
+        allow(execution).to receive(:execute).and_raise(StandardError, "provider timeout")
 
         expect { execute_repository }.to raise_error(StandardError, "provider timeout")
       end

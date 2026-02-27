@@ -19,7 +19,10 @@ module Search
         scores = collected_scores
         return nil if scores.empty?
 
-        weighted_average(scores)
+        ScoreResult.new(
+          value: weighted_average(scores),
+          components: scores
+        )
       end
 
       private

@@ -88,9 +88,11 @@ Search::Explanation::Builder.call(
   flight:,
   intent:,
   snapshot:,
-  final_score:
+  score_result:
 )
 ```
+
+Where `score_result` is a `Search::Scoring::ScoreResult` containing both the final score value and per-dimension component scores.
 
 Rules:
 - Returns a FlightExplanation or nil

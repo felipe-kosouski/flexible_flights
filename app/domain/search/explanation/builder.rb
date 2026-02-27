@@ -3,6 +3,8 @@
 module Search
   module Explanation
     class Builder
+      VERSION = "1.0"
+
       MATERIALITY_THRESHOLD = 0.15
       STRONG_DEVIATION_THRESHOLD = 0.35
       LAYOVER_PENALTY = 1.3
@@ -18,15 +20,15 @@ module Search
         trip_fit: :strong_trip_fit
       }.freeze
 
-      def self.call(flight:, intent:, snapshot:, final_score:)
-        new(flight:, intent:, snapshot:, final_score:).call
+      def self.call(flight:, intent:, snapshot:, score_result:)
+        new(flight:, intent:, snapshot:, score_result:).call
       end
 
-      def initialize(flight:, intent:, snapshot:, final_score:)
+      def initialize(flight:, intent:, snapshot:, score_result:)
         @flight = flight
         @intent = intent
         @snapshot = snapshot
-        @final_score = final_score
+        @score_result = score_result
       end
 
       def call
@@ -40,23 +42,28 @@ module Search
 
         FlightExplanation.new(
           flight: flight,
+          final_score: score_result.value,
           score_breakdown: breakdown,
           tradeoffs: detected_tradeoffs,
-          summary: explanation_summary
+          summary: explanation_summary,
+          baselines: build_baselines,
+          metadata: { version: VERSION }
         )
       end
 
       private
 
-      attr_reader :flight, :intent, :snapshot, :final_score
+      attr_reader :flight, :intent, :snapshot, :score_result
 
       def valid_inputs?
-        final_score && flight && snapshot
+        score_result && flight && snapshot
       end
 
       def build_score_breakdown
-        components = compute_component_scores
+        components = score_result.components
         return nil if components.values.any?(&:nil?)
+
+        deviations = compute_baseline_deviations
 
         components.sort_by { |dim, _| dim }.map do |dimension, raw_score|
           weight = Scoring::FinalScore::WEIGHTS[dimension]
@@ -65,17 +72,23 @@ module Search
             raw_score: raw_score,
             normalized_score: raw_score,
             weight: weight,
-            weighted_contribution: raw_score * weight
+            weighted_contribution: raw_score * weight,
+            relative_to_baseline: baseline_position(dimension, deviations)
           }
         end
       end
 
-      def compute_component_scores
-        {
-          price: Scoring::PriceScore.call(flight_sample: flight, analysis_snapshot: snapshot),
-          time_comfort: Scoring::TimeComfortScore.call(flight_sample: flight, analysis_snapshot: snapshot),
-          trip_fit: Scoring::TripFit.call(flight_sample: flight, search_intent: intent)
-        }
+      def baseline_position(dimension, deviations)
+        deviation = deviations[dimension]
+        return :neutral unless deviation
+
+        if deviation < -MATERIALITY_THRESHOLD
+          :better
+        elsif deviation > MATERIALITY_THRESHOLD
+          :worse
+        else
+          :neutral
+        end
       end
 
       def detect_tradeoffs
@@ -149,6 +162,15 @@ module Search
           primary_factors: primary,
           secondary_factors: secondary,
           explanation_keys: keys
+        }
+      end
+
+      def build_baselines
+        {
+          price_median_cents: snapshot.price_p50_cents,
+          duration_median_minutes: snapshot.route_median_duration_minutes,
+          volatility: snapshot.volatility,
+          confidence: snapshot.confidence
         }
       end
     end

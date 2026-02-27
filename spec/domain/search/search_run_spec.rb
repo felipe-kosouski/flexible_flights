@@ -15,8 +15,6 @@ RSpec.describe Search::SearchRun do
   let(:provider) { double("Provider") }
 
   let(:runner) { class_double(Search::Sampling::Runner) }
-  let(:snapshot_builder) { class_double(Search::Analysis::SnapshotBuilder) }
-  let(:scorer_class) { class_double(Search::Scoring::Scorer) }
 
   let(:search_run) do
     described_class.new(
@@ -35,10 +33,6 @@ RSpec.describe Search::SearchRun do
 
   before do
     stub_const("Search::Sampling::Runner", runner)
-    stub_const("Search::Analysis::SnapshotBuilder", snapshot_builder)
-    stub_const("Search::Scoring::Scorer", scorer_class)
-    allow(snapshot_builder).to receive(:build).and_return(instance_double(Search::Models::AnalysisSnapshot))
-    allow(scorer_class).to receive(:new).and_return(instance_double(Search::Scoring::Scorer, call: 0.75))
   end
 
   describe "PHASES" do
@@ -46,8 +40,6 @@ RSpec.describe Search::SearchRun do
       expect(described_class::PHASES).to eq(%i[
         initialized
         sampling
-        analyzing
-        scoring
         completed
         failed
       ])
@@ -71,21 +63,13 @@ RSpec.describe Search::SearchRun do
     it "has empty results" do
       expect(search_run.results).to eq([])
     end
-
-    it "has no analysis snapshot" do
-      expect(search_run.analysis_snapshot).to be_nil
-    end
-
-    it "has empty scored results" do
-      expect(search_run.scored_results).to eq([])
-    end
   end
 
   describe "#execute — happy path" do
     let(:samples) do
       [
-        { price_cents: 10_000, departure_date: earliest_departure_date },
-        { price_cents: 12_000, departure_date: earliest_departure_date + 1 }
+        { price_cents: 10_000, departure_datetime: earliest_departure_date.to_time },
+        { price_cents: 12_000, departure_datetime: (earliest_departure_date + 1).to_time }
       ]
     end
 
@@ -93,7 +77,7 @@ RSpec.describe Search::SearchRun do
       allow(runner).to receive(:call).and_return(samples)
     end
 
-    it "transitions state through sampling and analysis to completed" do
+    it "transitions state to completed" do
       search_run.execute
 
       expect(search_run.state).to eq(:completed)
@@ -139,6 +123,10 @@ RSpec.describe Search::SearchRun do
       search_run.execute
 
       expect(search_run.error).to be_nil
+    end
+
+    it "returns self" do
+      expect(search_run.execute).to eq(search_run)
     end
   end
 
@@ -189,125 +177,6 @@ RSpec.describe Search::SearchRun do
 
     it "re-raises the exception" do
       expect { search_run.execute }.to raise_error(StandardError, "sampling failed")
-    end
-  end
-
-  describe "#execute — nil analysis (insufficient data)" do
-    let(:samples) do
-      [
-        { price_cents: 10_000, departure_date: earliest_departure_date }
-      ]
-    end
-
-    before do
-      allow(runner).to receive(:call).and_return(samples)
-      allow(snapshot_builder).to receive(:build).and_return(nil)
-    end
-
-    it "completes successfully when analysis cannot be built" do
-      expect { search_run.execute }.not_to raise_error
-    end
-
-    it "sets state to completed" do
-      search_run.execute
-
-      expect(search_run.state).to eq(:completed)
-    end
-
-    it "preserves results" do
-      search_run.execute
-
-      expect(search_run.results).to eq(samples)
-    end
-
-    it "leaves analysis_snapshot as nil" do
-      search_run.execute
-
-      expect(search_run.analysis_snapshot).to be_nil
-    end
-  end
-
-  describe "#execute — scoring phase" do
-    let(:samples) do
-      [
-        { price_cents: 10_000, departure_date: earliest_departure_date },
-        { price_cents: 12_000, departure_date: earliest_departure_date + 1 }
-      ]
-    end
-    let(:snapshot) { instance_double(Search::Models::AnalysisSnapshot) }
-    let(:scorer_instance) { instance_double(Search::Scoring::Scorer, call: 0.82) }
-
-    before do
-      allow(runner).to receive(:call).and_return(samples)
-      allow(snapshot_builder).to receive(:build).and_return(snapshot)
-      allow(scorer_class).to receive(:new).and_return(scorer_instance)
-    end
-
-    it "enters the :scoring state during execution" do
-      states = []
-      allow(scorer_class).to receive(:new) do
-        states << search_run.state
-        scorer_instance
-      end
-
-      search_run.execute
-
-      expect(states).to all(eq(:scoring))
-    end
-
-    it "invokes Scorer once per flight sample" do
-      search_run.execute
-
-      expect(scorer_class).to have_received(:new).exactly(samples.size).times
-    end
-
-    it "passes the correct arguments to each Scorer instance" do
-      search_run.execute
-
-      samples.each do |sample|
-        expect(scorer_class).to have_received(:new).with(
-          flight: sample,
-          intent: an_instance_of(Search::Models::SearchIntent),
-          snapshot: snapshot
-        )
-      end
-    end
-
-    it "populates scored_results with the return value of each scorer" do
-      search_run.execute
-
-      expect(search_run.scored_results).to eq([ 0.82, 0.82 ])
-    end
-
-    it "completes successfully" do
-      search_run.execute
-
-      expect(search_run.state).to eq(:completed)
-    end
-  end
-
-  describe "#execute — scoring skipped (nil analysis)" do
-    before do
-      allow(runner).to receive(:call).and_return([ { price_cents: 10_000 } ])
-      allow(snapshot_builder).to receive(:build).and_return(nil)
-    end
-
-    it "leaves scored_results empty" do
-      search_run.execute
-
-      expect(search_run.scored_results).to eq([])
-    end
-
-    it "never instantiates Scorer" do
-      search_run.execute
-
-      expect(scorer_class).not_to have_received(:new)
-    end
-
-    it "completes successfully" do
-      search_run.execute
-
-      expect(search_run.state).to eq(:completed)
     end
   end
 

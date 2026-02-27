@@ -19,6 +19,17 @@ module Search
           provider: provider
         )
       end
+
+      def self.intent_from_record(search_run_record)
+        intent = search_run_record.search_intent
+
+        Models::SearchIntent.new(
+          min_stay_days: intent.min_stay_days,
+          max_stay_days: intent.max_stay_days,
+          luggage_requirement: intent.luggage_requirement&.to_sym,
+          max_stops: intent.max_stops
+        )
+      end
     end
   end
 end

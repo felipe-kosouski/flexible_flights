@@ -7,10 +7,10 @@ module Search
         price_cents
         currency
         airline_codes
-        stops_count
+        stops
         air_time_minutes
         layover_time_minutes
-        baggage_included
+        luggage_included
         raw_provider
       ].freeze
 
@@ -59,8 +59,8 @@ module Search
         return nil unless valid_sample?(raw_sample)
 
         raw_sample.merge(
-          departure_date: departure_date,
-          return_date: return_date
+          departure_datetime: departure_date.to_time,
+          return_datetime: return_date.to_time
         )
       end
 

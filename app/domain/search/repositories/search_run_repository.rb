@@ -12,25 +12,27 @@ module Search
           provider: provider
         )
 
+        intent = Factories::SearchRunFactory.intent_from_record(search_run_record)
+        execution = SearchExecution.new(search_run: search_run, intent: intent)
+
         ActiveRecord::Base.transaction do
-          results = search_run.execute
+          execution.execute
 
           Mappers::SearchRunMapper.apply(search_run, search_run_record)
           search_run_record.error_message = nil
           search_run_record.save!
 
-          persist_samples(search_run_record, results)
+          persist_samples(search_run_record, execution.results)
+          persist_analysis_snapshot(search_run_record, execution.analysis_snapshot)
 
-          results
+          execution
         end
       rescue => e
-        # Ensure we are not holding rolled-back state
         search_run_record.reload
 
         Mappers::SearchRunMapper.apply(search_run, search_run_record)
         search_run_record.error_message = search_run.error&.message || e.message
 
-        # Failure persistence must never be blocked by validations
         search_run_record.save!(validate: false)
 
         raise
@@ -47,13 +49,27 @@ module Search
             currency: sample[:currency],
             air_time_minutes: sample[:air_time_minutes],
             layover_time_minutes: sample[:layover_time_minutes],
-            stops: sample[:stops_count],
+            stops: sample[:stops],
             airlines: sample[:airline_codes],
-            luggage_included: sample[:baggage_included],
-            departure_datetime: sample[:departure_date],
-            return_datetime: sample[:return_date]
+            luggage_included: sample[:luggage_included],
+            departure_datetime: sample[:departure_datetime],
+            return_datetime: sample[:return_datetime]
           )
         end
+      end
+
+      def self.persist_analysis_snapshot(search_run_record, snapshot)
+        return unless snapshot
+
+        AnalysisSnapshot.create!(
+          search_run: search_run_record,
+          price_p25_cents: snapshot.price_p25_cents,
+          price_p50_cents: snapshot.price_p50_cents,
+          price_p75_cents: snapshot.price_p75_cents,
+          route_median_duration_minutes: snapshot.route_median_duration_minutes.to_i,
+          sample_size: snapshot.sample_count,
+          confidence_level: snapshot.confidence.to_s
+        )
       end
     end
   end

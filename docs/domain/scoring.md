@@ -75,17 +75,18 @@ Scoring receives:
 
 ## 3. Output
 
-For each flight sample, scoring produces:
+For each flight sample, scoring produces a `Search::Scoring::ScoreResult`:
 
-- `final_score` (Float, 0–100)
-- Per-dimension component scores (Float, 0–100 each, for explainability)
+- `value` (Float, 0–100) — the final weighted score
+- `components` (Hash) — per-dimension component scores (Float, 0–100 each), keyed by dimension symbol
 
-Scores are:
+ScoreResult is:
 
+- Immutable (frozen)
 - Computed on demand
 - Deterministic
 - Not persisted
-- Used only for sorting and explanation
+- Used for sorting, explanation, and ranking
 
 ---
 
@@ -366,12 +367,13 @@ Given identical inputs:
 
 ## 13. Domain objects
 
-| Object                          | Purpose              |
-| -------------------------------- | -------------------- |
-| `Search::Scoring::PriceScore`    | Price dimension      |
-| `Search::Scoring::TimeComfortScore` | Time & comfort    |
-| `Search::Scoring::TripFit`       | Trip fit dimension    |
-| `Search::Scoring::FinalScore`    | Final weighted score |
+| Object                              | Purpose                          |
+| ----------------------------------- | -------------------------------- |
+| `Search::Scoring::PriceScore`       | Price dimension                  |
+| `Search::Scoring::TimeComfortScore` | Time & comfort                   |
+| `Search::Scoring::TripFit`          | Trip fit dimension               |
+| `Search::Scoring::FinalScore`       | Final weighted score computation |
+| `Search::Scoring::ScoreResult`      | Immutable result value object    |
 
 All objects:
 
