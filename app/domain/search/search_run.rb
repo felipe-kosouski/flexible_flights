@@ -11,7 +11,7 @@ module Search
       failed
     ].freeze
 
-    attr_reader :state, :started_at, :finished_at, :error, :results, :analysis_snapshot
+    attr_reader :state, :started_at, :finished_at, :error, :results, :analysis_snapshot, :scored_results
 
     def initialize(
       origin:,
@@ -42,6 +42,7 @@ module Search
       @error = nil
       @results = []
       @analysis_snapshot = nil
+      @scored_results = []
     end
 
     def execute
@@ -67,9 +68,23 @@ module Search
         @state = :analyzing
         @analysis_snapshot = Analysis::SnapshotBuilder.build(@results)
 
+        @state = :scoring
+        @scored_results = if @analysis_snapshot
+          search_intent = build_search_intent
+          @results.map do |sample|
+            Scoring::Scorer.new(
+              flight: sample,
+              intent: search_intent,
+              snapshot: @analysis_snapshot
+            ).call
+          end
+        else
+          []
+        end
+
         @finished_at = now
         @state = :completed
-        @results
+        self
       rescue => e
         @error = e
         @finished_at = now
@@ -79,6 +94,14 @@ module Search
     end
 
     private
+
+    def build_search_intent
+      Models::SearchIntent.new(
+        min_stay_days: @min_stay_days,
+        max_stay_days: @max_stay_days,
+        luggage_requirement: nil
+      )
+    end
 
     def ensure_executable!
       return if @state == :initialized
