@@ -78,7 +78,7 @@ Scoring receives:
 For each flight sample, scoring produces:
 
 - `final_score` (Float, 0–100)
-- Per-dimension component scores (for explainability)
+- Per-dimension component scores (Float, 0–100 each, for explainability)
 
 Scores are:
 
@@ -302,11 +302,12 @@ Never a penalty.
 ### 7.7 Trip fit combination
 
 ```
-trip_fit_score = (length_fit × 0.5) + (luggage_fit × 0.3) + (time_fit × 0.2)
-trip_fit_score += stay_pattern_bonus  # if applicable
+raw = (length_fit × 0.5) + (luggage_fit × 0.3) + (time_fit × 0.2)
+raw += stay_pattern_bonus  # if applicable
+trip_fit_score = raw × 100
 ```
 
-Normalized to 0–100 when combined into final score.
+Components are 0.0–1.0 internally. The combined result is scaled to 0–100 before entering the final score formula.
 
 ---
 

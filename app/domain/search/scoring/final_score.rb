@@ -4,9 +4,9 @@ module Search
   module Scoring
     class FinalScore
       WEIGHTS = {
-        price: 0.4,
+        price: 0.45,
         time_comfort: 0.35,
-        trip_fit: 0.25
+        trip_fit: 0.20
       }.freeze
 
       def initialize(flight:, intent:, snapshot:)

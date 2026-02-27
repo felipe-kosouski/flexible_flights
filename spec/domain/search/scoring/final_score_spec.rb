@@ -29,10 +29,10 @@ RSpec.describe Search::Scoring::FinalScore do
   context "when all scores are present" do
     let(:price_score) { 100 }
     let(:time_score) { 80 }
-    let(:trip_fit_score) { 60 }
+    let(:trip_fit_score) { 90 }
 
     it "returns weighted average" do
-      expected = (100 * 0.4) + (80  * 0.35) + (60  * 0.25)
+      expected = (100 * 0.45) + (80 * 0.35) + (90 * 0.20)
 
       expect(score).to eq(expected)
     end
@@ -41,12 +41,12 @@ RSpec.describe Search::Scoring::FinalScore do
   context "when one scorer returns nil" do
     let(:price_score) { nil }
     let(:time_score) { 80 }
-    let(:trip_fit_score) { 60 }
+    let(:trip_fit_score) { 90 }
 
     it "renormalizes weights" do
-      total_weight = 0.35 + 0.25
+      total_weight = 0.35 + 0.20
 
-      expected = (80 * (0.35 / total_weight)) + (60 * (0.25 / total_weight))
+      expected = (80 * (0.35 / total_weight)) + (90 * (0.20 / total_weight))
 
       expect(score).to eq(expected)
     end

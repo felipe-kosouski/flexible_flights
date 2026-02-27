@@ -115,7 +115,7 @@ Fields:
 
 ---
 
-### Scores (All normalized 0.0–1.0)
+### Scores (All normalized 0–100)
 
 Scores are explainable and deterministic.
 

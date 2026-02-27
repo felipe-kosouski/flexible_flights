@@ -28,8 +28,8 @@ RSpec.describe Search::Scoring::TripFit do
 
   describe "#score" do
     context "trip length fit" do
-      it "returns 1.0 when stay length is exactly at midpoint" do
-        expect(score).to be_within(0.01).of(1.0)
+      it "returns 100 when stay length is exactly at midpoint" do
+        expect(score).to be_within(1).of(100)
       end
 
       it "returns a high score when within ±20% of the range" do
@@ -40,7 +40,7 @@ RSpec.describe Search::Scoring::TripFit do
         )
 
         score = described_class.new(flight_sample, intent).score
-        expect(score).to be > 0.8
+        expect(score).to be > 80
       end
 
       it "returns a lower score near the edges of the range" do
@@ -51,7 +51,7 @@ RSpec.describe Search::Scoring::TripFit do
         )
 
         score = described_class.new(sample, search_intent).score
-        expect(score).to be < 0.9
+        expect(score).to be < 90
       end
 
       it "returns nil when stay length is far outside the allowed range" do
@@ -93,7 +93,7 @@ RSpec.describe Search::Scoring::TripFit do
           )
 
           score = described_class.new(sample, search_intent).score
-          expect(score).to be_between(0.5, 0.95)
+          expect(score).to be_between(50, 95)
         end
       end
     end
@@ -107,7 +107,7 @@ RSpec.describe Search::Scoring::TripFit do
         )
 
         score = described_class.new(sample, search_intent).score
-        expect(score).to be < 0.95
+        expect(score).to be < 95
       end
 
       it "penalizes very late arrivals" do
@@ -118,7 +118,7 @@ RSpec.describe Search::Scoring::TripFit do
         )
 
         score = described_class.new(sample, search_intent).score
-        expect(score).to be < 0.95
+        expect(score).to be < 95
       end
     end
 

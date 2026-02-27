@@ -19,14 +19,16 @@ module Search
         @intent = search_intent
       end
 
+      SCALE = 100
+
       def score
         return nil unless hard_constraints_pass?
 
-        (
-          (length_fit_score  * LENGTH_WEIGHT) +
-          (luggage_fit_score * LUGGAGE_WEIGHT) +
-          (time_fit_score    * TIME_WEIGHT)
-        )
+        raw = (length_fit_score * LENGTH_WEIGHT) +
+              (luggage_fit_score * LUGGAGE_WEIGHT) +
+              (time_fit_score * TIME_WEIGHT)
+
+        raw * SCALE
       end
 
       private
