@@ -105,6 +105,15 @@ RSpec.describe Search::Repositories::SearchRunRepository do
       )
     end
 
+    let(:ranked_flight) do
+      Search::Ranking::RankedFlight.new(
+        flight: flight_sample,
+        score_result: score_result,
+        explanation: nil,
+        rank: 1
+      )
+    end
+
     let(:execution) do
       instance_double(Search::SearchExecution,
         results: samples,
@@ -112,6 +121,7 @@ RSpec.describe Search::Repositories::SearchRunRepository do
         analysis_snapshot: analysis_snapshot,
         scored_results: [ score_result ],
         explanations: [],
+        ranked_results: [ ranked_flight ],
         state: :completed,
         error: nil
       )
@@ -180,6 +190,7 @@ RSpec.describe Search::Repositories::SearchRunRepository do
           analysis_snapshot: nil,
           scored_results: [],
           explanations: [],
+          ranked_results: [],
           state: :completed,
           error: nil
         )

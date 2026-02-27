@@ -2,10 +2,10 @@
 
 module Search
   class SearchExecution
-    PHASES = %i[initialized sampling mapping analyzing scoring explaining completed failed].freeze
+    PHASES = %i[initialized sampling mapping analyzing scoring explaining ranking completed failed].freeze
 
     attr_reader :state, :search_run, :flight_samples, :analysis_snapshot,
-                :scored_results, :explanations, :error
+                :scored_results, :explanations, :ranked_results, :error
 
     def initialize(search_run:, intent:)
       @search_run = search_run
@@ -15,6 +15,7 @@ module Search
       @analysis_snapshot = nil
       @scored_results = []
       @explanations = []
+      @ranked_results = []
       @error = nil
     end
 
@@ -33,6 +34,13 @@ module Search
 
       @state = :explaining
       @explanations = build_explanations
+
+      @state = :ranking
+      @ranked_results = Ranking::Ranker.call(
+        flights: @flight_samples,
+        score_results: @scored_results,
+        explanations: @explanations
+      )
 
       @state = :completed
       self
@@ -63,7 +71,7 @@ module Search
     def build_explanations
       return [] unless @analysis_snapshot
 
-      @flight_samples.zip(@scored_results).filter_map do |sample, score_result|
+      @flight_samples.zip(@scored_results).map do |sample, score_result|
         next unless score_result
 
         Explanation::Builder.call(

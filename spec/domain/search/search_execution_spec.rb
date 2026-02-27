@@ -71,6 +71,26 @@ RSpec.describe Search::SearchExecution do
 
   let(:explanation) { instance_double(Search::Explanation::FlightExplanation) }
 
+  let(:ranked_flight_a) do
+    Search::Ranking::RankedFlight.new(
+      flight: flight_sample_a,
+      score_result: score_result,
+      explanation: explanation,
+      rank: 1
+    )
+  end
+
+  let(:ranked_flight_b) do
+    Search::Ranking::RankedFlight.new(
+      flight: flight_sample_b,
+      score_result: score_result,
+      explanation: explanation,
+      rank: 2
+    )
+  end
+
+  let(:ranker_class) { class_double(Search::Ranking::Ranker) }
+
   subject(:execution) { described_class.new(search_run: search_run, intent: intent) }
 
   before do
@@ -78,6 +98,7 @@ RSpec.describe Search::SearchExecution do
     stub_const("Search::Analysis::SnapshotBuilder", snapshot_builder)
     stub_const("Search::Scoring::Scorer", scorer_class)
     stub_const("Search::Explanation::Builder", builder_class)
+    stub_const("Search::Ranking::Ranker", ranker_class)
 
     allow(mapper_class).to receive(:map_all).and_return(mapped_samples)
     allow(snapshot_builder).to receive(:build).and_return(snapshot)
@@ -85,6 +106,7 @@ RSpec.describe Search::SearchExecution do
       instance_double(Search::Scoring::Scorer, call: score_result)
     )
     allow(builder_class).to receive(:call).and_return(explanation)
+    allow(ranker_class).to receive(:call).and_return([ ranked_flight_a, ranked_flight_b ])
   end
 
   describe "initial state" do
@@ -106,6 +128,10 @@ RSpec.describe Search::SearchExecution do
 
     it "has empty explanations" do
       expect(execution.explanations).to eq([])
+    end
+
+    it "has empty ranked_results" do
+      expect(execution.ranked_results).to eq([])
     end
 
     it "has no error" do
@@ -188,10 +214,28 @@ RSpec.describe Search::SearchExecution do
       end
     end
 
-    it "stores explanations" do
+    it "stores explanations (one per flight sample, nils preserved)" do
       execution.execute
 
+      expect(execution.explanations.size).to eq(2)
       expect(execution.explanations).to eq([ explanation, explanation ])
+    end
+
+    it "calls Ranker with flight_samples, scored_results, and explanations" do
+      execution.execute
+
+      expect(ranker_class).to have_received(:call).with(
+        flights: mapped_samples,
+        score_results: execution.scored_results,
+        explanations: execution.explanations
+      )
+    end
+
+    it "stores ranked_results from Ranker" do
+      execution.execute
+
+      expect(execution.ranked_results).to eq([ ranked_flight_a, ranked_flight_b ])
+      expect(execution.ranked_results).to all(be_a(Search::Ranking::RankedFlight))
     end
 
     it "exposes raw results through the search run" do
@@ -208,6 +252,7 @@ RSpec.describe Search::SearchExecution do
   describe "#execute — nil analysis (insufficient data)" do
     before do
       allow(snapshot_builder).to receive(:build).and_return(nil)
+      allow(ranker_class).to receive(:call).and_return([])
     end
 
     it "completes successfully" do
@@ -234,6 +279,12 @@ RSpec.describe Search::SearchExecution do
       expect(execution.explanations).to eq([])
     end
 
+    it "leaves ranked_results empty" do
+      execution.execute
+
+      expect(execution.ranked_results).to eq([])
+    end
+
     it "never instantiates a Scorer" do
       execution.execute
 
@@ -256,12 +307,20 @@ RSpec.describe Search::SearchExecution do
   describe "#execute — when Builder returns nil for some flights" do
     before do
       allow(builder_class).to receive(:call).and_return(explanation, nil)
+      allow(ranker_class).to receive(:call).and_return([ ranked_flight_a, ranked_flight_b ])
     end
 
-    it "filters out nil explanations" do
+    it "preserves array length with nil in explanations" do
       execution.execute
 
-      expect(execution.explanations).to eq([ explanation ])
+      expect(execution.explanations).to eq([ explanation, nil ])
+      expect(execution.explanations.size).to eq(2)
+    end
+
+    it "still produces ranked_results for all scored flights" do
+      execution.execute
+
+      expect(execution.ranked_results.size).to eq(2)
     end
   end
 
@@ -278,6 +337,7 @@ RSpec.describe Search::SearchExecution do
     before do
       allow(mapper_class).to receive(:map_all).and_return([])
       allow(snapshot_builder).to receive(:build).and_return(nil)
+      allow(ranker_class).to receive(:call).and_return([])
     end
 
     it "completes successfully" do
@@ -302,6 +362,12 @@ RSpec.describe Search::SearchExecution do
       execution.execute
 
       expect(execution.explanations).to eq([])
+    end
+
+    it "has empty ranked_results" do
+      execution.execute
+
+      expect(execution.ranked_results).to eq([])
     end
   end
 
@@ -354,7 +420,7 @@ RSpec.describe Search::SearchExecution do
   end
 
   describe "pipeline ordering" do
-    it "executes phases in order: sampling, mapping, analyzing, scoring, explaining" do
+    it "executes phases in order: sampling, mapping, analyzing, scoring, explaining, ranking" do
       phase_log = []
 
       allow(search_run).to receive(:execute) { phase_log << :sampling }
@@ -368,10 +434,14 @@ RSpec.describe Search::SearchExecution do
         phase_log << :explaining
         explanation
       end
+      allow(ranker_class).to receive(:call) do
+        phase_log << :ranking
+        [ ranked_flight_a, ranked_flight_b ]
+      end
 
       execution.execute
 
-      expect(phase_log).to eq([ :sampling, :mapping, :analyzing, :scoring, :scoring, :explaining, :explaining ])
+      expect(phase_log).to eq([ :sampling, :mapping, :analyzing, :scoring, :scoring, :explaining, :explaining, :ranking ])
     end
   end
 end

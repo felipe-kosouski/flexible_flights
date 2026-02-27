@@ -18,7 +18,7 @@ SearchExecution coordinates the **full pipeline** for one Smart Search.
 
 It is responsible for:
 
-- Orchestrating the sampling, mapping, analysis, scoring, and explaining phases
+- Orchestrating the sampling, mapping, analysis, scoring, explaining, and ranking phases
 - Bridging raw sampling output to domain models
 - Tracking overall pipeline state
 - Producing structured results for the repository layer
@@ -44,7 +44,8 @@ After execution, SearchExecution exposes:
 - **flight_samples** — Array of Search::Models::FlightSample domain objects
 - **analysis_snapshot** — Search::Models::AnalysisSnapshot or nil
 - **scored_results** — Array of Search::Scoring::ScoreResult objects (one per flight sample), or empty
-- **explanations** — Array of Search::Explanation::FlightExplanation objects, or empty
+- **explanations** — Array of Search::Explanation::FlightExplanation or nil (one per flight sample, nils preserved), or empty
+- **ranked_results** — Array of Search::Ranking::RankedFlight objects, ordered by sort rules (see scoring.md Section 10), or empty
 
 ---
 
@@ -66,6 +67,7 @@ After execution, SearchExecution exposes:
 - `analyzing`
 - `scoring`
 - `explaining`
+- `ranking`
 - `completed`
 - `failed`
 
@@ -87,9 +89,10 @@ When `execute` is called:
 2. Transition to `mapping` — convert raw hashes to FlightSample domain models via FlightSampleMapper
 3. Transition to `analyzing` — build AnalysisSnapshot from flight samples
 4. Transition to `scoring` — score each flight sample (skipped if analysis is nil); produces ScoreResult objects
-5. Transition to `explaining` — build a FlightExplanation for each scored flight (skipped if analysis is nil)
-6. Transition to `completed`
-7. Return `self`
+5. Transition to `explaining` — build a FlightExplanation (or nil) for each scored flight, preserving array length (skipped if analysis is nil)
+6. Transition to `ranking` — sort by final_score DESC, price_cents ASC, stops ASC (per scoring.md Section 10); produce RankedFlight list
+7. Transition to `completed`
+8. Return `self`
 
 If an error occurs at any step:
 
@@ -108,6 +111,7 @@ SearchExecution depends on:
 - `Search::Analysis::SnapshotBuilder`
 - `Search::Scoring::Scorer`
 - `Search::Explanation::Builder`
+- `Search::Ranking::Ranker`
 
 ---
 
@@ -118,8 +122,9 @@ When SnapshotBuilder returns nil (insufficient data):
 - analysis_snapshot remains nil
 - scored_results remains empty
 - explanations remains empty
+- ranked_results remains empty
 - Execution completes successfully
-- No scoring or explaining is attempted
+- No scoring, explaining, or ranking is attempted
 
 ---
 
