@@ -1,5 +1,7 @@
 class SearchRun < ApplicationRecord
   belongs_to :search_intent
+  has_many :flight_samples, dependent: :destroy
+  has_one :analysis_snapshot, dependent: :destroy
 
   enum :state, {
     initialized: 0,
