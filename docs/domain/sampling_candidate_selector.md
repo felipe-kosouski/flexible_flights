@@ -196,7 +196,7 @@ This is non-negotiable.
 
 ---
 
-## 13. Cursor Instruction
+## 13. Implementation Instructions
 
 When implementing:
 

@@ -226,7 +226,7 @@ Do NOT implement:
 
 ---
 
-## 9. Cursor Operating Rules
+## 9. AI Agent Operating Rules
 
 When generating code:
 - Follow this document strictly
@@ -235,4 +235,4 @@ When generating code:
 - Ask questions when unsure
 - MVP scope > elegance
 
-Cursor should behave like a careful junior engineer, not a product designer.
+AI Agent should behave like a careful junior/mid level engineer, not a product designer.

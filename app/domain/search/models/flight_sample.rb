@@ -24,6 +24,10 @@ module Search
         @layover_time_minutes = layover_time_minutes
       end
 
+      def departure_datetime
+        @departure_datetime
+      end
+
       def price_cents
         @price_cents
       end

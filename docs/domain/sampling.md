@@ -268,7 +268,7 @@ Each object must:
 
 ---
 
-## 14. Cursor Instruction (Important)
+## 14. Implementation Instructions (Important)
 
 When implementing sampling logic:
 

@@ -19,7 +19,7 @@ It specifies **observable behavior**, not implementation details.
 This document is normative for:
 
 - RSpec examples
-- Cursor implementation
+- AI Agent implementation
 - Future refactors
 
 ---
@@ -271,7 +271,7 @@ end
 
 ---
 
-## 17. Cursor Instruction
+## 17. Implementation Instructions
 
 When implementing:
 

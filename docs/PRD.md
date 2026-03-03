@@ -242,7 +242,7 @@ Any other decision requires updating PRODUCT_GUIDE.md.
 
 ---
 
-## 15. Cursor Usage Instruction
+## 15. AI Agent Usage Instruction
 
 When implementing this PRD:
 

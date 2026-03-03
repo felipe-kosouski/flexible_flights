@@ -227,7 +227,7 @@ These will extend the repository but MUST NOT change this contract.
 
 ---
 
-## 13. Cursor Instruction
+## 13. Implementation Instructions
 
 When implementing:
 

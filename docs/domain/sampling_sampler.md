@@ -224,7 +224,7 @@ The Runner decides what to do.
 
 ---
 
-## 14. Cursor Instruction
+## 14. Implementation Instructions
 
 When implementing:
 

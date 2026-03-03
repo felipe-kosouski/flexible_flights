@@ -392,7 +392,7 @@ All objects:
 
 ---
 
-## 15. Cursor instruction
+## 15. Implementation Instructions
 
 When implementing scoring:
 

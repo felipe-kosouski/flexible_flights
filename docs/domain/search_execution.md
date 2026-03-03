@@ -168,7 +168,7 @@ end
 
 ---
 
-## 12. Cursor Instruction
+## 12. Implementation Instructions
 
 When implementing:
 

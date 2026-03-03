@@ -90,6 +90,8 @@ RSpec.describe Search::SearchExecution do
   end
 
   let(:ranker_class) { class_double(Search::Ranking::Ranker) }
+  let(:insights_builder_class) { class_double(Search::Insights::Builder) }
+  let(:search_insights) { instance_double(Search::Insights::SearchInsights) }
 
   subject(:execution) { described_class.new(search_run: search_run, intent: intent) }
 
@@ -99,6 +101,7 @@ RSpec.describe Search::SearchExecution do
     stub_const("Search::Scoring::Scorer", scorer_class)
     stub_const("Search::Explanation::Builder", builder_class)
     stub_const("Search::Ranking::Ranker", ranker_class)
+    stub_const("Search::Insights::Builder", insights_builder_class)
 
     allow(mapper_class).to receive(:map_all).and_return(mapped_samples)
     allow(snapshot_builder).to receive(:build).and_return(snapshot)
@@ -107,6 +110,7 @@ RSpec.describe Search::SearchExecution do
     )
     allow(builder_class).to receive(:call).and_return(explanation)
     allow(ranker_class).to receive(:call).and_return([ ranked_flight_a, ranked_flight_b ])
+    allow(insights_builder_class).to receive(:call).and_return(search_insights)
   end
 
   describe "initial state" do
@@ -132,6 +136,10 @@ RSpec.describe Search::SearchExecution do
 
     it "has empty ranked_results" do
       expect(execution.ranked_results).to eq([])
+    end
+
+    it "has no insights" do
+      expect(execution.insights).to be_nil
     end
 
     it "has no error" do
@@ -238,6 +246,22 @@ RSpec.describe Search::SearchExecution do
       expect(execution.ranked_results).to all(be_a(Search::Ranking::RankedFlight))
     end
 
+    it "calls Insights::Builder with ranked_results, snapshot, and intent" do
+      execution.execute
+
+      expect(insights_builder_class).to have_received(:call).with(
+        ranked_flights: execution.ranked_results,
+        snapshot: snapshot,
+        intent: intent
+      )
+    end
+
+    it "stores insights from Insights::Builder" do
+      execution.execute
+
+      expect(execution.insights).to eq(search_insights)
+    end
+
     it "exposes raw results through the search run" do
       execution.execute
 
@@ -295,6 +319,18 @@ RSpec.describe Search::SearchExecution do
       execution.execute
 
       expect(builder_class).not_to have_received(:call)
+    end
+
+    it "never calls the Insights Builder" do
+      execution.execute
+
+      expect(insights_builder_class).not_to have_received(:call)
+    end
+
+    it "leaves insights as nil" do
+      execution.execute
+
+      expect(execution.insights).to be_nil
     end
 
     it "still stores mapped flight samples" do
@@ -438,10 +474,14 @@ RSpec.describe Search::SearchExecution do
         phase_log << :ranking
         [ ranked_flight_a, ranked_flight_b ]
       end
+      allow(insights_builder_class).to receive(:call) do
+        phase_log << :insights
+        search_insights
+      end
 
       execution.execute
 
-      expect(phase_log).to eq([ :sampling, :mapping, :analyzing, :scoring, :scoring, :explaining, :explaining, :ranking ])
+      expect(phase_log).to eq([ :sampling, :mapping, :analyzing, :scoring, :scoring, :explaining, :explaining, :ranking, :insights ])
     end
   end
 end
