@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 #
 # Full pipeline console test — no real provider needed.
 # Seeds AR records, injects a mock provider, runs the complete 8-phase
@@ -52,7 +53,7 @@ def mock_provider.search(origin:, destination:, departure_date:, return_date:, p
   [
     { price_cents:          38_000 + day_offset,
       currency:             "USD",
-      airline_codes:        ["AA"],
+      airline_codes:        [ "AA" ],
       stops:                0,
       air_time_minutes:     415,
       layover_time_minutes: 0,
@@ -60,7 +61,7 @@ def mock_provider.search(origin:, destination:, departure_date:, return_date:, p
       raw_provider:         "mock" },
     { price_cents:          44_000 + day_offset,
       currency:             "USD",
-      airline_codes:        ["BA"],
+      airline_codes:        [ "BA" ],
       stops:                1,
       air_time_minutes:     530,
       layover_time_minutes: 85,
@@ -68,7 +69,7 @@ def mock_provider.search(origin:, destination:, departure_date:, return_date:, p
       raw_provider:         "mock" },
     { price_cents:          52_000 + day_offset,
       currency:             "USD",
-      airline_codes:        ["AF"],
+      airline_codes:        [ "AF" ],
       stops:                0,
       air_time_minutes:     420,
       layover_time_minutes: 0,

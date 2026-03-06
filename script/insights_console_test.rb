@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 #
 # End-to-end manual test for the Insights domain.
 #
@@ -118,23 +119,23 @@ end
 flights_week_a = [
   flight(departure_date: "2026-03-09", price_cents: 16_000),  # 160 USD — below p25
   flight(departure_date: "2026-03-11", price_cents: 17_000),  # 170 USD
-  flight(departure_date: "2026-03-13", price_cents: 18_000),  # 180 USD
+  flight(departure_date: "2026-03-13", price_cents: 18_000)  # 180 USD
 ]
 scores_week_a = [
   score(value: 90, price: 88, time_comfort: 86, trip_fit: 80),
   score(value: 88, price: 85, time_comfort: 84, trip_fit: 82),
-  score(value: 85, price: 82, time_comfort: 83, trip_fit: 75),
+  score(value: 85, price: 82, time_comfort: 83, trip_fit: 75)
 ]
 
 flights_week_b = [
   flight(departure_date: "2026-03-16", price_cents: 28_000),  # 280 USD — between p25/p50
   flight(departure_date: "2026-03-18", price_cents: 29_000),
-  flight(departure_date: "2026-03-20", price_cents: 30_000),
+  flight(departure_date: "2026-03-20", price_cents: 30_000)
 ]
 scores_week_b = [
   score(value: 75, price: 72, time_comfort: 76, trip_fit: 70),
   score(value: 72, price: 70, time_comfort: 74, trip_fit: 68),
-  score(value: 70, price: 68, time_comfort: 73, trip_fit: 65),  # price 68 < 70 → not balanced
+  score(value: 70, price: 68, time_comfort: 73, trip_fit: 65)  # price 68 < 70 → not balanced
 ]
 
 all_ranked = [
@@ -143,7 +144,7 @@ all_ranked = [
   ranked(flight: flights_week_a[2], score_result: scores_week_a[2], rank: 3),
   ranked(flight: flights_week_b[0], score_result: scores_week_b[0], rank: 4),
   ranked(flight: flights_week_b[1], score_result: scores_week_b[1], rank: 5),
-  ranked(flight: flights_week_b[2], score_result: scores_week_b[2], rank: 6),
+  ranked(flight: flights_week_b[2], score_result: scores_week_b[2], rank: 6)
 ]
 
 # ─── Scenario A: High confidence, low volatility, cheap top flights ───────────
@@ -213,7 +214,7 @@ flights_mid = [
   flight(departure_date: "2026-03-13", price_cents: 24_000),
   flight(departure_date: "2026-03-16", price_cents: 32_000),
   flight(departure_date: "2026-03-18", price_cents: 33_000),
-  flight(departure_date: "2026-03-20", price_cents: 34_000),
+  flight(departure_date: "2026-03-20", price_cents: 34_000)
 ]
 scores_mid = [
   score(value: 82, price: 78, time_comfort: 80, trip_fit: 75),
@@ -221,7 +222,7 @@ scores_mid = [
   score(value: 78, price: 74, time_comfort: 78, trip_fit: 72),
   score(value: 68, price: 65, time_comfort: 70, trip_fit: 62),
   score(value: 65, price: 63, time_comfort: 68, trip_fit: 60),
-  score(value: 62, price: 60, time_comfort: 65, trip_fit: 58),
+  score(value: 62, price: 60, time_comfort: 65, trip_fit: 58)
 ]
 ranked_mid = flights_mid.each_with_index.map do |f, i|
   ranked(flight: f, score_result: scores_mid[i], rank: i + 1)

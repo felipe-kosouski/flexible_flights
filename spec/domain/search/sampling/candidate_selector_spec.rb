@@ -168,9 +168,9 @@ RSpec.describe Search::Sampling::CandidateSelector do
 
       expect(result.size).to eq(7)
       by_departure = result.group_by(&:first)
-      expect(by_departure[ Date.new(2025, 3, 1) ].size).to eq(3)
-      expect(by_departure[ Date.new(2025, 3, 2) ].size).to eq(2)
-      expect(by_departure[ Date.new(2025, 3, 3) ].size).to eq(2)
+      expect(by_departure[Date.new(2025, 3, 1)].size).to eq(3)
+      expect(by_departure[Date.new(2025, 3, 2)].size).to eq(2)
+      expect(by_departure[Date.new(2025, 3, 3)].size).to eq(2)
     end
   end
 end

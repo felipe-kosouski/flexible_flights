@@ -9,7 +9,7 @@ class FlightSample < ApplicationRecord
   validates :layover_time_minutes, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :stops, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :airlines, presence: true
-  validates :luggage_included, inclusion: { in: [true, false] }
+  validates :luggage_included, inclusion: { in: [ true, false ] }
   validates :departure_datetime, presence: true
   validates :return_datetime, presence: true
 end
