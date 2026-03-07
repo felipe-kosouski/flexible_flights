@@ -7,6 +7,7 @@ module Search
         search_run_record.state = domain_run.state
         search_run_record.started_at = domain_run.started_at
         search_run_record.finished_at = domain_run.finished_at
+        search_run_record.error_message = domain_run.error&.message
         search_run_record
       end
     end

@@ -19,7 +19,6 @@ module Search
           execution.execute
 
           Mappers::SearchRunMapper.apply(search_run, search_run_record)
-          search_run_record.error_message = nil
           search_run_record.save!
 
           persist_samples(search_run_record, execution.results)
@@ -31,8 +30,6 @@ module Search
         search_run_record.reload
 
         Mappers::SearchRunMapper.apply(search_run, search_run_record)
-        search_run_record.error_message = search_run.error&.message || e.message
-
         search_run_record.save!(validate: false)
 
         raise
@@ -67,8 +64,9 @@ module Search
           price_p50_cents: snapshot.price_p50_cents,
           price_p75_cents: snapshot.price_p75_cents,
           route_median_duration_minutes: snapshot.route_median_duration_minutes.to_i,
-          sample_size: snapshot.sample_count,
-          confidence_level: snapshot.confidence.to_s
+          sample_count: snapshot.sample_count,
+          confidence_level: snapshot.confidence.to_s,
+          volatility: snapshot.volatility.to_s
         )
       end
     end

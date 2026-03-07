@@ -173,6 +173,7 @@ RSpec.describe Search::Repositories::SearchRunRepository do
         expect(snapshot.price_p50_cents).to eq(10_000)
         expect(snapshot.price_p75_cents).to eq(15_000)
         expect(snapshot.confidence_level).to eq("low")
+        expect(snapshot.volatility).to eq("low")
       end
 
       it "returns the execution object" do

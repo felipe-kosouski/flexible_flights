@@ -10,22 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_17_111918) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_06_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "analysis_snapshots", force: :cascade do |t|
-    t.integer "confidence_level"
+    t.integer "confidence_level", null: false
     t.datetime "created_at", null: false
     t.integer "price_p25_cents"
     t.integer "price_p50_cents"
     t.integer "price_p75_cents"
     t.integer "route_median_duration_minutes"
-    t.integer "sample_size"
+    t.integer "sample_count"
     t.bigint "search_run_id", null: false
     t.datetime "updated_at", null: false
-    t.float "volatility_index"
-    t.index ["search_run_id"], name: "index_analysis_snapshots_on_search_run_id"
+    t.integer "volatility"
+    t.index ["search_run_id"], name: "index_analysis_snapshots_on_search_run_id", unique: true
   end
 
   create_table "flight_samples", force: :cascade do |t|
@@ -35,7 +35,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_111918) do
     t.string "currency"
     t.datetime "departure_datetime"
     t.integer "layover_time_minutes"
-    t.boolean "luggage_included"
+    t.boolean "luggage_included", null: false
     t.integer "price_cents"
     t.string "provider"
     t.datetime "return_datetime"
@@ -48,17 +48,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_111918) do
 
   create_table "search_intents", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.string "destination_airport"
-    t.date "earliest_departure"
-    t.date "latest_return"
+    t.string "destination_airport", null: false
+    t.date "earliest_departure", null: false
+    t.date "latest_return", null: false
     t.integer "luggage_requirement"
-    t.integer "max_stay_days"
+    t.integer "max_stay_days", null: false
     t.integer "max_stops"
-    t.integer "min_stay_days"
-    t.string "origin_airport"
+    t.integer "min_stay_days", null: false
+    t.string "origin_airport", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
-    t.index ["origin_airport", "destination_airport"], name: "index_search_intents_on_origin_airport_and_destination_airport", unique: true
     t.index ["user_id"], name: "index_search_intents_on_user_id"
   end
 
@@ -69,7 +68,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_111918) do
     t.datetime "finished_at"
     t.bigint "search_intent_id", null: false
     t.datetime "started_at"
-    t.integer "state"
+    t.integer "state", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["search_intent_id"], name: "index_search_runs_on_search_intent_id"
   end
