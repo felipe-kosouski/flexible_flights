@@ -72,31 +72,48 @@ It is not a replacement for `PRODUCT_GUIDE.md` or `PRD.md`; it is a practical ex
 
 ---
 
-## 5) Provider Integrations via Base Abstraction
+## 5) Provider Integrations via Base Abstraction ✅ DONE
 
 **Goal**
 
 - Integrate real flight providers behind a stable provider contract.
 
-**Why it matters**
+**Completed**
 
-- Sampling quality and coverage depend on real provider data.
-- A base abstraction keeps integration consistent and swap-friendly.
-- Current pipeline uses an injected provider stub; no real provider is wired.
-
-**Target shape**
-
-- A provider interface/base object defining required methods and response contract.
-- Adapter implementations per provider (normalize upstream payloads to domain input shape).
-- Deterministic error/timeout handling at the orchestration boundary.
-
-**Expected output**
-
-- One fully integrated provider end-to-end, plus scaffolding for additional providers.
+- `Flights::Base` defines the provider interface: `search(origin:, destination:, departure_date:, return_date:, passengers:, cabin_class:) → Array<Hash>`.
+- Domain error hierarchy (`Flights::Error`, `TimeoutError`, `RateLimitError`, `AuthError`, `InvalidResponse`) defined in a Zeitwerk explicit namespace file (`app/providers/flights.rb`).
+- `Flights::Stub` returns hardcoded flights; used in development and as the default in `SearchRunJob`.
+- `Flights::Registry` maps string names → provider instances, enabling ActiveJob-safe serialization (`provider_name: "amadeus"` rather than a Ruby object).
+- `Flights::Amadeus::Client` — Faraday HTTP client with OAuth2 token caching (60 s expiry buffer) and typed error mapping.
+- `Flights::Amadeus::Normalizer` — pure data transformation: raw Amadeus offer hash → canonical 8-field hash (`price_cents`, `currency`, `airline_codes`, `stops`, `air_time_minutes`, `layover_time_minutes`, `luggage_included`, `raw_provider`). Returns `nil` for malformed offers.
+- `Flights::Amadeus::Provider` — thin adapter: calls client, feeds each offer to normalizer, drops nils.
+- `SearchRunJob` updated to accept `provider_name:` string; resolves provider via registry inside `perform`.
+- Full spec coverage: client (6), normalizer (16), provider (5), registry (3). 434 examples, 0 failures.
 
 ---
 
-## 6) Presentation Layer
+## 6) Results Read Layer ✅ DONE
+
+**Goal**
+
+- Give the presentation layer access to scored, ranked, and insight data after the async job completes.
+
+**Decision: recompute on demand**
+
+Scoring, ranking, explaining, and insights are pure Ruby with no I/O — microseconds. Raw `flight_samples` and `analysis_snapshot` are already persisted. No new schema is needed.
+
+A `SearchRunRepository.load_results` method loads the stored raw data and reruns the compute-only pipeline phases on every read. Raw data is the source of truth; computed results are always derived.
+
+**Completed**
+
+- `Search::Factories::AnalysisSnapshotFactory.from_record` — hydrates `Models::AnalysisSnapshot` from the AR `AnalysisSnapshot` record (converts integer enum strings to symbols).
+- `Search::SearchResults` — frozen Struct value object carrying `ranked_flights`, `insights`, `snapshot`.
+- `SearchRunRepository.load_results(search_run_record)` — loads snapshot + samples, runs Scorer → Explanation::Builder → Ranker → Insights::Builder, returns `SearchResults`. Returns `nil` if no snapshot exists (still running / failed / empty).
+- Spec coverage: factory (7 examples), repository `load_results` (10 examples). 451 examples, 0 failures.
+
+---
+
+## 7) Presentation Layer
 
 **Goal**
 
@@ -105,7 +122,7 @@ It is not a replacement for `PRODUCT_GUIDE.md` or `PRD.md`; it is a practical ex
 **Why it matters**
 
 - MVP value is delivered through what users can see and understand.
-- The full domain pipeline is complete — only the UI delivery layer is missing.
+- The full domain pipeline (including results persistence) will be complete — only the UI delivery layer remains.
 
 **Must include**
 
@@ -121,7 +138,7 @@ It is not a replacement for `PRODUCT_GUIDE.md` or `PRD.md`; it is a practical ex
 
 ---
 
-## 7) Confidence Gating in Presentation
+## 8) Confidence Gating in Presentation
 
 **Goal**
 
@@ -151,9 +168,10 @@ It is not a replacement for `PRODUCT_GUIDE.md` or `PRD.md`; it is a practical ex
 2. ~~Persistence review~~ ✅
 3. ~~Job orchestration decision~~ ✅
 4. ~~Insights domain~~ ✅
-5. Provider base abstraction + first real provider.
-6. Presentation layer (search form → async job → results page).
-7. Confidence gating in presentation (UI messaging by confidence level).
+5. ~~Provider base abstraction + first real provider.~~ ✅
+6. ~~Results read layer (recompute on demand from stored raw data).~~ ✅
+7. Presentation layer (search form → async job → results page).
+8. Confidence gating in presentation (UI messaging by confidence level).
 
 ---
 

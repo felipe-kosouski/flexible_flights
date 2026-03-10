@@ -35,6 +35,44 @@ module Search
         raise
       end
 
+      def self.load_results(search_run_record)
+        ar_snapshot = search_run_record.analysis_snapshot
+        return nil unless ar_snapshot
+
+        snapshot = Factories::AnalysisSnapshotFactory.from_record(ar_snapshot)
+        intent   = Factories::SearchRunFactory.intent_from_record(search_run_record)
+
+        flight_samples = search_run_record.flight_samples.map do |ar_sample|
+          Mappers::FlightSampleMapper.from_hash(ar_sample.attributes.symbolize_keys)
+        end.compact
+
+        score_results = flight_samples.map do |sample|
+          Scoring::Scorer.new(flight: sample, intent: intent, snapshot: snapshot).call
+        end
+
+        explanations = flight_samples.zip(score_results).map do |sample, score_result|
+          next unless score_result
+
+          Explanation::Builder.call(
+            flight: sample, intent: intent, snapshot: snapshot, score_result: score_result
+          )
+        end
+
+        ranked_flights = Ranking::Ranker.call(
+          flights: flight_samples,
+          score_results: score_results,
+          explanations: explanations
+        )
+
+        insights = Insights::Builder.call(
+          ranked_flights: ranked_flights,
+          snapshot: snapshot,
+          intent: intent
+        )
+
+        SearchResults.new(ranked_flights: ranked_flights, insights: insights, snapshot: snapshot)
+      end
+
       private
 
       def self.persist_samples(search_run_record, samples)
