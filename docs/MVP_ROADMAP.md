@@ -113,28 +113,24 @@ A `SearchRunRepository.load_results` method loads the stored raw data and reruns
 
 ---
 
-## 7) Presentation Layer
+## 7) Presentation Layer ✅ DONE
 
 **Goal**
 
 - Render the user-facing Smart Search result page and all its states.
 
-**Why it matters**
+**Completed**
 
-- MVP value is delivered through what users can see and understand.
-- The full domain pipeline (including results persistence) will be complete — only the UI delivery layer remains.
-
-**Must include**
-
-- Search form wired to controller → `SearchRunJob` enqueue.
-- Polling or Turbo Streams for async result delivery.
-- Insight summary block (best time, book/wait recommendation).
-- Ranked flight list with per-flight score context and explanation.
-- UI states: loading, success, low-confidence, failed/empty.
-
-**Expected output**
-
-- End-to-end UI flow: search submission → async execution → results page.
+- `SearchesController` with `new`, `create`, `show` actions; session-based guest user.
+- Search form (`searches/new`) wired to controller → `SearchRunJob` enqueue.
+- Turbo Streams + Solid Cable for live async result delivery from the Solid Queue worker process (`async` adapter replaced with `solid_cable` in development).
+- `SearchRunJob#broadcast_result` in `ensure` block — broadcasts `searches/results` or `searches/failed` partial after job completes.
+- Presenters: `SearchResultsPresenter`, `RankedFlightPresenter`, `InsightsPresenter`.
+- UI states: loading spinner, success (ranked flights + insights), failed.
+- Per-flight cards: score ring badge, price/dates, stops/duration/luggage, score breakdown, human-readable explanation summary + tradeoffs.
+- Insight cards: best time to travel, wait-or-book recommendation, price rarity, cheapest comfort window.
+- Rails 8 per-environment encrypted credentials (`bin/rails credentials:edit --environment development`) wired to Amadeus provider and `flight_provider` key in `SearchRunJob`.
+- End-to-end verified with real Amadeus data in development.
 
 ---
 
@@ -170,7 +166,7 @@ A `SearchRunRepository.load_results` method loads the stored raw data and reruns
 4. ~~Insights domain~~ ✅
 5. ~~Provider base abstraction + first real provider.~~ ✅
 6. ~~Results read layer (recompute on demand from stored raw data).~~ ✅
-7. Presentation layer (search form → async job → results page).
+7. ~~Presentation layer (search form → async job → results page).~~ ✅
 8. Confidence gating in presentation (UI messaging by confidence level).
 
 ---

@@ -17,7 +17,7 @@
 
   <%# Insights %>
   <% if presenter.insights.any? %>
-    <%= render "insights", insights: presenter.insights %>
+    <%= render "searches/insights", insights: presenter.insights %>
   <% end %>
 
   <%# Ranked flights %>
@@ -25,7 +25,7 @@
     <h2 class="text-base font-semibold text-gray-700 mb-4">Ranked options</h2>
     <div class="space-y-3">
       <% presenter.ranked_flights.each do |flight| %>
-        <%= render "flight_card", flight: flight %>
+        <%= render "searches/flight_card", flight: flight %>
       <% end %>
     </div>
   </div>

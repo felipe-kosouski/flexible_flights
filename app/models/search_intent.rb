@@ -8,6 +8,8 @@ class SearchIntent < ApplicationRecord
     checked: 2
   }, prefix: true
 
+  before_validation { self.origin_airport = origin_airport&.upcase; self.destination_airport = destination_airport&.upcase }
+
   validates :user, presence: true
   validates :origin_airport, presence: true
   validates :destination_airport, presence: true

@@ -33,6 +33,10 @@ class InsightsPresenter
     @insights.confidence_level
   end
 
+  def low_confidence?
+    @insights.confidence_level == :low
+  end
+
   def any?
     wait_or_book || best_time_to_travel || price_rarity || cheapest_comfort_window
   end
@@ -88,6 +92,16 @@ class InsightsPresenter
     def confidence_level
       @insight.confidence_level
     end
+
+    def medium_confidence?
+      @insight.confidence_level == :medium
+    end
+
+    def subtext
+      return "Not enough data to make a reliable recommendation for this route yet." if @insight.directive == :insufficient_data
+
+      nil
+    end
   end
 
   class DateRangePresenter
@@ -109,6 +123,10 @@ class InsightsPresenter
 
     def confidence_level
       @insight.confidence_level
+    end
+
+    def medium_confidence?
+      @insight.confidence_level == :medium
     end
   end
 
@@ -153,6 +171,10 @@ class InsightsPresenter
 
     def confidence_level
       @insight.confidence_level
+    end
+
+    def medium_confidence?
+      @insight.confidence_level == :medium
     end
   end
 end
