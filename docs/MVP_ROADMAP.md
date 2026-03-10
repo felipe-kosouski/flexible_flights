@@ -6,159 +6,162 @@ It is not a replacement for `PRODUCT_GUIDE.md` or `PRD.md`; it is a practical ex
 
 ---
 
-## 1) Ranking (In Progress)
+## 1) Ranking ✅ DONE
 
 **Goal**
+
 - Produce a deterministic ranked list of flights for each search run.
 
-**Why it matters**
-- The product must show the best options first, not just scored data.
-- PRD/scoring rules define clear ordering semantics.
+**Completed**
 
-**Current status**
-- Ranking phase exists in `SearchExecution`.
-- `RankedFlight` and `Ranker` are implemented.
-
-**Remaining work**
-- Validate ranking output contract in the eventual presentation/query path.
-- Ensure rank consumers use `ranked_results` as the canonical ordered list.
+- `Ranking::Ranker` and `RankedFlight` implemented and spec-covered.
+- Ranking phase wired in `SearchExecution` as phase 7.
+- `ranked_results` is the canonical ordered output consumed by insights and repository.
 
 ---
 
-## 2) Persistence Layer Review
+## 2) Persistence Layer Review ✅ DONE
 
 **Goal**
+
 - Ensure DB schema + ActiveRecord models match domain vocabulary, constraints, and read/write needs.
 
-**Why it matters**
-- Persistence is the source of truth for facts (`search_runs`, `flight_samples`, `analysis_snapshots`).
-- Misaligned schema constraints create subtle runtime bugs.
+**Completed**
 
-**Known review points**
-- `search_intents` unique index scoping (currently likely too restrictive).
-- `luggage_included` boolean validation behavior.
-- `analysis_snapshots.volatility_index` storage type vs domain usage (float vs symbol/enum semantics).
-
-**Expected output**
-- List of migration/model fixes with backward-compatible rollout order.
+- Schema aligned with domain vocabulary (`state`, `finished_at`, integer cents, integer enums).
+- `analysis_snapshots.volatility` stored as integer (enum semantics); `confidence_level` as integer.
+- `flight_samples.luggage_included` has `null: false` constraint; AR validation enforced.
+- `search_intents` index scoped to `user_id` only (not over-constrained).
+- Foreign keys and indexes reviewed and in place.
 
 ---
 
-## 3) Provider Integrations via Base Abstraction
+## 3) Insights ✅ DONE
 
 **Goal**
+
+- Build the domain that answers: best time to travel, book now vs wait, supporting rationale.
+
+**Completed**
+
+- `Insights::Builder`, `SearchInsights`, `DateRangeInsight`, `WaitOrBookInsight`, `PriceRarityInsight` implemented.
+- All 4 artifacts produced: `best_time_to_travel`, `wait_or_book`, `price_rarity`, `cheapest_comfort_window`.
+- Confidence-gated within the domain: low confidence suppresses recommendations and returns `:insufficient_data`.
+- Integrated in `SearchExecution` as phase 8.
+- Spec coverage in `spec/domain/search/insights/`.
+
+---
+
+## 4) Job Orchestration Strategy ✅ DONE
+
+**Goal**
+
+- Choose and implement one coherent execution entrypoint.
+
+**Decision**
+
+- Single `SearchRunJob` wraps the synchronous repository pipeline in an async job.
+- Repository owns all state transitions, error handling, and persistence.
+- Old multi-job stubs (`StartSearchRunJob`, `SamplingJob`, `AnalysisJob`) removed.
+- Solid Queue wired as backend; `worker: bin/jobs` in `Procfile.dev`.
+
+**Documented pattern**
+
+- Controller creates `SearchRun` record → enqueues `SearchRunJob` → job delegates to `SearchRunRepository.execute`.
+- Job is intentionally thin. Errors propagate to Solid Queue for tracking.
+
+---
+
+## 5) Provider Integrations via Base Abstraction
+
+**Goal**
+
 - Integrate real flight providers behind a stable provider contract.
 
 **Why it matters**
-- Sampling quality and coverage depend on provider implementations.
+
+- Sampling quality and coverage depend on real provider data.
 - A base abstraction keeps integration consistent and swap-friendly.
+- Current pipeline uses an injected provider stub; no real provider is wired.
 
 **Target shape**
+
 - A provider interface/base object defining required methods and response contract.
 - Adapter implementations per provider (normalize upstream payloads to domain input shape).
-- Deterministic handling of provider errors/timeouts in orchestration boundaries.
+- Deterministic error/timeout handling at the orchestration boundary.
 
 **Expected output**
+
 - One fully integrated provider end-to-end, plus scaffolding for additional providers.
 
 ---
 
-## 4) Presentation Layer
+## 6) Presentation Layer
 
 **Goal**
-- Render the user-facing Smart Search result page and states.
+
+- Render the user-facing Smart Search result page and all its states.
 
 **Why it matters**
+
 - MVP value is delivered through what users can see and understand.
+- The full domain pipeline is complete — only the UI delivery layer is missing.
 
 **Must include**
-- Insight summary block above flights.
-- Ranked flight list with clear explanation hooks.
-- Confidence-aware messaging.
-- Empty/failed/loading states.
+
+- Search form wired to controller → `SearchRunJob` enqueue.
+- Polling or Turbo Streams for async result delivery.
+- Insight summary block (best time, book/wait recommendation).
+- Ranked flight list with per-flight score context and explanation.
+- UI states: loading, success, low-confidence, failed/empty.
 
 **Expected output**
-- End-to-end UI flow from search submission to results display.
+
+- End-to-end UI flow: search submission → async execution → results page.
 
 ---
 
-## 5) Insights (Critical Missing Domain)
+## 7) Confidence Gating in Presentation
 
 **Goal**
-- Build the domain that answers:
-  - Best time to travel
-  - Book now vs wait
-  - Supporting rationale
+
+- Surface confidence-driven behavior in the UI, not just in the domain.
 
 **Why it matters**
-- This is core product value in `PRODUCT_GUIDE.md`, not an optional enhancement.
-- Current explanation logic is per-flight; insights are cross-flight and decision-oriented.
+
+- Domain already gates insights by confidence (low → suppressed or `:insufficient_data`).
+- PRD requires confidence-aware messaging in the UI: wording, tone, visual cues must reflect confidence level.
 
 **Current gap**
-- No insight domain objects.
-- No best-window derivation logic.
-- No deterministic recommendation policy object.
+
+- Domain confidence policy is in place. Presentation layer does not yet consume or render it.
 
 **Expected output**
-- Insight domain objects and builders, deterministic and confidence-aware.
 
----
-
-## 6) Job Orchestration Strategy
-
-**Goal**
-- Choose and implement one coherent execution entrypoint:
-  - synchronous repository pipeline, or
-  - asynchronous job-driven pipeline.
-
-**Why it matters**
-- The codebase currently has empty job stubs while repository executes synchronously.
-- Mixed orchestration models create drift and operational ambiguity.
-
-**Decision to make**
-- If jobs are canonical: wire `StartSearchRunJob`, `SamplingJob`, `AnalysisJob` properly and adjust repository role.
-- If repository is canonical: remove/deprecate unused job stubs to reduce confusion.
-
-**Expected output**
-- Single documented orchestration path with tests and lifecycle guarantees.
-
----
-
-## 7) Confidence as a Gating Mechanism
-
-**Goal**
-- Use confidence to control recommendation strength and wording, not just store it.
-
-**Why it matters**
-- PRD and PRODUCT_GUIDE require confidence-gated behavior:
-  - low confidence must avoid strong advice
-  - stale/weak signals must not produce decisive recommendations
-
-**Current gap**
-- Confidence is computed in analysis but not enforced in decision/presentation behavior.
-
-**Expected output**
-- Explicit policy rules mapping confidence levels to allowed recommendation types and message tone.
+- Explicit UI rules mapping confidence levels to message tone and visual state:
+  - `:high` → confident recommendation copy.
+  - `:medium` → hedged copy ("prices suggest…").
+  - `:low` → "not enough data" state with no recommendation shown.
 
 ---
 
 ## Suggested Execution Order
 
-1. Finish ranking integration verification in consumers.
-2. Persistence review + schema/model corrections.
-3. Decide orchestration model (jobs vs repository) and align execution path.
-4. Implement provider base abstraction + first real provider.
-5. Implement Insights domain (best time + book/wait).
-6. Add confidence gating policy through insights and presentation.
-7. Complete final presentation layer wiring and UX polish.
+1. ~~Ranking~~ ✅
+2. ~~Persistence review~~ ✅
+3. ~~Job orchestration decision~~ ✅
+4. ~~Insights domain~~ ✅
+5. Provider base abstraction + first real provider.
+6. Presentation layer (search form → async job → results page).
+7. Confidence gating in presentation (UI messaging by confidence level).
 
 ---
 
 ## Definition of Done (MVP)
 
 MVP is complete when a user can run one Smart Search and receive:
+
 - A ranked list of flights with explainable scoring context.
 - A best-time-to-travel insight.
 - A deterministic book-vs-wait recommendation that is confidence-gated.
 - Clear UI states for success, low-confidence, and failure.
-

@@ -16,6 +16,7 @@ gem "bootsnap", require: false
 gem "kamal", require: false
 gem "thruster", require: false
 gem "rspec-rails"
+gem "faraday"
 
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -32,4 +33,5 @@ end
 
 group :test do
   gem "shoulda-matchers"
+  gem "webmock"
 end
