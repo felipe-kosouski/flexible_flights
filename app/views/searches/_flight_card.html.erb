@@ -1,0 +1,75 @@
+<div class="rounded-xl border border-gray-200 bg-white p-5 hover:shadow-sm transition-shadow">
+  <div class="flex items-start gap-4">
+
+    <%# Rank + Score badge %>
+    <div class="flex-shrink-0 flex flex-col items-center gap-1.5 pt-0.5">
+      <span class="text-xs font-medium text-gray-400">#<%= flight.rank %></span>
+      <div class="w-12 h-12 rounded-full ring-2 flex flex-col items-center justify-center <%= flight.score_ring_class %>">
+        <span class="text-base font-bold leading-none <%= flight.score_color_class %>"><%= flight.score %></span>
+        <span class="text-[9px] font-medium leading-none text-gray-400 mt-0.5">score</span>
+      </div>
+      <span class="text-[10px] font-medium <%= flight.score_color_class %>"><%= flight.score_label %></span>
+    </div>
+
+    <%# Main info %>
+    <div class="flex-1 min-w-0">
+
+      <%# Price + dates row %>
+      <div class="flex items-baseline justify-between gap-2 flex-wrap">
+        <span class="text-xl font-bold text-gray-900"><%= flight.price %></span>
+        <span class="text-sm text-gray-500">
+          <%= flight.departure_date %> &ndash; <%= flight.return_date %>
+          &middot; <%= flight.stay_days %>d stay
+        </span>
+      </div>
+
+      <%# Route details %>
+      <div class="mt-2 flex items-center gap-3 text-sm text-gray-500 flex-wrap">
+        <span class="<%= flight.stops_color_class %>"><%= flight.stops_label %></span>
+        <span>&middot;</span>
+        <span><%= flight.duration %> total</span>
+        <span>&middot;</span>
+        <span class="<%= flight.luggage_included_class %>"><%= flight.luggage_label %></span>
+      </div>
+
+      <%# Score breakdown %>
+      <div class="mt-3 flex items-center gap-3 flex-wrap">
+        <% if flight.price_score %>
+          <span class="text-xs text-gray-400">
+            Price <span class="font-medium text-gray-600"><%= flight.price_score %></span>
+          </span>
+        <% end %>
+        <% if flight.comfort_score %>
+          <span class="text-xs text-gray-400">
+            Comfort <span class="font-medium text-gray-600"><%= flight.comfort_score %></span>
+          </span>
+        <% end %>
+        <% if flight.trip_fit_score %>
+          <span class="text-xs text-gray-400">
+            Trip fit <span class="font-medium text-gray-600"><%= flight.trip_fit_score %></span>
+          </span>
+        <% end %>
+      </div>
+
+      <%# Explanation summary + tradeoffs %>
+      <% if flight.summary.present? || flight.tradeoffs.present? %>
+        <div class="mt-3 rounded-lg bg-gray-50 border border-gray-100 px-3.5 py-3">
+          <% if flight.summary.present? %>
+            <p class="text-sm text-gray-600 leading-relaxed"><%= flight.summary %></p>
+          <% end %>
+          <% if flight.tradeoffs.present? %>
+            <ul class="mt-2 space-y-1">
+              <% flight.tradeoffs.each do |tradeoff| %>
+                <li class="text-xs text-gray-400 flex items-start gap-1.5">
+                  <span class="mt-0.5 shrink-0 text-gray-300">&bull;</span>
+                  <%= tradeoff %>
+                </li>
+              <% end %>
+            </ul>
+          <% end %>
+        </div>
+      <% end %>
+
+    </div>
+  </div>
+</div>

@@ -4,4 +4,16 @@ class ApplicationController < ActionController::Base
 
   # Changes to the importmap will invalidate the etag for HTML responses
   stale_when_importmap_changes
+
+  private
+
+  def current_user
+    @current_user ||= User.find_by(id: session[:user_id]) || create_guest_user
+  end
+
+  def create_guest_user
+    user = User.create!(email: "guest_#{SecureRandom.hex(8)}@guest.local")
+    session[:user_id] = user.id
+    user
+  end
 end

@@ -21,7 +21,7 @@ class SearchRunJob < ApplicationJob
 
   discard_on ActiveRecord::RecordNotFound
 
-  def perform(search_run_id, provider_name: "stub", max_candidates: 20, passengers: 1, cabin_class: :economy)
+  def perform(search_run_id, provider_name: Rails.application.credentials.flight_provider || "stub", max_candidates: 20, passengers: 1, cabin_class: :economy)
     provider = Flights::Registry.resolve(provider_name)
     search_run_record = SearchRun.find(search_run_id)
 
@@ -32,5 +32,30 @@ class SearchRunJob < ApplicationJob
       passengers: passengers,
       cabin_class: cabin_class
     )
+  ensure
+    search_run_record&.reload
+    broadcast_result(search_run_record) if search_run_record
+  end
+
+  private
+
+  def broadcast_result(search_run)
+    if search_run.completed?
+      results = Search::Repositories::SearchRunRepository.load_results(search_run)
+      presenter = SearchResultsPresenter.new(results, search_run)
+      Turbo::StreamsChannel.broadcast_replace_to(
+        "search_run_#{search_run.id}",
+        target: "search_results",
+        partial: "searches/results",
+        locals: { presenter: presenter }
+      )
+    else
+      Turbo::StreamsChannel.broadcast_replace_to(
+        "search_run_#{search_run.id}",
+        target: "search_results",
+        partial: "searches/failed",
+        locals: { search_run: search_run }
+      )
+    end
   end
 end

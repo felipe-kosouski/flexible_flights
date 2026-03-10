@@ -1,5 +1,6 @@
 class SearchIntent < ApplicationRecord
   belongs_to :user
+  has_many :search_runs, dependent: :destroy
 
   enum :luggage_requirement, {
     none: 0,

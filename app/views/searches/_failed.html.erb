@@ -1,0 +1,12 @@
+<div id="search_results" class="w-full flex flex-col items-center justify-center py-24 text-center">
+  <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-6">
+    <svg class="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+    </svg>
+  </div>
+  <h2 class="text-lg font-medium text-gray-800">Search failed</h2>
+  <p class="mt-1 text-sm text-gray-400">Something went wrong while searching. Please try again.</p>
+  <div class="mt-6">
+    <%= link_to "Try again", new_search_path, class: "inline-block bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg px-5 py-2.5 transition-colors" %>
+  </div>
+</div>

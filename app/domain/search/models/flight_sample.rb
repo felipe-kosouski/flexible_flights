@@ -28,6 +28,10 @@ module Search
         @departure_datetime
       end
 
+      def return_datetime
+        @return_datetime
+      end
+
       def price_cents
         @price_cents
       end

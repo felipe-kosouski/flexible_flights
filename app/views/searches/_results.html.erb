@@ -1,0 +1,32 @@
+<div id="search_results" class="w-full">
+  <%# Header %>
+  <div class="flex items-center justify-between mb-8">
+    <div>
+      <h1 class="text-2xl font-semibold text-gray-900 tracking-tight">
+        <%= presenter.origin %> &rarr; <%= presenter.destination %>
+      </h1>
+      <p class="mt-1 text-sm text-gray-500">
+        <%= presenter.sample_count %> options analysed &middot;
+        <span class="<%= presenter.confidence_color_class %>"><%= presenter.confidence_label %></span>
+      </p>
+    </div>
+    <%= link_to new_search_path, class: "text-sm text-indigo-600 hover:text-indigo-700 font-medium" do %>
+      Search again &rarr;
+    <% end %>
+  </div>
+
+  <%# Insights %>
+  <% if presenter.insights.any? %>
+    <%= render "insights", insights: presenter.insights %>
+  <% end %>
+
+  <%# Ranked flights %>
+  <div class="mt-8">
+    <h2 class="text-base font-semibold text-gray-700 mb-4">Ranked options</h2>
+    <div class="space-y-3">
+      <% presenter.ranked_flights.each do |flight| %>
+        <%= render "flight_card", flight: flight %>
+      <% end %>
+    </div>
+  </div>
+</div>

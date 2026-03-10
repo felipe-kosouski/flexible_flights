@@ -12,10 +12,11 @@ module Flights
       MAX_RESULTS = 10
 
       def initialize
+        creds = Rails.application.credentials.amadeus!
         @client = Client.new(
-          client_id: ENV.fetch("AMADEUS_CLIENT_ID"),
-          client_secret: ENV.fetch("AMADEUS_CLIENT_SECRET"),
-          env: ENV.fetch("AMADEUS_ENV", "test").to_sym
+          client_id: creds.client_id!,
+          client_secret: creds.client_secret!,
+          env: Rails.env.production? ? :production : :test
         )
       end
 
