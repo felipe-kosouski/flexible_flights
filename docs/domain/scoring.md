@@ -399,4 +399,31 @@ When implementing scoring:
 - Follow this document strictly
 - Do not invent factors
 - Do not persist results
+
+---
+
+## 16. Known Limitations & Future Improvements
+
+### Duration score granularity (time_comfort)
+
+`TimeComfortScore` uses discrete buckets for `duration_score`:
+
+| Relative duration | Score |
+|-------------------|-------|
+| < 0.9× median     | 100   |
+| 0.9–1.1× median   | 80    |
+| 1.1–1.3× median   | 50    |
+| > 1.3× median     | 20    |
+
+**Problem:** flights with meaningfully different actual durations (e.g. 15h 15m vs 15h 44m) both score 100 when they are both well under the median. The score cannot differentiate them.
+
+**Current mitigation:** the curated flight selection (`SearchResultsPresenter#curated_with_roles`) breaks ties on the `best_comfort` slot by shortest actual travel time, so the "Best comfort" tag correctly highlights the faster flight even when both score identically.
+
+**Future fix:** replace `duration_score` with a continuous formula that maps `relative_duration` to a 0–100 score without hard steps. A candidate formula:
+
+```
+duration_score = clamp(100 - ((relative_duration - 0.5) × 100), 0, 100)
+```
+
+This would produce genuinely different scores for flights in the same bucket and eliminate the need for a tiebreaker. Requires updating this spec and all related scoring specs before implementing.
 - Ask if unclear

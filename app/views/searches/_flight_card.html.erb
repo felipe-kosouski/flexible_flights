@@ -14,6 +14,17 @@
     <%# Main info %>
     <div class="flex-1 min-w-0">
 
+      <%# Role tags %>
+      <% if flight.tags.any? %>
+        <div class="flex flex-wrap gap-1.5 mb-2">
+          <% flight.tags.each do |tag| %>
+            <span class="inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-semibold <%= flight.tag_color_class(tag) %>">
+              <%= flight.tag_label(tag) %>
+            </span>
+          <% end %>
+        </div>
+      <% end %>
+
       <%# Price + dates row %>
       <div class="flex items-baseline justify-between gap-2 flex-wrap">
         <span class="text-xl font-bold text-gray-900"><%= flight.price %></span>
@@ -66,6 +77,9 @@
                 </li>
               <% end %>
             </ul>
+          <% end %>
+          <% if flight.skip_reason.present? %>
+            <p class="mt-2 text-xs text-amber-600 font-medium"><%= flight.skip_reason %></p>
           <% end %>
         </div>
       <% end %>

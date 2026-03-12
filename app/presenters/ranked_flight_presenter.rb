@@ -1,12 +1,40 @@
 # frozen_string_literal: true
 
 class RankedFlightPresenter
-  def initialize(ranked_flight)
+  TAG_LABELS = {
+    top_rated:    "Top rated",
+    best_price:   "Best price",
+    best_comfort: "Best comfort"
+  }.freeze
+
+  TAG_COLOR_CLASSES = {
+    top_rated:    "bg-indigo-50 text-indigo-600",
+    best_price:   "bg-emerald-50 text-emerald-600",
+    best_comfort: "bg-blue-50 text-blue-600"
+  }.freeze
+
+  def initialize(ranked_flight, intent: nil, total_flights: nil, ai_copy: nil, tags: [])
     @ranked_flight = ranked_flight
+    @intent = intent
+    @total_flights = total_flights
+    @precomputed_ai_copy = ai_copy
+    @tags = Array(tags)
   end
 
   def rank
     @ranked_flight.rank
+  end
+
+  def tags
+    @tags
+  end
+
+  def tag_label(tag)
+    TAG_LABELS[tag]
+  end
+
+  def tag_color_class(tag)
+    TAG_COLOR_CLASSES[tag]
   end
 
   def score
@@ -82,22 +110,15 @@ class RankedFlightPresenter
   end
 
   def summary
-    return nil unless explanation&.summary
-
-    keys = explanation.summary[:explanation_keys] || []
-    primary = explanation.summary[:primary_factors] || []
-
-    if keys.any?
-      EXPLANATION_KEY_LABELS[keys.first]
-    else
-      DIMENSION_LABELS[primary.first]
-    end
+    @precomputed_ai_copy&.dig(:summary)
   end
 
   def tradeoffs
-    return [] unless explanation&.tradeoffs
+    @precomputed_ai_copy&.dig(:tradeoffs) || []
+  end
 
-    explanation.tradeoffs.filter_map { |t| TRADEOFF_LABELS[t[:explanation_key]] }
+  def skip_reason
+    @precomputed_ai_copy&.dig(:skip_reason)
   end
 
   def price_score
@@ -132,6 +153,25 @@ class RankedFlightPresenter
   }.freeze
 
   private
+
+  def template_summary
+    return nil unless explanation&.summary
+
+    keys = explanation.summary[:explanation_keys] || []
+    primary = explanation.summary[:primary_factors] || []
+
+    if keys.any?
+      EXPLANATION_KEY_LABELS[keys.first]
+    else
+      DIMENSION_LABELS[primary.first]
+    end
+  end
+
+  def template_tradeoffs
+    return [] unless explanation&.tradeoffs
+
+    explanation.tradeoffs.filter_map { |t| TRADEOFF_LABELS[t[:explanation_key]] }
+  end
 
   def flight
     @ranked_flight.flight

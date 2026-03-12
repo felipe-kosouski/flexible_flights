@@ -29,10 +29,12 @@ module Search
 
       def sort_triples(triples)
         triples.sort_by do |flight, score_result, _explanation|
+          total_minutes = flight.air_time_minutes.to_i + flight.layover_time_minutes.to_i
           [
             -score_result.value,
             flight.price_cents || Float::INFINITY,
-            flight.stops || Float::INFINITY
+            flight.stops || Float::INFINITY,
+            total_minutes
           ]
         end
       end

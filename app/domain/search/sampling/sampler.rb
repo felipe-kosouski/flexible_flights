@@ -39,7 +39,7 @@ module Search
           end
         end
 
-        samples
+        dedup(samples)
       end
 
       private
@@ -69,6 +69,22 @@ module Search
 
         REQUIRED_KEYS.all? do |key|
           raw_sample.key?(key) && !raw_sample[key].nil?
+        end
+      end
+
+      def dedup(samples)
+        seen = {}
+        samples.each_with_object([]) do |s, unique|
+          key = [
+            s[:price_cents],
+            s[:departure_datetime],
+            s[:return_datetime],
+            s[:stops],
+            s[:air_time_minutes],
+            s[:layover_time_minutes]
+          ]
+          unique << s unless seen.key?(key)
+          seen[key] = true
         end
       end
     end
