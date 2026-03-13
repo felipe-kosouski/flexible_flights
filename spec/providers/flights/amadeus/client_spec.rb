@@ -25,7 +25,7 @@ RSpec.describe Flights::Amadeus::Client do
       before { stub_token }
 
       it "fetches and returns the flight offers data" do
-        offers_body = { "data" => [{ "id" => "1" }] }.to_json
+        offers_body = { "data" => [ { "id" => "1" } ] }.to_json
         stub_get(offers_url)
           .with(headers: { "Authorization" => "Bearer #{valid_token}" })
           .to_return(status: 200, body: offers_body, headers: { "Content-Type" => "application/json" })

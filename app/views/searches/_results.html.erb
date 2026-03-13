@@ -20,6 +20,13 @@
     <%= render "searches/insights", insights: presenter.insights %>
   <% end %>
 
+  <%# Route summary %>
+  <% if presenter.insights.route_summary %>
+    <div class="mt-6 rounded-xl border border-gray-200 bg-white px-5 py-4">
+      <p class="text-sm text-gray-700 leading-relaxed"><%= presenter.insights.route_summary %></p>
+    </div>
+  <% end %>
+
   <%# Ranked flights %>
   <div class="mt-8">
     <h2 class="text-base font-semibold text-gray-700 mb-4">Ranked options</h2>

@@ -30,7 +30,7 @@ RSpec.describe Flights::Amadeus::Normalizer do
     describe "airline_codes" do
       it "returns unique carrier codes from the outbound itinerary only" do
         # Both outbound segments are VY; return is IB — only outbound included
-        expect(result[:airline_codes]).to eq(["VY"])
+        expect(result[:airline_codes]).to eq([ "VY" ])
       end
     end
 

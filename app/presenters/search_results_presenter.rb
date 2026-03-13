@@ -19,7 +19,7 @@ class SearchResultsPresenter
   end
 
   def insights
-    @insights ||= InsightsPresenter.new(@results.insights)
+    @insights ||= InsightsPresenter.new(@results.insights, route_summary: route_ai_summary)
   end
 
   def origin
@@ -84,6 +84,14 @@ class SearchResultsPresenter
       ranked_flights: curated_flights,
       intent: @search_run.search_intent,
       total_flights: @results.ranked_flights.size
+    )
+  end
+
+  def route_ai_summary
+    @route_ai_summary ||= RouteSummaryCopyService.call(
+      insights: @results.insights,
+      snapshot: @results.snapshot,
+      intent: @search_run.search_intent
     )
   end
 end

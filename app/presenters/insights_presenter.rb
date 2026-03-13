@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 class InsightsPresenter
-  def initialize(insights)
+  def initialize(insights, route_summary: nil)
     @insights = insights
+    @route_summary = route_summary
   end
 
   def wait_or_book
@@ -35,6 +36,10 @@ class InsightsPresenter
 
   def low_confidence?
     @insights.confidence_level == :low
+  end
+
+  def route_summary
+    @route_summary
   end
 
   def any?

@@ -7,7 +7,7 @@ FactoryBot.define do
     air_time_minutes { 480 }
     layover_time_minutes { 0 }
     stops { 0 }
-    airlines { ["AA"] }
+    airlines { [ "AA" ] }
     luggage_included { false }
     departure_datetime { 30.days.from_now }
     return_datetime { 37.days.from_now }

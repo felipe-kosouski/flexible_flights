@@ -5,20 +5,32 @@ class ExplanationCopyService
   CACHE_TTL = 7.days
 
   SYSTEM_PROMPT = <<~SYSTEM.strip
-    You write short, honest flight explanations for travelers. Use ONLY the
-    numbers provided. Never invent or imply statistics not listed below.
+    You write short, honest flight explanations for travelers that read like
+    advice from a knowledgeable friend. Translate numbers into meaning. Use
+    specific dollar amounts. Avoid raw percentages for travel time — describe
+    what they mean instead (e.g., "about 2 hours longer than typical" not
+    "17% longer than median"). Use ONLY the numbers provided. Never invent or
+    imply statistics not listed below.
   SYSTEM
 
   RULES_TEXT = <<~TEXT.strip
     RULES
     - 2 sentences max for summary
-    - Reference specific numbers; avoid vague language
-    - If volatility is HIGH and price is BETTER → note urgency ("don't wait")
-    - If volatility is HIGH and price is WORSE → note possibility of better prices
+    - Every summary must answer at least 2 of these questions:
+        (1) How does this compare to the market? (price position, route speed)
+        (2) What does price history suggest? (volatility signal)
+        (3) Is there urgency to act now?
+    - Lead with the most decision-relevant fact
+    - For price: use $ amounts + qualitative label (e.g. "one of the cheapest at $536", "above average at $620")
+    - For travel time: describe difference in plain words — hours saved/added, or relative terms
+        like "among the fastest", "much longer than typical". Do NOT say "X% faster/slower".
+    - If volatility is HIGH and price is BETTER → note urgency ("prices on this route swing — this won't last")
+    - If volatility is HIGH and price is WORSE → note possibility of better prices appearing
     - If price is WORSE and no dimension is BETTER → set skip_reason explaining why
     - Luggage mismatch (user needs checked, flight has carry-on only) → flag it in tradeoffs
     - If stops equal user max → note "at your stop limit" in tradeoffs
     - If skip_reason does not apply, set it to null
+    - Never use em dashes (—) or semicolons (;) — rewrite the sentence instead
   TEXT
 
   def self.call(ranked_flight:, intent:, total_flights: nil)
@@ -44,7 +56,7 @@ class ExplanationCopyService
     return {} unless api_key
 
     fingerprints = ranked_flights.map { |rf| fingerprint_for(rf) }
-    cache_key = "explanation_copy/batch/v1/#{fingerprints.sort.join('|')}"
+    cache_key = "explanation_copy/batch/v3/#{fingerprints.sort.join('|')}"
 
     Rails.cache.fetch(cache_key, expires_in: CACHE_TTL) do
       pairs = ranked_flights.zip(fingerprints).filter_map { |rf, fp|
@@ -154,7 +166,7 @@ class ExplanationCopyService
 
   def cache_key
     [
-      "explanation_copy/v1",
+      "explanation_copy/v3",
       flight.price_cents,
       flight.departure_datetime.to_i,
       baselines[:price_median_cents],
