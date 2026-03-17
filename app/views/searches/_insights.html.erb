@@ -39,8 +39,11 @@
           </span>
         </div>
       </div>
+      <% if rarity.description %>
+        <p class="mt-2 text-sm font-medium"><%= rarity.description %></p>
+      <% end %>
       <% if rarity.market_price %>
-        <p class="mt-2 text-sm font-medium">Market price around <%= rarity.market_price %></p>
+        <p class="mt-1 text-xs opacity-70">Market median around <%= rarity.market_price %></p>
       <% end %>
     </div>
   <% end %>
@@ -55,6 +58,9 @@
         <% end %>
       </div>
       <p class="mt-2 text-sm font-semibold"><%= btt.date_range %></p>
+      <% if btt.description %>
+        <p class="mt-1 text-sm opacity-80"><%= btt.description %></p>
+      <% end %>
       <p class="mt-1 text-xs opacity-70">
         Avg. score <%= btt.average_score %>/100 across <%= btt.flight_count %> <%= "option".pluralize(btt.flight_count) %>
       </p>
@@ -71,6 +77,9 @@
         <% end %>
       </div>
       <p class="mt-2 text-sm font-semibold"><%= ccw.date_range %></p>
+      <% if ccw.description %>
+        <p class="mt-1 text-sm opacity-80"><%= ccw.description %></p>
+      <% end %>
       <p class="mt-1 text-xs opacity-70">
         Balances price and comfort &middot; avg. score <%= ccw.average_score %>/100
       </p>

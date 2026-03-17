@@ -43,10 +43,11 @@ class SearchRunJob < ApplicationJob
     if search_run.completed?
       results = Search::Repositories::SearchRunRepository.load_results(search_run)
       presenter = SearchResultsPresenter.new(results, search_run)
+      partial = presenter.low_confidence? ? "searches/low_confidence" : "searches/results"
       Turbo::StreamsChannel.broadcast_replace_to(
         "search_run_#{search_run.id}",
         target: "search_results",
-        partial: "searches/results",
+        partial: partial,
         locals: { presenter: presenter }
       )
     else

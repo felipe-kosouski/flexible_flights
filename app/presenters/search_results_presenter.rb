@@ -50,6 +50,10 @@ class SearchResultsPresenter
     end
   end
 
+  def low_confidence?
+    @results.snapshot.confidence == :low
+  end
+
   private
 
   def curated_flights

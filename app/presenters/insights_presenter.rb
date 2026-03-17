@@ -105,7 +105,20 @@ class InsightsPresenter
     def subtext
       return "Not enough data to make a reliable recommendation for this route yet." if @insight.directive == :insufficient_data
 
-      nil
+      case @insight.confidence_level
+      when :high
+        case @insight.directive
+        when :book_now          then "Prices are at a good level right now — waiting risks paying more."
+        when :wait              then "Prices are elevated for this route. Better options are likely ahead."
+        when :consider_booking  then "Conditions are reasonable. Booking now is a solid choice."
+        end
+      when :medium
+        case @insight.directive
+        when :book_now          then "Prices suggest this may be a good time to book."
+        when :wait              then "Prices suggest waiting could pay off for this route."
+        when :consider_booking  then "Prices appear reasonable, though the data picture isn't fully clear."
+        end
+      end
     end
   end
 
@@ -132,6 +145,13 @@ class InsightsPresenter
 
     def medium_confidence?
       @insight.confidence_level == :medium
+    end
+
+    def description
+      case @insight.confidence_level
+      when :high   then "Strong market signal for this window."
+      when :medium then "Based on available data, this window looks favorable."
+      end
     end
   end
 
@@ -180,6 +200,25 @@ class InsightsPresenter
 
     def medium_confidence?
       @insight.confidence_level == :medium
+    end
+
+    def description
+      case @insight.confidence_level
+      when :high
+        case @insight.classification
+        when :rare_cheap    then "Prices are unusually low for this route right now."
+        when :below_median  then "Prices are below the typical range for this route."
+        when :above_median  then "Prices are above the typical range for this route."
+        when :expensive     then "Prices are high relative to this route's history."
+        end
+      when :medium
+        case @insight.classification
+        when :rare_cheap    then "Prices appear lower than usual, though data is limited."
+        when :below_median  then "Prices appear to be below average."
+        when :above_median  then "Prices appear to be above average."
+        when :expensive     then "Prices appear high, though data is limited."
+        end
+      end
     end
   end
 end

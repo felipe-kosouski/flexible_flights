@@ -17,7 +17,11 @@
   <%# Results area — replaced by Turbo Stream when the job completes.
       Each partial owns the <div id="search_results"> wrapper so broadcast_replace_to can target it. %>
   <% if @search_run.completed? && @presenter %>
-    <%= render "results", presenter: @presenter %>
+    <% if @presenter.low_confidence? %>
+      <%= render "low_confidence", presenter: @presenter %>
+    <% else %>
+      <%= render "results", presenter: @presenter %>
+    <% end %>
   <% elsif @search_run.failed? %>
     <%= render "failed", search_run: @search_run %>
   <% else %>
