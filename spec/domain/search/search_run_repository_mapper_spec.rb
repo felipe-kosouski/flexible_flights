@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe Search::Repositories::SearchRunRepository do
   describe ".execute" do
-    let(:user) { User.create!(email: "test@example.com") }
+    let(:user) { User.create!(email: "test@example.com", password: "password123") }
 
     let(:search_intent) do
       SearchIntent.create!(
@@ -275,7 +275,7 @@ RSpec.describe Search::Repositories::SearchRunRepository do
   end
 
   describe ".load_results" do
-    let(:user) { User.create!(email: "load@example.com") }
+    let(:user) { User.create!(email: "load@example.com", password: "password123") }
 
     let(:search_intent) do
       SearchIntent.create!(

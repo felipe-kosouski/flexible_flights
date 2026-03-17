@@ -6,10 +6,10 @@ RSpec.describe User, type: :model do
   end
 
   describe "database constraints" do
-    it "enforces email uniqueness at the database level" do
+    it "enforces email uniqueness" do
       create(:user, email: "dup@example.com")
 
-      expect { create(:user, email: "dup@example.com") }.to raise_error(ActiveRecord::RecordNotUnique)
+      expect { create(:user, email: "dup@example.com") }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it "accepts two users with different emails" do

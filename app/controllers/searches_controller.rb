@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class SearchesController < ApplicationController
+  before_action :authenticate_user!
+
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found
+
   def new
     @search_intent = SearchIntent.new
   end
@@ -18,7 +22,9 @@ class SearchesController < ApplicationController
   end
 
   def show
-    @search_run = SearchRun.includes(search_intent: :user).find(params[:id])
+    @search_run = current_user.search_runs
+                               .includes(search_intent: :user)
+                               .find(params[:id])
 
     return unless @search_run.completed?
 
@@ -27,6 +33,10 @@ class SearchesController < ApplicationController
   end
 
   private
+
+  def not_found
+    redirect_to new_search_path, alert: "Search not found."
+  end
 
   def search_intent_params
     params.require(:search_intent).permit(

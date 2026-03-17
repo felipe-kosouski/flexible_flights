@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  devise_for :users
   root "searches#new"
 
   resources :searches, only: [ :new, :create, :show ]
