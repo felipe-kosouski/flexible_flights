@@ -19,40 +19,40 @@ puts "=" * 70
 def flight(departure_date:, price_cents:, stops: 0, air_time_minutes: 360)
   Search::Models::FlightSample.new(
     departure_datetime: Time.zone.parse("#{departure_date} 08:30"),
-    return_datetime:    Time.zone.parse("#{departure_date} 08:30") + 7.days + 19.hours,
-    luggage_included:   true,
-    price_cents:        price_cents,
-    stops:              stops,
-    air_time_minutes:   air_time_minutes,
+    return_datetime: Time.zone.parse("#{departure_date} 08:30") + 7.days + 19.hours,
+    luggage_included: true,
+    price_cents: price_cents,
+    stops: stops,
+    air_time_minutes: air_time_minutes,
     layover_time_minutes: stops > 0 ? 90 : 0
   )
 end
 
 def score(value:, price:, time_comfort:, trip_fit:)
   Search::Scoring::ScoreResult.new(
-    value:      value,
+    value: value,
     components: { price: price, time_comfort: time_comfort, trip_fit: trip_fit }
   )
 end
 
 def ranked(flight:, score_result:, rank:)
   Search::Ranking::RankedFlight.new(
-    flight:       flight,
+    flight: flight,
     score_result: score_result,
-    explanation:  nil,
-    rank:         rank
+    explanation: nil,
+    rank: rank
   )
 end
 
 def snapshot(confidence:, volatility:, p25: 20_000, p50: 30_000, p75: 40_000)
   Search::Models::AnalysisSnapshot.new(
-    price_p25_cents:             p25,
-    price_p50_cents:             p50,
-    price_p75_cents:             p75,
+    price_p25_cents: p25,
+    price_p50_cents: p50,
+    price_p75_cents: p75,
     route_median_duration_minutes: 360,
-    sample_count:                6,
-    volatility:                  volatility,
-    confidence:                  confidence
+    sample_count: 6,
+    volatility: volatility,
+    confidence: confidence
   )
 end
 
@@ -117,9 +117,9 @@ end
 # Price thresholds (snapshot): p25=200 USD, p50=300 USD, p75=400 USD
 
 flights_week_a = [
-  flight(departure_date: "2026-03-09", price_cents: 16_000),  # 160 USD — below p25
-  flight(departure_date: "2026-03-11", price_cents: 17_000),  # 170 USD
-  flight(departure_date: "2026-03-13", price_cents: 18_000)  # 180 USD
+  flight(departure_date: "2026-03-09", price_cents: 16_000), # 160 USD — below p25
+  flight(departure_date: "2026-03-11", price_cents: 17_000), # 170 USD
+  flight(departure_date: "2026-03-13", price_cents: 18_000) # 180 USD
 ]
 scores_week_a = [
   score(value: 90, price: 88, time_comfort: 86, trip_fit: 80),
@@ -128,14 +128,14 @@ scores_week_a = [
 ]
 
 flights_week_b = [
-  flight(departure_date: "2026-03-16", price_cents: 28_000),  # 280 USD — between p25/p50
+  flight(departure_date: "2026-03-16", price_cents: 28_000), # 280 USD — between p25/p50
   flight(departure_date: "2026-03-18", price_cents: 29_000),
   flight(departure_date: "2026-03-20", price_cents: 30_000)
 ]
 scores_week_b = [
   score(value: 75, price: 72, time_comfort: 76, trip_fit: 70),
   score(value: 72, price: 70, time_comfort: 74, trip_fit: 68),
-  score(value: 70, price: 68, time_comfort: 73, trip_fit: 65)  # price 68 < 70 → not balanced
+  score(value: 70, price: 68, time_comfort: 73, trip_fit: 65) # price 68 < 70 → not balanced
 ]
 
 all_ranked = [
@@ -160,8 +160,8 @@ all_ranked = [
 
 insights_a = Search::Insights::Builder.call(
   ranked_flights: all_ranked,
-  snapshot:       snapshot(confidence: :high, volatility: :low),
-  intent:         nil
+  snapshot: snapshot(confidence: :high, volatility: :low),
+  intent: nil
 )
 print_insights("SCENARIO A — High confidence · Low volatility · Cheap prices", insights_a)
 
@@ -178,8 +178,8 @@ print_insights("SCENARIO A — High confidence · Low volatility · Cheap prices
 
 insights_b = Search::Insights::Builder.call(
   ranked_flights: all_ranked,
-  snapshot:       snapshot(confidence: :high, volatility: :high),
-  intent:         nil
+  snapshot: snapshot(confidence: :high, volatility: :high),
+  intent: nil
 )
 print_insights("SCENARIO B — High confidence · HIGH volatility · Cheap prices", insights_b)
 
@@ -193,8 +193,8 @@ print_insights("SCENARIO B — High confidence · HIGH volatility · Cheap price
 
 insights_c = Search::Insights::Builder.call(
   ranked_flights: all_ranked,
-  snapshot:       snapshot(confidence: :low, volatility: :low),
-  intent:         nil
+  snapshot: snapshot(confidence: :low, volatility: :low),
+  intent: nil
 )
 print_insights("SCENARIO C — LOW confidence (all date-range insights suppressed)", insights_c)
 
@@ -230,8 +230,8 @@ end
 
 insights_d = Search::Insights::Builder.call(
   ranked_flights: ranked_mid,
-  snapshot:       snapshot(confidence: :medium, volatility: :low),
-  intent:         nil
+  snapshot: snapshot(confidence: :medium, volatility: :low),
+  intent: nil
 )
 print_insights("SCENARIO D — Medium confidence · Low volatility · Below-median prices", insights_d)
 

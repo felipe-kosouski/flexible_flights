@@ -7,17 +7,17 @@ RSpec.describe Search::Scoring::TimeComfortScore do
     Search::Models::AnalysisSnapshot.new(route_median_duration_minutes: 120)
   end
 
-  let(:stops)               { 0 }
-  let(:air_time_minutes)    { 100 }
+  let(:stops) { 0 }
+  let(:air_time_minutes) { 100 }
   let(:layover_time_minutes) { 0 }
 
   let(:flight_sample) do
     Search::Models::FlightSample.new(
-      departure_datetime:   Time.new(2025, 3, 1, 10, 0, 0),
-      return_datetime:      Time.new(2025, 3, 16, 12, 0, 0),
-      luggage_included:     true,
-      stops:                stops,
-      air_time_minutes:     air_time_minutes,
+      departure_datetime: Time.new(2025, 3, 1, 10, 0, 0),
+      return_datetime: Time.new(2025, 3, 16, 12, 0, 0),
+      luggage_included: true,
+      stops: stops,
+      air_time_minutes: air_time_minutes,
       layover_time_minutes: layover_time_minutes
     )
   end
@@ -104,7 +104,7 @@ RSpec.describe Search::Scoring::TimeComfortScore do
       end
 
       context "when layover inflates effective duration (layover_penalty = 1.3)" do
-        let(:air_time_minutes)    { 60 }
+        let(:air_time_minutes) { 60 }
         let(:layover_time_minutes) { 100 }
 
         it "penalizes layover time at 1.3x (effective = 60 + 100*1.3 = 190, relative ~1.58 > 1.3)" do
@@ -116,11 +116,11 @@ RSpec.describe Search::Scoring::TimeComfortScore do
     context "missing inputs" do
       it "returns nil when stops is nil" do
         sample = Search::Models::FlightSample.new(
-          departure_datetime:   Time.new(2025, 3, 1, 10, 0, 0),
-          return_datetime:      Time.new(2025, 3, 16, 12, 0, 0),
-          luggage_included:     true,
-          stops:                nil,
-          air_time_minutes:     100,
+          departure_datetime: Time.new(2025, 3, 1, 10, 0, 0),
+          return_datetime: Time.new(2025, 3, 16, 12, 0, 0),
+          luggage_included: true,
+          stops: nil,
+          air_time_minutes: 100,
           layover_time_minutes: 0
         )
 
@@ -129,11 +129,11 @@ RSpec.describe Search::Scoring::TimeComfortScore do
 
       it "returns nil when air_time_minutes is nil" do
         sample = Search::Models::FlightSample.new(
-          departure_datetime:   Time.new(2025, 3, 1, 10, 0, 0),
-          return_datetime:      Time.new(2025, 3, 16, 12, 0, 0),
-          luggage_included:     true,
-          stops:                0,
-          air_time_minutes:     nil,
+          departure_datetime: Time.new(2025, 3, 1, 10, 0, 0),
+          return_datetime: Time.new(2025, 3, 16, 12, 0, 0),
+          luggage_included: true,
+          stops: 0,
+          air_time_minutes: nil,
           layover_time_minutes: 0
         )
 
@@ -142,11 +142,11 @@ RSpec.describe Search::Scoring::TimeComfortScore do
 
       it "returns nil when layover_time_minutes is nil" do
         sample = Search::Models::FlightSample.new(
-          departure_datetime:   Time.new(2025, 3, 1, 10, 0, 0),
-          return_datetime:      Time.new(2025, 3, 16, 12, 0, 0),
-          luggage_included:     true,
-          stops:                0,
-          air_time_minutes:     100,
+          departure_datetime: Time.new(2025, 3, 1, 10, 0, 0),
+          return_datetime: Time.new(2025, 3, 16, 12, 0, 0),
+          luggage_included: true,
+          stops: 0,
+          air_time_minutes: 100,
           layover_time_minutes: nil
         )
 
@@ -173,8 +173,8 @@ RSpec.describe Search::Scoring::TimeComfortScore do
   describe ".call" do
     it "delegates to #score and returns the same result" do
       instance_score = described_class.new(flight_sample, analysis_snapshot).score
-      class_score    = described_class.call(
-        flight_sample:     flight_sample,
+      class_score = described_class.call(
+        flight_sample: flight_sample,
         analysis_snapshot: analysis_snapshot
       )
 

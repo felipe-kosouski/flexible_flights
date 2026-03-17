@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe "SearchHistory", type: :request do
-  let(:user)       { create(:user) }
+  let(:user) { create(:user) }
   let(:other_user) { create(:user) }
 
   describe "GET /history" do
@@ -23,10 +23,10 @@ RSpec.describe "SearchHistory", type: :request do
       end
 
       it "shows only the current user's search runs" do
-        own_intent   = create(:search_intent, user: user)
-        own_run      = create(:search_run, search_intent: own_intent)
+        own_intent = create(:search_intent, user: user)
+        own_run = create(:search_run, search_intent: own_intent)
         other_intent = create(:search_intent, user: other_user)
-        other_run    = create(:search_run, search_intent: other_intent)
+        other_run = create(:search_run, search_intent: other_intent)
 
         get search_history_path
 
@@ -37,9 +37,9 @@ RSpec.describe "SearchHistory", type: :request do
       it "orders runs newest first" do
         intent = create(:search_intent, user: user)
         old_run = create(:search_run, search_intent: intent,
-                         created_at: 3.days.ago)
+                                      created_at: 3.days.ago)
         new_run = create(:search_run, search_intent: intent,
-                         created_at: 1.hour.ago)
+                                      created_at: 1.hour.ago)
 
         get search_history_path
 

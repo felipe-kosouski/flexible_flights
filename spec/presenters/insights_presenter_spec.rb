@@ -3,16 +3,16 @@
 require "rails_helper"
 
 RSpec.describe InsightsPresenter do
-  let(:from_date)    { Date.new(2025, 5, 1) }
-  let(:to_date)      { Date.new(2025, 5, 8) }
+  let(:from_date) { Date.new(2025, 5, 1) }
+  let(:to_date) { Date.new(2025, 5, 8) }
 
   let(:date_range_insight) do
     instance_double(
       Search::Insights::DateRangeInsight,
-      from_date:      from_date,
-      to_date:        to_date,
-      average_score:  78.5,
-      flight_count:   12,
+      from_date: from_date,
+      to_date: to_date,
+      average_score: 78.5,
+      flight_count: 12,
       confidence_level: :high
     )
   end
@@ -20,11 +20,11 @@ RSpec.describe InsightsPresenter do
   let(:insights) do
     instance_double(
       Search::Insights::SearchInsights,
-      best_time_to_travel:     date_range_insight,
+      best_time_to_travel: date_range_insight,
       cheapest_comfort_window: date_range_insight,
-      wait_or_book:            nil,
-      price_rarity:            nil,
-      confidence_level:        :high
+      wait_or_book: nil,
+      price_rarity: nil,
+      confidence_level: :high
     )
   end
 

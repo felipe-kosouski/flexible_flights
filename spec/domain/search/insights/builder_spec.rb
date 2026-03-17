@@ -61,9 +61,9 @@ RSpec.describe Search::Insights::Builder do
   let(:ranked_flights) do
     [
       ranked(flight: week_1_flight_a, score_result: score(value: 90.0, price: 100, time_comfort: 85), rank: 1),
-      ranked(flight: week_1_flight_b, score_result: score(value: 85.0, price: 90,  time_comfort: 80), rank: 2),
-      ranked(flight: week_2_flight_a, score_result: score(value: 70.0, price: 75,  time_comfort: 72), rank: 3),
-      ranked(flight: week_2_flight_b, score_result: score(value: 65.0, price: 60,  time_comfort: 68), rank: 4)
+      ranked(flight: week_1_flight_b, score_result: score(value: 85.0, price: 90, time_comfort: 80), rank: 2),
+      ranked(flight: week_2_flight_a, score_result: score(value: 70.0, price: 75, time_comfort: 72), rank: 3),
+      ranked(flight: week_2_flight_b, score_result: score(value: 65.0, price: 60, time_comfort: 68), rank: 4)
     ]
   end
 
@@ -436,7 +436,7 @@ RSpec.describe Search::Insights::Builder do
         # The second has time_comfort: 65 — below threshold
         [
           ranked(flight: week_1_flight_a, score_result: score(value: 90.0, price: 100, time_comfort: 85), rank: 1),
-          ranked(flight: week_1_flight_b, score_result: score(value: 75.0, price: 80,  time_comfort: 65), rank: 2)
+          ranked(flight: week_1_flight_b, score_result: score(value: 75.0, price: 80, time_comfort: 65), rank: 2)
         ]
       end
 

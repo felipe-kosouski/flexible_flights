@@ -3,17 +3,17 @@
 module Search
   module Scoring
     class PriceScore
-      CHEAP_SCORE        = 100
+      CHEAP_SCORE = 100
       BELOW_MEDIAN_SCORE = 80
       ABOVE_MEDIAN_SCORE = 50
-      EXPENSIVE_SCORE    = 20
+      EXPENSIVE_SCORE = 20
 
       def self.call(flight_sample:, analysis_snapshot:)
         new(flight_sample, analysis_snapshot).score
       end
 
       def initialize(flight_sample, analysis_snapshot)
-        @flight   = flight_sample
+        @flight = flight_sample
         @snapshot = analysis_snapshot
       end
 

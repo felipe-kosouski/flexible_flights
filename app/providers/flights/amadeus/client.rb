@@ -69,7 +69,7 @@ module Flights
         @api_connection ||= Faraday.new(url: @base_url, request: { timeout: 10 }) do |f|
           f.response :json
           f.response :raise_error
-          f.adapter  :net_http
+          f.adapter :net_http
         end
       end
 
@@ -78,7 +78,7 @@ module Flights
           f.headers["Content-Type"] = "application/x-www-form-urlencoded"
           f.response :json
           f.response :raise_error
-          f.adapter  :net_http
+          f.adapter :net_http
         end
       end
     end

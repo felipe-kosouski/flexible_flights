@@ -22,8 +22,8 @@ RSpec.describe Search::Scoring::TripFit do
   end
 
   let(:departure_datetime) { Time.new(2025, 3, 1, 10, 0, 0) }
-  let(:return_datetime)   { Time.new(2025, 3, 16, 12, 0, 0) } # 15 days
-  let(:luggage_included)  { true }
+  let(:return_datetime) { Time.new(2025, 3, 16, 12, 0, 0) } # 15 days
+  let(:luggage_included) { true }
   let(:luggage_requirement) { :required }
 
   describe "#score" do

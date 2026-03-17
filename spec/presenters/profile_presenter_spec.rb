@@ -8,9 +8,9 @@ RSpec.describe ProfilePresenter do
   def build_presenter(first_name: "Jane", last_name: "Doe", email: "jane@example.com")
     user = instance_double(User,
       first_name: first_name,
-      last_name:  last_name,
-      email:      email,
-      errors:     errors)
+      last_name: last_name,
+      email: email,
+      errors: errors)
     described_class.new(user)
   end
 
@@ -38,11 +38,11 @@ RSpec.describe ProfilePresenter do
 
   describe "#personal_info_errors" do
     it "returns full messages for first_name, last_name, and email" do
-      allow(errors).to receive(:full_messages_for).with(:first_name).and_return(["First name can't be blank"])
+      allow(errors).to receive(:full_messages_for).with(:first_name).and_return([ "First name can't be blank" ])
       allow(errors).to receive(:full_messages_for).with(:last_name).and_return([])
       allow(errors).to receive(:full_messages_for).with(:email).and_return([])
 
-      expect(build_presenter.personal_info_errors).to eq(["First name can't be blank"])
+      expect(build_presenter.personal_info_errors).to eq([ "First name can't be blank" ])
     end
 
     it "returns empty array when there are no errors" do
@@ -56,11 +56,11 @@ RSpec.describe ProfilePresenter do
 
   describe "#password_errors" do
     it "returns full messages for current_password, password, and password_confirmation" do
-      allow(errors).to receive(:full_messages_for).with(:current_password).and_return(["Current password is invalid"])
+      allow(errors).to receive(:full_messages_for).with(:current_password).and_return([ "Current password is invalid" ])
       allow(errors).to receive(:full_messages_for).with(:password).and_return([])
       allow(errors).to receive(:full_messages_for).with(:password_confirmation).and_return([])
 
-      expect(build_presenter.password_errors).to eq(["Current password is invalid"])
+      expect(build_presenter.password_errors).to eq([ "Current password is invalid" ])
     end
 
     it "returns empty array when there are no errors" do

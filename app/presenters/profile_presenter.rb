@@ -10,8 +10,8 @@ class ProfilePresenter
 
   def display_name
     first = @user.first_name.to_s
-    last  = @user.last_name.to_s
-    name  = "#{first} #{last}".strip
+    last = @user.last_name.to_s
+    name = "#{first} #{last}".strip
     name.present? ? name : @user.email
   end
 

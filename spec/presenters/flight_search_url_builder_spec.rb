@@ -4,17 +4,17 @@ require "spec_helper"
 require_relative "../../app/presenters/flight_search_url_builder"
 
 RSpec.describe FlightSearchUrlBuilder do
-  let(:origin)         { "BCN" }
-  let(:destination)    { "LHR" }
+  let(:origin) { "BCN" }
+  let(:destination) { "LHR" }
   let(:departure_date) { Date.new(2025, 5, 1) }
-  let(:return_date)    { Date.new(2025, 5, 8) }
+  let(:return_date) { Date.new(2025, 5, 8) }
 
   subject(:urls) do
     described_class.call(
-      origin:         origin,
-      destination:    destination,
+      origin: origin,
+      destination: destination,
       departure_date: departure_date,
-      return_date:    return_date
+      return_date: return_date
     )
   end
 

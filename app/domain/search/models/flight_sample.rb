@@ -4,7 +4,7 @@ module Search
   module Models
     class FlightSample
       REASONABLE_DEPARTURE_HOURS = 6..22
-      REASONABLE_ARRIVAL_HOURS   = 7..23
+      REASONABLE_ARRIVAL_HOURS = 7..23
 
       def initialize(
         departure_datetime:,
@@ -15,12 +15,12 @@ module Search
         air_time_minutes: nil,
         layover_time_minutes: nil
       )
-        @departure_datetime  = departure_datetime
-        @return_datetime     = return_datetime
-        @luggage_included    = luggage_included
-        @price_cents         = price_cents
-        @stops               = stops
-        @air_time_minutes    = air_time_minutes
+        @departure_datetime = departure_datetime
+        @return_datetime = return_datetime
+        @luggage_included = luggage_included
+        @price_cents = price_cents
+        @stops = stops
+        @air_time_minutes = air_time_minutes
         @layover_time_minutes = layover_time_minutes
       end
 

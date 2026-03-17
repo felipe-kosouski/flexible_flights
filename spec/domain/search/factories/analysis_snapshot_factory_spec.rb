@@ -9,13 +9,13 @@ RSpec.describe Search::Factories::AnalysisSnapshotFactory do
       # AR integer enums return the string key (e.g. "low"), not the integer.
       double(
         "AnalysisSnapshot",
-        price_p25_cents:               5_000,
-        price_p50_cents:               8_000,
-        price_p75_cents:               12_000,
+        price_p25_cents: 5_000,
+        price_p50_cents: 8_000,
+        price_p75_cents: 12_000,
         route_median_duration_minutes: 180,
-        sample_count:                  25,
-        confidence_level:              "medium",
-        volatility:                    "high"
+        sample_count: 25,
+        confidence_level: "medium",
+        volatility: "high"
       )
     end
 

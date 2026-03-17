@@ -15,7 +15,7 @@ module Search
       end
 
       def initialize(flight_sample, analysis_snapshot)
-        @flight   = flight_sample
+        @flight = flight_sample
         @snapshot = analysis_snapshot
       end
 

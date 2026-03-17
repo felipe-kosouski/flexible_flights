@@ -6,9 +6,9 @@ require "fixtures/amadeus/flight_offer"
 RSpec.describe Flights::Amadeus::Provider do
   subject(:provider) { described_class.new }
 
-  let(:base_url)       { "https://test.api.amadeus.com" }
-  let(:token_url)      { "#{base_url}/v1/security/oauth2/token" }
-  let(:offers_url)     { "#{base_url}/v2/shopping/flight-offers" }
+  let(:base_url) { "https://test.api.amadeus.com" }
+  let(:token_url) { "#{base_url}/v1/security/oauth2/token" }
+  let(:offers_url) { "#{base_url}/v2/shopping/flight-offers" }
   let(:token_response) do
     { "access_token" => "token", "expires_in" => 1799 }.to_json
   end
@@ -24,14 +24,14 @@ RSpec.describe Flights::Amadeus::Provider do
 
   describe "#search" do
     let(:departure_date) { Date.new(2024, 6, 1) }
-    let(:return_date)    { Date.new(2024, 6, 8) }
+    let(:return_date) { Date.new(2024, 6, 8) }
 
     context "when the API returns valid offers" do
       before do
         stub_get(offers_url)
           .to_return(
             status: 200,
-            body:   { "data" => [ Fixtures::Amadeus::FLIGHT_OFFER ] }.to_json,
+            body: { "data" => [ Fixtures::Amadeus::FLIGHT_OFFER ] }.to_json,
             headers: { "Content-Type" => "application/json" }
           )
       end
@@ -55,12 +55,12 @@ RSpec.describe Flights::Amadeus::Provider do
 
         expect(WebMock).to have_requested(:get, offers_url).with(
           query: hash_including(
-            "originLocationCode"      => "MAD",
+            "originLocationCode" => "MAD",
             "destinationLocationCode" => "LHR",
-            "departureDate"           => "2024-06-01",
-            "returnDate"              => "2024-06-08",
-            "adults"                  => "1",
-            "travelClass"             => "ECONOMY"
+            "departureDate" => "2024-06-01",
+            "returnDate" => "2024-06-08",
+            "adults" => "1",
+            "travelClass" => "ECONOMY"
           )
         )
       end
@@ -99,8 +99,8 @@ RSpec.describe Flights::Amadeus::Provider do
       before do
         stub_get(offers_url)
           .to_return(
-            status:  200,
-            body:    { "data" => [ { "broken" => true }, Fixtures::Amadeus::FLIGHT_OFFER ] }.to_json,
+            status: 200,
+            body: { "data" => [ { "broken" => true }, Fixtures::Amadeus::FLIGHT_OFFER ] }.to_json,
             headers: { "Content-Type" => "application/json" }
           )
       end

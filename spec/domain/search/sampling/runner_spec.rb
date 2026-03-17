@@ -7,7 +7,7 @@ RSpec.describe Search::Sampling::Runner do
   let(:destination) { "LON" }
 
   let(:earliest_departure_date) { Date.new(2025, 3, 1) }
-  let(:latest_departure_date)   { Date.new(2025, 3, 10) }
+  let(:latest_departure_date) { Date.new(2025, 3, 10) }
 
   let(:min_stay_days) { 3 }
   let(:max_stay_days) { 7 }

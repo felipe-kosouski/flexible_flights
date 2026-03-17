@@ -6,3 +6,13 @@ inherit_gem: { rubocop-rails-omakase: rubocop.yml }
 # # Use `[a, [b, c]]` not `[ a, [ b, c ] ]`
 # Layout/SpaceInsideArrayLiteralBrackets:
 #   Enabled: false
+
+# Disallow alignment padding on consecutive assignments
+Layout/ExtraSpacing:
+  Enabled: true
+  AllowForAlignment: false
+
+# Disallow value alignment padding in hashes
+Layout/HashAlignment:
+  Enabled: true
+  EnforcedColonStyle: key

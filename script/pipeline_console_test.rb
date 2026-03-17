@@ -20,17 +20,17 @@ puts "=" * 70
 user = User.find_or_create_by!(email: "pipeline_test@example.com")
 
 intent = SearchIntent.find_or_initialize_by(
-  origin_airport:      "JFK",
+  origin_airport: "JFK",
   destination_airport: "CDG"
 )
 intent.assign_attributes(
-  user:                user,
-  earliest_departure:  Date.today + 14,
-  latest_return:       Date.today + 56,
-  min_stay_days:       5,
-  max_stay_days:       10,
+  user: user,
+  earliest_departure: Date.today + 14,
+  latest_return: Date.today + 56,
+  min_stay_days: 5,
+  max_stay_days: 10,
   luggage_requirement: :carry_on,
-  max_stops:           1
+  max_stops: 1
 )
 intent.save!
 
@@ -48,33 +48,33 @@ puts "Window: #{intent.earliest_departure} to #{intent.latest_return}"
 
 mock_provider = Object.new
 def mock_provider.search(origin:, destination:, departure_date:, return_date:, passengers:, cabin_class:)
-  day_offset = departure_date.wday * 1_500  # Mon 0 → Sun 9_000 cents variation
+  day_offset = departure_date.wday * 1_500 # Mon 0 → Sun 9_000 cents variation
 
   [
-    { price_cents:          38_000 + day_offset,
-      currency:             "USD",
-      airline_codes:        [ "AA" ],
-      stops:                0,
-      air_time_minutes:     415,
+    { price_cents: 38_000 + day_offset,
+      currency: "USD",
+      airline_codes: [ "AA" ],
+      stops: 0,
+      air_time_minutes: 415,
       layover_time_minutes: 0,
-      luggage_included:     true,
-      raw_provider:         "mock" },
-    { price_cents:          44_000 + day_offset,
-      currency:             "USD",
-      airline_codes:        [ "BA" ],
-      stops:                1,
-      air_time_minutes:     530,
+      luggage_included: true,
+      raw_provider: "mock" },
+    { price_cents: 44_000 + day_offset,
+      currency: "USD",
+      airline_codes: [ "BA" ],
+      stops: 1,
+      air_time_minutes: 530,
       layover_time_minutes: 85,
-      luggage_included:     false,
-      raw_provider:         "mock" },
-    { price_cents:          52_000 + day_offset,
-      currency:             "USD",
-      airline_codes:        [ "AF" ],
-      stops:                0,
-      air_time_minutes:     420,
+      luggage_included: false,
+      raw_provider: "mock" },
+    { price_cents: 52_000 + day_offset,
+      currency: "USD",
+      airline_codes: [ "AF" ],
+      stops: 0,
+      air_time_minutes: 420,
       layover_time_minutes: 0,
-      luggage_included:     true,
-      raw_provider:         "mock" }
+      luggage_included: true,
+      raw_provider: "mock" }
   ]
 end
 
@@ -88,10 +88,10 @@ puts "\nRunning pipeline (max_candidates: 8)..."
 begin
   execution = Search::Repositories::SearchRunRepository.execute(
     run,
-    provider:       mock_provider,
+    provider: mock_provider,
     max_candidates: 8,
-    passengers:     1,
-    cabin_class:    :economy
+    passengers: 1,
+    cabin_class: :economy
   )
 
   run.reload
@@ -118,7 +118,7 @@ begin
   puts "\nTop 5 ranked flights:"
   puts "-" * 60
   execution.ranked_results.first(5).each do |rf|
-    dep   = rf.flight.departure_datetime.strftime("%Y-%m-%d")
+    dep = rf.flight.departure_datetime.strftime("%Y-%m-%d")
     price = rf.flight.price_cents
     puts "  ##{rf.rank} | #{dep} | #{rf.flight.stops} stop(s) | $#{price / 100} | score=#{rf.score_result.value}"
   end

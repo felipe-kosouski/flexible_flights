@@ -16,9 +16,9 @@ RSpec.describe Search::Scoring::PriceScore do
   let(:flight_sample) do
     Search::Models::FlightSample.new(
       departure_datetime: Time.new(2025, 3, 1, 10, 0, 0),
-      return_datetime:    Time.new(2025, 3, 16, 12, 0, 0),
-      luggage_included:   true,
-      price_cents:        price_cents
+      return_datetime: Time.new(2025, 3, 16, 12, 0, 0),
+      luggage_included: true,
+      price_cents: price_cents
     )
   end
 
@@ -87,9 +87,9 @@ RSpec.describe Search::Scoring::PriceScore do
       it "returns nil when price_cents is nil" do
         sample = Search::Models::FlightSample.new(
           departure_datetime: Time.new(2025, 3, 1, 10, 0, 0),
-          return_datetime:    Time.new(2025, 3, 16, 12, 0, 0),
-          luggage_included:   true,
-          price_cents:        nil
+          return_datetime: Time.new(2025, 3, 16, 12, 0, 0),
+          luggage_included: true,
+          price_cents: nil
         )
 
         expect(described_class.new(sample, analysis_snapshot).score).to be_nil
@@ -139,8 +139,8 @@ RSpec.describe Search::Scoring::PriceScore do
   describe ".call" do
     it "delegates to #score and returns the same result" do
       instance_score = described_class.new(flight_sample, analysis_snapshot).score
-      class_score    = described_class.call(
-        flight_sample:     flight_sample,
+      class_score = described_class.call(
+        flight_sample: flight_sample,
         analysis_snapshot: analysis_snapshot
       )
 

@@ -7,7 +7,7 @@ class AddDeviseToUsers < ActiveRecord::Migration[8.1]
       t.string :encrypted_password, null: false, default: ""
 
       ## Recoverable
-      t.string   :reset_password_token
+      t.string :reset_password_token
       t.datetime :reset_password_sent_at
 
       ## Rememberable

@@ -7,10 +7,10 @@ RSpec.describe Flights::Amadeus::Client do
     described_class.new(client_id: "test_id", client_secret: "test_secret", env: :test)
   end
 
-  let(:base_url)       { "https://test.api.amadeus.com" }
-  let(:token_url)      { "#{base_url}/v1/security/oauth2/token" }
-  let(:offers_url)     { "#{base_url}/v2/shopping/flight-offers" }
-  let(:valid_token)    { "test_access_token" }
+  let(:base_url) { "https://test.api.amadeus.com" }
+  let(:token_url) { "#{base_url}/v1/security/oauth2/token" }
+  let(:offers_url) { "#{base_url}/v2/shopping/flight-offers" }
+  let(:valid_token) { "test_access_token" }
   let(:token_response) do
     { "access_token" => valid_token, "expires_in" => 1799 }.to_json
   end

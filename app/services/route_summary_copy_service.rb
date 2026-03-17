@@ -35,7 +35,7 @@ class RouteSummaryCopyService
   def initialize(insights, snapshot, intent)
     @insights = insights
     @snapshot = snapshot
-    @intent   = intent
+    @intent = intent
   end
 
   def call

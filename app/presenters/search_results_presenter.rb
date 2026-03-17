@@ -8,8 +8,8 @@ class SearchResultsPresenter
 
   def ranked_flights
     intent = @search_run.search_intent
-    total  = @results.ranked_flights.size
-    copy   = batch_ai_copy
+    total = @results.ranked_flights.size
+    copy = batch_ai_copy
 
     role_map = curated_with_roles
     @ranked_flights ||= curated_flights.map { |rf|
@@ -22,8 +22,8 @@ class SearchResultsPresenter
     @insights ||= InsightsPresenter.new(
       @results.insights,
       route_summary: route_ai_summary,
-      origin:        origin,
-      destination:   destination
+      origin: origin,
+      destination: destination
     )
   end
 
@@ -81,21 +81,21 @@ class SearchResultsPresenter
 
   def curated_with_roles
     @curated_with_roles ||= begin
-      all          = @results.ranked_flights
-      top3         = all.first(3)
-      best_price   = all.max_by { |rf|
+      all = @results.ranked_flights
+      top3 = all.first(3)
+      best_price = all.max_by { |rf|
         [ rf.score_result.components[:price].to_f, -rf.flight.price_cents.to_i ]
       }
       best_comfort = all.max_by { |rf|
         total = rf.flight.air_time_minutes.to_i + rf.flight.layover_time_minutes.to_i
         [ rf.score_result.components[:time_comfort].to_f, -total ]
       }
-      top3_set     = top3.to_set
+      top3_set = top3.to_set
 
       (top3 + [ best_price, best_comfort ].compact).uniq.each_with_object({}) do |rf, map|
         roles = []
-        roles << :top_rated    if top3_set.include?(rf)
-        roles << :best_price   if rf.equal?(best_price)
+        roles << :top_rated if top3_set.include?(rf)
+        roles << :best_price if rf.equal?(best_price)
         roles << :best_comfort if rf.equal?(best_comfort)
         map[rf] = roles
       end

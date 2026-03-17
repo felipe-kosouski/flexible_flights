@@ -40,7 +40,7 @@ module Search
         return nil unless ar_snapshot
 
         snapshot = Factories::AnalysisSnapshotFactory.from_record(ar_snapshot)
-        intent   = Factories::SearchRunFactory.intent_from_record(search_run_record)
+        intent = Factories::SearchRunFactory.intent_from_record(search_run_record)
 
         flight_samples = search_run_record.flight_samples.map do |ar_sample|
           Mappers::FlightSampleMapper.from_hash(ar_sample.attributes.symbolize_keys)

@@ -10,7 +10,7 @@ class ProfileController < ApplicationController
   def update
     case params[:form_type]
     when "personal_info" then update_personal_info
-    when "password"      then update_password
+    when "password" then update_password
     else
       redirect_to profile_path, alert: "Invalid request."
     end

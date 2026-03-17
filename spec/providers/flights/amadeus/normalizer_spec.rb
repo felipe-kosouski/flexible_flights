@@ -95,25 +95,25 @@ RSpec.describe Flights::Amadeus::Normalizer do
 
   describe "parse_iso_duration (via layover calculation)" do
     {
-      "PT45M"     => 45,
-      "PT1H"      => 60,
-      "PT2H30M"   => 150,
-      "P1DT3H"    => 1620,
+      "PT45M" => 45,
+      "PT1H" => 60,
+      "PT2H30M" => 150,
+      "P1DT3H" => 1620,
       "P1DT2H30M" => 1590
     }.each do |iso, expected_minutes|
       it "parses #{iso} as #{expected_minutes} minutes" do
         # Build a minimal offer with a single direct segment and known total duration
         # so layover = total_duration - air_time = expected_minutes - air_time
         single_segment_offer = {
-          "price"       => { "grandTotal" => "100.00", "currency" => "EUR" },
+          "price" => { "grandTotal" => "100.00", "currency" => "EUR" },
           "itineraries" => [
             {
               "duration" => iso,
               "segments" => [
                 {
                   "carrierCode" => "IB",
-                  "departure"   => { "iataCode" => "MAD", "at" => "2024-06-01T10:00:00" },
-                  "arrival"     => { "iataCode" => "LHR", "at" => "2024-06-01T10:00:00" }
+                  "departure" => { "iataCode" => "MAD", "at" => "2024-06-01T10:00:00" },
+                  "arrival" => { "iataCode" => "LHR", "at" => "2024-06-01T10:00:00" }
                 }
               ]
             }

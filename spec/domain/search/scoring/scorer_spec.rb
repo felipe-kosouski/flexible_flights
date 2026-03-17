@@ -3,8 +3,8 @@
 require "rails_helper"
 
 RSpec.describe Search::Scoring::Scorer do
-  let(:flight)   { instance_double("Search::Models::FlightSample") }
-  let(:intent)   { instance_double("Search::Models::SearchIntent") }
+  let(:flight) { instance_double("Search::Models::FlightSample") }
+  let(:intent) { instance_double("Search::Models::SearchIntent") }
   let(:snapshot) { instance_double("Search::Models::AnalysisSnapshot") }
 
   let(:score_result) do

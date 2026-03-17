@@ -7,12 +7,12 @@ RSpec.describe Search::Analysis::SnapshotBuilder do
 
   def build_sample(price_cents: 10_000, air_time_minutes: 120, layover_time_minutes: 30)
     Search::Models::FlightSample.new(
-      departure_datetime:   base_datetime,
-      return_datetime:      base_datetime + 7.days,
-      luggage_included:     true,
-      price_cents:          price_cents,
-      stops:                0,
-      air_time_minutes:     air_time_minutes,
+      departure_datetime: base_datetime,
+      return_datetime: base_datetime + 7.days,
+      luggage_included: true,
+      price_cents: price_cents,
+      stops: 0,
+      air_time_minutes: air_time_minutes,
       layover_time_minutes: layover_time_minutes
     )
   end
@@ -244,7 +244,7 @@ RSpec.describe Search::Analysis::SnapshotBuilder do
     end
 
     it "returns identical snapshots for the same inputs on repeated calls" do
-      first  = described_class.build(samples)
+      first = described_class.build(samples)
       second = described_class.build(samples)
 
       expect(first.price_p25_cents).to eq(second.price_p25_cents)

@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe Search::Sampling::Sampler do
   let(:departure_date) { Date.new(2025, 3, 1) }
-  let(:return_date)    { Date.new(2025, 3, 6) }
+  let(:return_date) { Date.new(2025, 3, 6) }
 
   let(:valid_sample) do
     {

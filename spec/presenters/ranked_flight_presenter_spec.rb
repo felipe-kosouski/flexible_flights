@@ -4,19 +4,19 @@ require "rails_helper"
 
 RSpec.describe RankedFlightPresenter do
   let(:departure_dt) { Time.zone.local(2025, 5, 1, 10, 0) }
-  let(:return_dt)    { Time.zone.local(2025, 5, 8, 18, 0) }
+  let(:return_dt) { Time.zone.local(2025, 5, 8, 18, 0) }
 
   let(:flight) do
     instance_double(
       Search::Models::FlightSample,
-      departure_datetime:    departure_dt,
-      return_datetime:       return_dt,
-      price_cents:           15000,
-      stops:                 0,
-      air_time_minutes:      120,
-      layover_time_minutes:  0,
-      luggage_included?:     false,
-      stay_length_days:      7
+      departure_datetime: departure_dt,
+      return_datetime: return_dt,
+      price_cents: 15000,
+      stops: 0,
+      air_time_minutes: 120,
+      layover_time_minutes: 0,
+      luggage_included?: false,
+      stay_length_days: 7
     )
   end
 
@@ -31,17 +31,17 @@ RSpec.describe RankedFlightPresenter do
   let(:ranked_flight) do
     instance_double(
       Search::Ranking::RankedFlight,
-      rank:         1,
-      flight:       flight,
+      rank: 1,
+      flight: flight,
       score_result: score_result,
-      explanation:  nil
+      explanation: nil
     )
   end
 
   let(:intent) do
     instance_double(
       SearchIntent,
-      origin_airport:      "BCN",
+      origin_airport: "BCN",
       destination_airport: "LHR"
     )
   end

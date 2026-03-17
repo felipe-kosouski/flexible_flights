@@ -2,14 +2,14 @@
 
 class RankedFlightPresenter
   TAG_LABELS = {
-    top_rated:    "Top rated",
-    best_price:   "Best price",
+    top_rated: "Top rated",
+    best_price: "Best price",
     best_comfort: "Best comfort"
   }.freeze
 
   TAG_COLOR_CLASSES = {
-    top_rated:    "bg-indigo-50 text-indigo-600",
-    best_price:   "bg-emerald-50 text-emerald-600",
+    top_rated: "bg-indigo-50 text-indigo-600",
+    best_price: "bg-emerald-50 text-emerald-600",
     best_comfort: "bg-blue-50 text-blue-600"
   }.freeze
 
@@ -125,10 +125,10 @@ class RankedFlightPresenter
     return nil unless @intent
 
     FlightSearchUrlBuilder.call(
-      origin:         @intent.origin_airport,
-      destination:    @intent.destination_airport,
+      origin: @intent.origin_airport,
+      destination: @intent.destination_airport,
       departure_date: flight.departure_datetime.to_date,
-      return_date:    flight.return_datetime.to_date
+      return_date: flight.return_datetime.to_date
     )
   end
 
@@ -145,21 +145,21 @@ class RankedFlightPresenter
   end
 
   EXPLANATION_KEY_LABELS = {
-    strong_price:        "Great value — price is the main reason this scores well.",
+    strong_price: "Great value — price is the main reason this scores well.",
     strong_time_comfort: "Comfortable journey — routing and travel time are the main strengths.",
-    strong_trip_fit:     "Fits your trip requirements well.",
-    cheap_but_longer:    "Cheaper than average, but the journey takes longer.",
-    fast_but_expensive:  "Faster than average, but costs more."
+    strong_trip_fit: "Fits your trip requirements well.",
+    cheap_but_longer: "Cheaper than average, but the journey takes longer.",
+    fast_but_expensive: "Faster than average, but costs more."
   }.freeze
 
   DIMENSION_LABELS = {
-    price:        "Scores mainly on price.",
+    price: "Scores mainly on price.",
     time_comfort: "Scores mainly on journey comfort and duration.",
-    trip_fit:     "Scores mainly on how well it fits your trip."
+    trip_fit: "Scores mainly on how well it fits your trip."
   }.freeze
 
   TRADEOFF_LABELS = {
-    cheap_but_longer:   "Cheaper than average, but the journey takes longer.",
+    cheap_but_longer: "Cheaper than average, but the journey takes longer.",
     fast_but_expensive: "Faster than average, but costs more."
   }.freeze
 

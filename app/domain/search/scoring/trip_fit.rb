@@ -3,9 +3,9 @@
 module Search
   module Scoring
     class TripFit
-      LENGTH_WEIGHT  = 0.5
+      LENGTH_WEIGHT = 0.5
       LUGGAGE_WEIGHT = 0.3
-      TIME_WEIGHT    = 0.2
+      TIME_WEIGHT = 0.2
       MIDPOINT_TOLERANCE_DAYS = 0.5
       SOFT_RANGE_PERCENTAGE = 0.2
       EDGE_TOLERANCE_DAYS = 3

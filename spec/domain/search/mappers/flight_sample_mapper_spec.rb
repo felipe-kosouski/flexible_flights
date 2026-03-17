@@ -4,7 +4,7 @@ require "rails_helper"
 
 RSpec.describe Search::Mappers::FlightSampleMapper do
   let(:departure_time) { Time.new(2025, 3, 1, 10, 0, 0) }
-  let(:return_time)    { Time.new(2025, 3, 8, 14, 0, 0) }
+  let(:return_time) { Time.new(2025, 3, 8, 14, 0, 0) }
 
   let(:valid_hash) do
     {

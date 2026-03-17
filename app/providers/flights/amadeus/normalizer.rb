@@ -57,7 +57,7 @@ module Flights
       def air_time_minutes
         all_segments.sum do |segment|
           departure = Time.parse(segment.dig("departure", "at"))
-          arrival   = Time.parse(segment.dig("arrival", "at"))
+          arrival = Time.parse(segment.dig("arrival", "at"))
           ((arrival - departure) / 60).round
         end
       end

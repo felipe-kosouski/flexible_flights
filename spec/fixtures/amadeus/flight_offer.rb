@@ -7,7 +7,7 @@ module Fixtures
     FLIGHT_OFFER = {
       "id" => "1",
       "price" => {
-        "currency"   => "EUR",
+        "currency" => "EUR",
         "grandTotal" => "234.56"
       },
       "itineraries" => [
@@ -17,14 +17,14 @@ module Fixtures
           "segments" => [
             {
               "carrierCode" => "VY",
-              "departure"   => { "iataCode" => "MAD", "at" => "2024-06-01T07:00:00" },
-              "arrival"     => { "iataCode" => "BCN", "at" => "2024-06-01T08:10:00" },
+              "departure" => { "iataCode" => "MAD", "at" => "2024-06-01T07:00:00" },
+              "arrival" => { "iataCode" => "BCN", "at" => "2024-06-01T08:10:00" },
               "numberOfStops" => 0
             },
             {
               "carrierCode" => "VY",
-              "departure"   => { "iataCode" => "BCN", "at" => "2024-06-01T09:30:00" },
-              "arrival"     => { "iataCode" => "LHR", "at" => "2024-06-01T11:30:00" },
+              "departure" => { "iataCode" => "BCN", "at" => "2024-06-01T09:30:00" },
+              "arrival" => { "iataCode" => "LHR", "at" => "2024-06-01T11:30:00" },
               "numberOfStops" => 0
             }
           ]
@@ -35,8 +35,8 @@ module Fixtures
           "segments" => [
             {
               "carrierCode" => "IB",
-              "departure"   => { "iataCode" => "LHR", "at" => "2024-06-08T14:00:00" },
-              "arrival"     => { "iataCode" => "MAD", "at" => "2024-06-08T17:30:00" },
+              "departure" => { "iataCode" => "LHR", "at" => "2024-06-08T14:00:00" },
+              "arrival" => { "iataCode" => "MAD", "at" => "2024-06-08T17:30:00" },
               "numberOfStops" => 0
             }
           ]
