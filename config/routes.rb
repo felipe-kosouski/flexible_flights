@@ -6,5 +6,7 @@ Rails.application.routes.draw do
 
   get "history", to: "search_history#index", as: :search_history
 
+  resource :profile, only: [ :show, :update, :destroy ], controller: "profile"
+
   get "up" => "rails/health#show", as: :rails_health_check
 end

@@ -27,9 +27,7 @@ class SearchesController < ApplicationController
   end
 
   def show
-    @search_run = current_user.search_runs
-                               .includes(search_intent: :user)
-                               .find(params[:id])
+    @search_run = current_user.search_runs.includes(search_intent: :user).find(params[:id])
 
     return unless @search_run.completed?
 
