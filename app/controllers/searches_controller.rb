@@ -6,7 +6,12 @@ class SearchesController < ApplicationController
   rescue_from ActiveRecord::RecordNotFound, with: :not_found
 
   def new
-    @search_intent = SearchIntent.new
+    @search_intent = if params[:from_intent]
+      intent = current_user.search_intents.find_by(id: params[:from_intent])
+      SearchIntent.new(intent&.slice(*PREFILLABLE_ATTRS) || {})
+    else
+      SearchIntent.new
+    end
   end
 
   def create
@@ -31,6 +36,13 @@ class SearchesController < ApplicationController
     results = Search::Repositories::SearchRunRepository.load_results(@search_run)
     @presenter = SearchResultsPresenter.new(results, @search_run) if results
   end
+
+  PREFILLABLE_ATTRS = %w[
+    origin_airport destination_airport
+    earliest_departure latest_return
+    min_stay_days max_stay_days
+    luggage_requirement max_stops
+  ].freeze
 
   private
 

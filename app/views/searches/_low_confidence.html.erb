@@ -9,6 +9,15 @@
         <%= presenter.sample_count %> options analysed &middot;
         <span class="text-red-500">Low confidence</span>
       </p>
+      <p class="mt-1 text-xs text-gray-400">
+        <%= presenter.freshness_label %>
+        <% if presenter.stale? %>
+          &middot;
+          <%= link_to "Run again →",
+                new_search_path(from_intent: @search_run.search_intent_id),
+                class: "text-indigo-500 hover:text-indigo-600" %>
+        <% end %>
+      </p>
     </div>
     <%= link_to new_search_path, class: "text-sm text-indigo-600 hover:text-indigo-700 font-medium" do %>
       Search again &rarr;

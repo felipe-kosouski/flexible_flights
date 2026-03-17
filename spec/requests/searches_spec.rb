@@ -47,4 +47,41 @@ RSpec.describe "Searches", type: :request do
       expect(response).to redirect_to(new_search_path)
     end
   end
+
+  describe "GET /searches/new with from_intent param" do
+    before { sign_in user }
+
+    context "with a valid from_intent belonging to current user" do
+      it "returns 200 and pre-fills the form with the intent's fields" do
+        intent = create(:search_intent, user: user)
+        get new_search_path(from_intent: intent.id)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include(intent.origin_airport)
+        expect(response.body).to include(intent.destination_airport)
+      end
+    end
+
+    context "with a from_intent belonging to another user" do
+      it "returns 200 and renders a blank form (no error)" do
+        other_intent = create(:search_intent, user: other_user)
+        get new_search_path(from_intent: other_intent.id)
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "with a non-existent from_intent id" do
+      it "returns 200 and renders a blank form (no error, no alert)" do
+        get new_search_path(from_intent: 999_999)
+        expect(response).to have_http_status(:ok)
+        expect(response.body).not_to include("Search not found")
+      end
+    end
+
+    context "without a from_intent param" do
+      it "returns 200 and renders a blank form" do
+        get new_search_path
+        expect(response).to have_http_status(:ok)
+      end
+    end
+  end
 end

@@ -54,6 +54,20 @@ class SearchResultsPresenter
     @results.snapshot.confidence == :low
   end
 
+  # Presenter is only instantiated when search_run.completed? (see SearchesController#show).
+  # finished_at is always present on completed runs, but guard defensively.
+  def stale?
+    @search_run.finished_at.present? && @search_run.finished_at <= 7.days.ago
+  end
+
+  def freshness_label
+    return "Analysis pending" unless @search_run.finished_at.present?
+
+    days = ((Time.current - @search_run.finished_at) / 1.day).floor
+    label = "Analysed #{days} #{days == 1 ? 'day' : 'days'} ago"
+    stale? ? "#{label} · consider running again" : label
+  end
+
   private
 
   def curated_flights

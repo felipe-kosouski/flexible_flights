@@ -1,0 +1,41 @@
+<div id="search_history" class="w-full max-w-3xl">
+  <h1 class="text-2xl font-semibold text-gray-900 tracking-tight mb-6">Search History</h1>
+
+  <% if @search_runs.empty? %>
+    <div class="rounded-xl border border-gray-200 bg-white px-6 py-10 text-center">
+      <p class="text-gray-500 text-sm">No searches yet.</p>
+      <%= link_to "Start a search", new_search_path,
+            class: "mt-3 inline-block text-sm text-indigo-600 hover:text-indigo-700 font-medium" %>
+    </div>
+  <% else %>
+    <div class="space-y-3">
+      <% @search_runs.each do |run| %>
+        <% presenter = SearchHistoryPresenter.new(run) %>
+        <div data-run-id="<%= run.id %>" class="rounded-xl border border-gray-200 bg-white px-5 py-4">
+          <div class="flex items-start justify-between gap-4">
+            <div class="min-w-0">
+              <p class="font-semibold text-gray-900 text-sm"><%= presenter.route %></p>
+              <p class="mt-0.5 text-xs text-gray-500">
+                <%= presenter.date_window %> &middot; <%= presenter.stay_range %>
+              </p>
+              <p class="mt-1 text-xs text-gray-400"><%= presenter.run_at %></p>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+              <span class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium <%= presenter.status_color_class %>">
+                <%= presenter.status_label %>
+              </span>
+            </div>
+          </div>
+          <div class="mt-3 flex items-center gap-4 border-t border-gray-100 pt-3">
+            <% if presenter.view_results_path %>
+              <%= link_to "View results", presenter.view_results_path,
+                    class: "text-xs text-indigo-600 hover:text-indigo-700 font-medium" %>
+            <% end %>
+            <%= link_to "Run again →", presenter.run_again_path,
+                  class: "text-xs text-gray-500 hover:text-gray-700" %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
