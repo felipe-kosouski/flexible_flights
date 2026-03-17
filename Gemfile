@@ -18,6 +18,7 @@ gem "thruster", require: false
 gem "rspec-rails"
 gem "faraday"
 gem "anthropic"
+gem "devise"
 
 group :development, :test do
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
