@@ -19,7 +19,12 @@ class SearchResultsPresenter
   end
 
   def insights
-    @insights ||= InsightsPresenter.new(@results.insights, route_summary: route_ai_summary)
+    @insights ||= InsightsPresenter.new(
+      @results.insights,
+      route_summary: route_ai_summary,
+      origin:        origin,
+      destination:   destination
+    )
   end
 
   def origin

@@ -121,6 +121,17 @@ class RankedFlightPresenter
     @precomputed_ai_copy&.dig(:skip_reason)
   end
 
+  def search_urls
+    return nil unless @intent
+
+    FlightSearchUrlBuilder.call(
+      origin:         @intent.origin_airport,
+      destination:    @intent.destination_airport,
+      departure_date: flight.departure_datetime.to_date,
+      return_date:    flight.return_datetime.to_date
+    )
+  end
+
   def price_score
     score_result.components[:price]&.round
   end

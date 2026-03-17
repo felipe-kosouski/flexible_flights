@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 class InsightsPresenter
-  def initialize(insights, route_summary: nil)
-    @insights = insights
+  def initialize(insights, route_summary: nil, origin: nil, destination: nil)
+    @insights      = insights
     @route_summary = route_summary
+    @origin        = origin
+    @destination   = destination
   end
 
   def wait_or_book
@@ -15,7 +17,7 @@ class InsightsPresenter
   def best_time_to_travel
     return nil unless @insights.best_time_to_travel
 
-    DateRangePresenter.new(@insights.best_time_to_travel)
+    DateRangePresenter.new(@insights.best_time_to_travel, origin: @origin, destination: @destination)
   end
 
   def price_rarity
@@ -27,7 +29,7 @@ class InsightsPresenter
   def cheapest_comfort_window
     return nil unless @insights.cheapest_comfort_window
 
-    DateRangePresenter.new(@insights.cheapest_comfort_window)
+    DateRangePresenter.new(@insights.cheapest_comfort_window, origin: @origin, destination: @destination)
   end
 
   def confidence_level
@@ -123,8 +125,21 @@ class InsightsPresenter
   end
 
   class DateRangePresenter
-    def initialize(insight)
-      @insight = insight
+    def initialize(insight, origin: nil, destination: nil)
+      @insight     = insight
+      @origin      = origin
+      @destination = destination
+    end
+
+    def search_urls
+      return nil unless @origin && @destination
+
+      FlightSearchUrlBuilder.call(
+        origin:         @origin,
+        destination:    @destination,
+        departure_date: @insight.from_date,
+        return_date:    @insight.to_date
+      )
     end
 
     def date_range

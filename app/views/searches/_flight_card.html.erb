@@ -84,6 +84,19 @@
         </div>
       <% end %>
 
+      <%# Search redirect links %>
+      <% if flight.search_urls %>
+        <div class="mt-3 pt-3 border-t border-gray-100 flex items-center gap-4">
+          <span class="text-xs text-gray-400">Search this flight:</span>
+          <%= link_to "Google Flights", flight.search_urls.google_flights_url,
+                target: "_blank", rel: "noopener noreferrer",
+                class: "text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline" %>
+          <%= link_to "Skyscanner", flight.search_urls.skyscanner_url,
+                target: "_blank", rel: "noopener noreferrer",
+                class: "text-xs font-medium text-cyan-600 hover:text-cyan-800 hover:underline" %>
+        </div>
+      <% end %>
+
     </div>
   </div>
 </div>
