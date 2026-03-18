@@ -13,11 +13,22 @@
       <div class="grid grid-cols-2 gap-4">
         <div>
           <%= f.label :origin_airport, "From", class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
-          <%= f.text_field :origin_airport,
-                placeholder: "JFK",
-                maxlength: 3,
-                class: "w-full bg-white rounded-lg border border-gray-300 px-3 py-2.5 text-base font-semibold uppercase tracking-widest text-gray-900 placeholder:text-gray-300 placeholder:font-normal placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500",
-                autofocus: true %>
+          <div data-controller="airport-autocomplete" class="relative">
+            <input
+              type="text"
+              data-airport-autocomplete-target="display"
+              data-action="input->airport-autocomplete#search keydown->airport-autocomplete#navigate"
+              placeholder="City or airport"
+              autocomplete="off"
+              autofocus
+              class="w-full bg-white rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+            <%= f.hidden_field :origin_airport, data: { "airport-autocomplete-target": "code" } %>
+            <div
+              data-airport-autocomplete-target="dropdown"
+              class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg p-1 max-h-64 overflow-y-auto"
+            ></div>
+          </div>
           <% if @search_intent.errors[:origin_airport].any? %>
             <p class="mt-1 text-xs text-red-500"><%= @search_intent.errors[:origin_airport].first %></p>
           <% end %>
@@ -25,10 +36,21 @@
 
         <div>
           <%= f.label :destination_airport, "To", class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
-          <%= f.text_field :destination_airport,
-                placeholder: "LHR",
-                maxlength: 3,
-                class: "w-full bg-white rounded-lg border border-gray-300 px-3 py-2.5 text-base font-semibold uppercase tracking-widest text-gray-900 placeholder:text-gray-300 placeholder:font-normal placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+          <div data-controller="airport-autocomplete" class="relative">
+            <input
+              type="text"
+              data-airport-autocomplete-target="display"
+              data-action="input->airport-autocomplete#search keydown->airport-autocomplete#navigate"
+              placeholder="City or airport"
+              autocomplete="off"
+              class="w-full bg-white rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            >
+            <%= f.hidden_field :destination_airport, data: { "airport-autocomplete-target": "code" } %>
+            <div
+              data-airport-autocomplete-target="dropdown"
+              class="hidden absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-lg p-1 max-h-64 overflow-y-auto"
+            ></div>
+          </div>
           <% if @search_intent.errors[:destination_airport].any? %>
             <p class="mt-1 text-xs text-red-500"><%= @search_intent.errors[:destination_airport].first %></p>
           <% end %>
