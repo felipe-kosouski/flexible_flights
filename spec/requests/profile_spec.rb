@@ -105,6 +105,21 @@ RSpec.describe "Profile", type: :request do
     end
   end
 
+  describe "PATCH /profile — preferred_locale" do
+    before { sign_in user }
+
+    it "saves preferred_locale to the user" do
+      patch profile_path, params: { form_type: "personal_info", user: { preferred_locale: "pt-BR" } }
+      expect(response).to redirect_to(profile_path)
+      expect(user.reload.preferred_locale).to eq("pt-BR")
+    end
+
+    it "rejects unsupported locale" do
+      patch profile_path, params: { form_type: "personal_info", user: { preferred_locale: "fr" } }
+      expect(user.reload.preferred_locale).not_to eq("fr")
+    end
+  end
+
   describe "PATCH /profile — unknown form_type" do
     before { sign_in user }
 

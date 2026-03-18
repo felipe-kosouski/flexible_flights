@@ -4,7 +4,7 @@
   <% if (wob = insights.wait_or_book) %>
     <div class="rounded-xl border p-4 <%= wob.directive_color_class %>">
       <div class="flex items-start justify-between gap-2">
-        <p class="text-xs font-medium uppercase tracking-wide opacity-60">Recommendation</p>
+        <p class="text-xs font-medium uppercase tracking-wide opacity-60"><%= t("insights.recommendation_label") %></p>
         <div class="flex items-center gap-1.5">
           <% if wob.medium_confidence? %>
             <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Moderate confidence</span>
@@ -29,7 +29,7 @@
   <% if (rarity = insights.price_rarity) %>
     <div class="rounded-xl border p-4 <%= rarity.color_class %>">
       <div class="flex items-start justify-between gap-2">
-        <p class="text-xs font-medium uppercase tracking-wide opacity-60">Price level</p>
+        <p class="text-xs font-medium uppercase tracking-wide opacity-60"><%= t("insights.price_level_label") %></p>
         <div class="flex items-center gap-1.5">
           <% if rarity.medium_confidence? %>
             <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Moderate confidence</span>
@@ -52,7 +52,7 @@
   <% if (btt = insights.best_time_to_travel) %>
     <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-4 text-indigo-900">
       <div class="flex items-start justify-between gap-2">
-        <p class="text-xs font-medium uppercase tracking-wide opacity-60">Best time to travel</p>
+        <p class="text-xs font-medium uppercase tracking-wide opacity-60"><%= t("insights.best_time_label") %></p>
         <% if btt.medium_confidence? %>
           <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Moderate confidence</span>
         <% end %>
@@ -66,11 +66,11 @@
       </p>
       <% if btt.search_urls %>
         <div class="mt-3 pt-3 border-t border-indigo-200 border-opacity-50 flex items-center gap-4">
-          <span class="text-xs opacity-60">Search this window:</span>
-          <%= link_to "Google Flights", btt.search_urls.google_flights_url,
+          <span class="text-xs opacity-60"><%= t("flights.labels.search_this_flight") %></span>
+          <%= link_to t("flights.labels.google_flights"), btt.search_urls.google_flights_url,
                 target: "_blank", rel: "noopener noreferrer",
                 class: "text-xs font-medium text-indigo-700 hover:text-indigo-900 hover:underline" %>
-          <%= link_to "Skyscanner", btt.search_urls.skyscanner_url,
+          <%= link_to t("flights.labels.skyscanner"), btt.search_urls.skyscanner_url,
                 target: "_blank", rel: "noopener noreferrer",
                 class: "text-xs font-medium text-indigo-700 hover:text-indigo-900 hover:underline" %>
         </div>
@@ -82,7 +82,7 @@
   <% if (ccw = insights.cheapest_comfort_window) %>
     <div class="rounded-xl border border-purple-200 bg-purple-50 p-4 text-purple-900">
       <div class="flex items-start justify-between gap-2">
-        <p class="text-xs font-medium uppercase tracking-wide opacity-60">Best value window</p>
+        <p class="text-xs font-medium uppercase tracking-wide opacity-60"><%= t("insights.best_value_label") %></p>
         <% if ccw.medium_confidence? %>
           <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">Moderate confidence</span>
         <% end %>
@@ -96,11 +96,11 @@
       </p>
       <% if ccw.search_urls %>
         <div class="mt-3 pt-3 border-t border-purple-200 border-opacity-50 flex items-center gap-4">
-          <span class="text-xs opacity-60">Search this window:</span>
-          <%= link_to "Google Flights", ccw.search_urls.google_flights_url,
+          <span class="text-xs opacity-60"><%= t("flights.labels.search_this_flight") %></span>
+          <%= link_to t("flights.labels.google_flights"), ccw.search_urls.google_flights_url,
                 target: "_blank", rel: "noopener noreferrer",
                 class: "text-xs font-medium text-purple-700 hover:text-purple-900 hover:underline" %>
-          <%= link_to "Skyscanner", ccw.search_urls.skyscanner_url,
+          <%= link_to t("flights.labels.skyscanner"), ccw.search_urls.skyscanner_url,
                 target: "_blank", rel: "noopener noreferrer",
                 class: "text-xs font-medium text-purple-700 hover:text-purple-900 hover:underline" %>
         </div>
@@ -111,7 +111,7 @@
   <%# Low confidence placeholder — shown when the 3 data-driven insights are suppressed %>
   <% if insights.low_confidence? %>
     <div class="col-span-full rounded-xl border border-gray-200 bg-gray-50 p-4">
-      <p class="text-sm font-medium text-gray-600">Not enough data for detailed insights</p>
+      <p class="text-sm font-medium text-gray-600"><%= t("insights.no_detailed_insights") %></p>
       <p class="mt-1 text-xs text-gray-400">
         We need more samples to surface reliable patterns for this route. Results improve with a wider date range or more flexible travel windows.
       </p>

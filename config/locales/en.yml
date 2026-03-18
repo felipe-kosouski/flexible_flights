@@ -28,4 +28,123 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  flights:
+    tags:
+      top_rated: "Top rated"
+      best_price: "Best price"
+      best_comfort: "Best comfort"
+    stops:
+      direct: "Direct"
+      one_stop: "1 stop"
+      many_stops: "%{count} stops"
+    score_labels:
+      excellent: "Excellent"
+      good: "Good"
+      fair: "Fair"
+      poor: "Poor"
+    luggage:
+      included: "Luggage included"
+      carry_on_only: "Carry-on only"
+    score_breakdown:
+      price: "Price"
+      comfort: "Comfort"
+      trip_fit: "Trip fit"
+      total: "Total"
+    labels:
+      score: "score"
+      search_this_flight: "Search this flight:"
+      google_flights: "Google Flights"
+      skyscanner: "Skyscanner"
+  searches:
+    new:
+      title: "Find the best time to fly"
+      subtitle: "We'll scan your travel window and tell you when to go — and whether to book now or wait."
+      from_label: "From"
+      to_label: "To"
+      submit: "Search flights"
+      earliest_departure: "Earliest departure"
+      latest_return: "Latest return"
+      min_stay: "Min stay (days)"
+      max_stay: "Max stay (days)"
+      max_stops_label: "Max stops"
+      luggage_label: "Luggage"
+      stops_any: "Any"
+      stops_direct: "Direct only"
+      stops_1: "1 stop max"
+      stops_2: "2 stops max"
+      luggage_any: "Any"
+      luggage_carry_on: "Carry-on"
+      luggage_checked: "Checked bag"
+      luggage_none: "None"
+    show:
+      loading_title: "Searching for flights"
+      loading_subtitle: "We're analysing your travel window. This usually takes 15–30 seconds."
+      search_again: "Search again"
+      options_analysed: "options analysed"
+      ranked_options: "Ranked options"
+      failed_title: "Search failed"
+      failed_body: "Something went wrong while searching. Please try again."
+      try_again: "Try again"
+    history:
+      title: "Search history"
+      no_searches: "No searches yet."
+      run_search: "Run a new search"
+      view_results: "View results"
+      run_again: "Run again →"
+  insights:
+    confidence:
+      high: "High confidence"
+      medium: "Medium confidence"
+      low: "Low confidence"
+    low_confidence_title: "Not enough data for reliable insights"
+    low_confidence_body: "Flights are shown but no recommendations are made."
+    flights_found: "Flights found"
+    recommendation_label: "Recommendation"
+    price_level_label: "Price level"
+    best_time_label: "Best time to travel"
+    best_value_label: "Best value window"
+    no_detailed_insights: "Not enough data for detailed insights."
+    wait_or_book:
+      book_now: "Book Now"
+      wait: "Wait"
+      consider_booking: "Consider Booking"
+      insufficient_data: "Not Enough Data"
+    price_band:
+      cheap: "Prices are cheap right now"
+      below_median: "Prices are below average"
+      above_median: "Prices are above average"
+      expensive: "Prices are high"
+    price_rarity:
+      rare_cheap: "Rare deal"
+      below_median: "Below average"
+      above_median: "Above average"
+      expensive: "Expensive"
+    date_range:
+      description_high: "Strong market signal for this window."
+      description_medium: "Based on available data, this window looks favorable."
+    subtext:
+      insufficient_data: "Not enough data to make a reliable recommendation for this route yet."
+      high_book_now: "Prices are at a good level right now — waiting risks paying more."
+      high_wait: "Prices are elevated for this route. Better options are likely ahead."
+      high_consider_booking: "Conditions are reasonable. Booking now is a solid choice."
+      medium_book_now: "Prices suggest this may be a good time to book."
+      medium_wait: "Prices suggest waiting could pay off for this route."
+      medium_consider_booking: "Prices appear reasonable, though the data picture isn't fully clear."
+    price_rarity_description:
+      high_rare_cheap: "Prices are unusually low for this route right now."
+      high_below_median: "Prices are below the typical range for this route."
+      high_above_median: "Prices are above the typical range for this route."
+      high_expensive: "Prices are high relative to this route's history."
+      medium_rare_cheap: "Prices appear lower than usual, though data is limited."
+      medium_below_median: "Prices appear to be below average."
+      medium_above_median: "Prices appear to be above average."
+      medium_expensive: "Prices appear high, though data is limited."
+    freshness:
+      pending: "Analysis pending"
+      days_ago:
+        one: "Analysed 1 day ago"
+        other: "Analysed %{count} days ago"
+      stale_suffix: " · consider running again"
+  profile:
+    locale_label: "Language & currency"
+    locale_auto: "Auto-detect from browser"

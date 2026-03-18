@@ -1,12 +1,6 @@
 # frozen_string_literal: true
 
 class RankedFlightPresenter
-  TAG_LABELS = {
-    top_rated: "Top rated",
-    best_price: "Best price",
-    best_comfort: "Best comfort"
-  }.freeze
-
   TAG_COLOR_CLASSES = {
     top_rated: "bg-indigo-50 text-indigo-600",
     best_price: "bg-emerald-50 text-emerald-600",
@@ -30,7 +24,7 @@ class RankedFlightPresenter
   end
 
   def tag_label(tag)
-    TAG_LABELS[tag]
+    I18n.t("flights.tags.#{tag}")
   end
 
   def tag_color_class(tag)
@@ -43,10 +37,10 @@ class RankedFlightPresenter
 
   def score_label
     case score_result.value
-    when 80..100 then "Excellent"
-    when 60..79 then "Good"
-    when 40..59 then "Fair"
-    else "Poor"
+    when 80..100 then I18n.t("flights.score_labels.excellent")
+    when 60..79 then I18n.t("flights.score_labels.good")
+    when 40..59 then I18n.t("flights.score_labels.fair")
+    else I18n.t("flights.score_labels.poor")
     end
   end
 
@@ -91,9 +85,9 @@ class RankedFlightPresenter
 
   def stops_label
     case flight.stops
-    when 0 then "Direct"
-    when 1 then "1 stop"
-    else "#{flight.stops} stops"
+    when 0 then I18n.t("flights.stops.direct")
+    when 1 then I18n.t("flights.stops.one_stop")
+    else I18n.t("flights.stops.many_stops", count: flight.stops)
     end
   end
 
@@ -102,7 +96,8 @@ class RankedFlightPresenter
   end
 
   def luggage_label
-    flight.luggage_included? ? "Luggage included" : "Carry-on only"
+    key = flight.luggage_included? ? "included" : "carry_on_only"
+    I18n.t("flights.luggage.#{key}")
   end
 
   def luggage_included_class
@@ -144,45 +139,7 @@ class RankedFlightPresenter
     score_result.components[:trip_fit]&.round
   end
 
-  EXPLANATION_KEY_LABELS = {
-    strong_price: "Great value — price is the main reason this scores well.",
-    strong_time_comfort: "Comfortable journey — routing and travel time are the main strengths.",
-    strong_trip_fit: "Fits your trip requirements well.",
-    cheap_but_longer: "Cheaper than average, but the journey takes longer.",
-    fast_but_expensive: "Faster than average, but costs more."
-  }.freeze
-
-  DIMENSION_LABELS = {
-    price: "Scores mainly on price.",
-    time_comfort: "Scores mainly on journey comfort and duration.",
-    trip_fit: "Scores mainly on how well it fits your trip."
-  }.freeze
-
-  TRADEOFF_LABELS = {
-    cheap_but_longer: "Cheaper than average, but the journey takes longer.",
-    fast_but_expensive: "Faster than average, but costs more."
-  }.freeze
-
   private
-
-  def template_summary
-    return nil unless explanation&.summary
-
-    keys = explanation.summary[:explanation_keys] || []
-    primary = explanation.summary[:primary_factors] || []
-
-    if keys.any?
-      EXPLANATION_KEY_LABELS[keys.first]
-    else
-      DIMENSION_LABELS[primary.first]
-    end
-  end
-
-  def template_tradeoffs
-    return [] unless explanation&.tradeoffs
-
-    explanation.tradeoffs.filter_map { |t| TRADEOFF_LABELS[t[:explanation_key]] }
-  end
 
   def flight
     @ranked_flight.flight
@@ -197,8 +154,6 @@ class RankedFlightPresenter
   end
 
   def format_price(cents)
-    return "N/A" unless cents
-
-    "$#{(cents / 100.0).round}"
+    PriceFormatter.call(cents, flight.currency)
   end
 end

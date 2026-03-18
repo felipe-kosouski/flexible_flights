@@ -17,7 +17,8 @@ module Search
           layover_time_minutes: raw[:layover_time_minutes],
           departure_datetime: raw[:departure_datetime],
           return_datetime: raw[:return_datetime],
-          luggage_included: raw[:luggage_included]
+          luggage_included: raw[:luggage_included],
+          currency: raw[:currency]
         )
       end
     end

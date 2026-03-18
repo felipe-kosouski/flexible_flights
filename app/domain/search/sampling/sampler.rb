@@ -14,13 +14,14 @@ module Search
         raw_provider
       ].freeze
 
-      def initialize(origin:, destination:, date_pairs:, passengers: 1, cabin_class: :economy, provider:)
+      def initialize(origin:, destination:, date_pairs:, passengers: 1, cabin_class: :economy, provider:, currency_code: "USD")
         @origin = origin
         @destination = destination
         @date_pairs = date_pairs
         @passengers = passengers
         @cabin_class = cabin_class
         @provider = provider
+        @currency_code = currency_code
       end
 
       def call
@@ -51,7 +52,8 @@ module Search
           departure_date: departure_date,
           return_date: return_date,
           passengers: @passengers,
-          cabin_class: @cabin_class
+          cabin_class: @cabin_class,
+          currency_code: @currency_code
         )
       end
 

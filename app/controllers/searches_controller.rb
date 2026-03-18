@@ -16,6 +16,7 @@ class SearchesController < ApplicationController
 
   def create
     @search_intent = current_user.search_intents.build(search_intent_params)
+    @search_intent.currency = CurrencyResolver.for_locale(I18n.locale)
 
     if @search_intent.save
       search_run = @search_intent.search_runs.create!

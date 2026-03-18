@@ -1,17 +1,18 @@
 # frozen_string_literal: true
 
 class InsightsPresenter
-  def initialize(insights, route_summary: nil, origin: nil, destination: nil)
+  def initialize(insights, route_summary: nil, origin: nil, destination: nil, currency: nil)
     @insights = insights
     @route_summary = route_summary
     @origin = origin
     @destination = destination
+    @currency = currency
   end
 
   def wait_or_book
     return nil unless @insights.wait_or_book
 
-    WaitOrBookPresenter.new(@insights.wait_or_book)
+    WaitOrBookPresenter.new(@insights.wait_or_book, currency: @currency)
   end
 
   def best_time_to_travel
@@ -23,7 +24,7 @@ class InsightsPresenter
   def price_rarity
     return nil unless @insights.price_rarity
 
-    PriceRarityPresenter.new(@insights.price_rarity)
+    PriceRarityPresenter.new(@insights.price_rarity, currency: @currency)
   end
 
   def cheapest_comfort_window
@@ -49,17 +50,14 @@ class InsightsPresenter
   end
 
   class WaitOrBookPresenter
-    def initialize(insight)
+    def initialize(insight, currency: nil)
       @insight = insight
+      @currency = currency
     end
 
     def directive_label
-      case @insight.directive
-      when :book_now then "Book Now"
-      when :wait then "Wait"
-      when :consider_booking then "Consider Booking"
-      else "Not Enough Data"
-      end
+      key = @insight.directive == :insufficient_data ? "insufficient_data" : @insight.directive.to_s
+      I18n.t("insights.wait_or_book.#{key}")
     end
 
     def directive_color_class
@@ -81,19 +79,14 @@ class InsightsPresenter
     end
 
     def price_band_label
-      case @insight.price_band
-      when :cheap then "Prices are cheap right now"
-      when :below_median then "Prices are below average"
-      when :above_median then "Prices are above average"
-      when :expensive then "Prices are high"
-      end
+      I18n.t("insights.price_band.#{@insight.price_band}")
     end
 
     def top_price
       cents = @insight.top_flight_median_price_cents
       return nil unless cents
 
-      "$#{(cents / 100.0).round}"
+      PriceFormatter.call(cents, @currency || "USD")
     end
 
     def confidence_level
@@ -105,22 +98,10 @@ class InsightsPresenter
     end
 
     def subtext
-      return "Not enough data to make a reliable recommendation for this route yet." if @insight.directive == :insufficient_data
+      return I18n.t("insights.subtext.insufficient_data") if @insight.directive == :insufficient_data
 
-      case @insight.confidence_level
-      when :high
-        case @insight.directive
-        when :book_now then "Prices are at a good level right now — waiting risks paying more."
-        when :wait then "Prices are elevated for this route. Better options are likely ahead."
-        when :consider_booking then "Conditions are reasonable. Booking now is a solid choice."
-        end
-      when :medium
-        case @insight.directive
-        when :book_now then "Prices suggest this may be a good time to book."
-        when :wait then "Prices suggest waiting could pay off for this route."
-        when :consider_booking then "Prices appear reasonable, though the data picture isn't fully clear."
-        end
-      end
+      key = "#{@insight.confidence_level}_#{@insight.directive}"
+      I18n.t("insights.subtext.#{key}", default: nil)
     end
   end
 
@@ -163,25 +144,18 @@ class InsightsPresenter
     end
 
     def description
-      case @insight.confidence_level
-      when :high then "Strong market signal for this window."
-      when :medium then "Based on available data, this window looks favorable."
-      end
+      I18n.t("insights.date_range.description_#{@insight.confidence_level}", default: nil)
     end
   end
 
   class PriceRarityPresenter
-    def initialize(insight)
+    def initialize(insight, currency: nil)
       @insight = insight
+      @currency = currency
     end
 
     def label
-      case @insight.classification
-      when :rare_cheap then "Rare deal"
-      when :below_median then "Below average"
-      when :above_median then "Above average"
-      when :expensive then "Expensive"
-      end
+      I18n.t("insights.price_rarity.#{@insight.classification}")
     end
 
     def color_class
@@ -206,7 +180,7 @@ class InsightsPresenter
       cents = @insight.market_representative_price_cents
       return nil unless cents
 
-      "$#{(cents / 100.0).round}"
+      PriceFormatter.call(cents, @currency || "USD")
     end
 
     def confidence_level
@@ -218,22 +192,8 @@ class InsightsPresenter
     end
 
     def description
-      case @insight.confidence_level
-      when :high
-        case @insight.classification
-        when :rare_cheap then "Prices are unusually low for this route right now."
-        when :below_median then "Prices are below the typical range for this route."
-        when :above_median then "Prices are above the typical range for this route."
-        when :expensive then "Prices are high relative to this route's history."
-        end
-      when :medium
-        case @insight.classification
-        when :rare_cheap then "Prices appear lower than usual, though data is limited."
-        when :below_median then "Prices appear to be below average."
-        when :above_median then "Prices appear to be above average."
-        when :expensive then "Prices appear high, though data is limited."
-        end
-      end
+      key = "#{@insight.confidence_level}_#{@insight.classification}"
+      I18n.t("insights.price_rarity_description.#{key}", default: nil)
     end
   end
 end

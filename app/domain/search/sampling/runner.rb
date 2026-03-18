@@ -15,7 +15,8 @@ module Search
         max_candidates:,
         passengers: 1,
         cabin_class: :economy,
-        provider:
+        provider:,
+        currency_code: "USD"
       )
         @origin = origin
         @destination = destination
@@ -27,6 +28,7 @@ module Search
         @passengers = passengers
         @cabin_class = cabin_class
         @provider = provider
+        @currency_code = currency_code
       end
 
       def call
@@ -66,7 +68,8 @@ module Search
           date_pairs: date_pairs,
           passengers: @passengers,
           cabin_class: @cabin_class,
-          provider: @provider
+          provider: @provider,
+          currency_code: @currency_code
         )
         sampler.call
       end

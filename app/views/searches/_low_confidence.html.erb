@@ -6,8 +6,8 @@
         <%= presenter.origin %> &rarr; <%= presenter.destination %>
       </h1>
       <p class="mt-1 text-sm text-gray-500">
-        <%= presenter.sample_count %> options analysed &middot;
-        <span class="text-red-500">Low confidence</span>
+        <%= presenter.sample_count %> <%= t("searches.show.options_analysed") %> &middot;
+        <span class="text-red-500"><%= t("insights.confidence.low") %></span>
       </p>
       <p class="mt-1 text-xs text-gray-400">
         <%= presenter.freshness_label %>
@@ -20,7 +20,7 @@
       </p>
     </div>
     <%= link_to new_search_path, class: "text-sm text-indigo-600 hover:text-indigo-700 font-medium" do %>
-      Search again &rarr;
+      <%= t("searches.show.search_again") %> &rarr;
     <% end %>
   </div>
 
@@ -31,7 +31,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
       </svg>
       <div>
-        <p class="text-sm font-semibold text-amber-900">Not enough data for reliable insights</p>
+        <p class="text-sm font-semibold text-amber-900"><%= t("insights.low_confidence_title") %></p>
         <p class="mt-1 text-sm text-amber-700">
           We found flights but couldn&rsquo;t build a confident market picture for this route and window.
           Recommendations have been withheld. Try a wider date range or more flexible travel window to improve results.
@@ -42,7 +42,7 @@
 
   <%# Ranked flights %>
   <div>
-    <h2 class="text-base font-semibold text-gray-700 mb-4">Flights found</h2>
+    <h2 class="text-base font-semibold text-gray-700 mb-4"><%= t("insights.flights_found") %></h2>
     <div class="space-y-3">
       <% presenter.ranked_flights.each do |flight| %>
         <%= render "searches/flight_card", flight: flight %>

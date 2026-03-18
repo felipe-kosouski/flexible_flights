@@ -4,7 +4,7 @@ module Flights
   # Deterministic stub for tests and development.
   # Returns a fixed set of canonical flight hashes regardless of input.
   class Stub < Base
-    def search(origin:, destination:, departure_date:, return_date:, passengers:, cabin_class:)
+    def search(origin:, destination:, departure_date:, return_date:, passengers:, cabin_class:, currency_code: "USD")
       [
         {
           price_cents: 15_000,

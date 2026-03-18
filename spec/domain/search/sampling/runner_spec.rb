@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
-require "rails_helper"
+require "spec_helper"
+require_relative "../../../../app/domain/search/sampling/date_grid"
+require_relative "../../../../app/domain/search/sampling/candidate_selector"
+require_relative "../../../../app/domain/search/sampling/sampler"
+require_relative "../../../../app/domain/search/sampling/runner"
 
 RSpec.describe Search::Sampling::Runner do
   let(:origin) { "NYC" }
@@ -99,8 +103,25 @@ RSpec.describe Search::Sampling::Runner do
       date_pairs: selected_date_pairs,
       passengers: passengers,
       cabin_class: cabin_class,
-      provider: provider
+      provider: provider,
+      currency_code: "USD"
     )
+  end
+
+  it "passes currency_code to Sampler" do
+    sampler_double = instance_double(Search::Sampling::Sampler, call: [])
+    allow(Search::Sampling::Sampler).to receive(:new).and_return(sampler_double)
+
+    described_class.call(
+      origin: "GRU", destination: "LHR",
+      earliest_departure_date: Date.today + 30,
+      latest_departure_date: Date.today + 60,
+      min_stay_days: 5, max_stay_days: 10,
+      max_candidates: 5, provider: double("provider", search: []),
+      currency_code: "BRL"
+    )
+
+    expect(Search::Sampling::Sampler).to have_received(:new).with(hash_including(currency_code: "BRL"))
   end
 
   it "returns an empty array when no date pairs are generated" do

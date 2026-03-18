@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_17_192444) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_18_022227) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -48,6 +48,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_192444) do
 
   create_table "search_intents", force: :cascade do |t|
     t.datetime "created_at", null: false
+    t.string "currency", default: "USD", null: false
     t.string "destination_airport", null: false
     t.date "earliest_departure", null: false
     t.date "latest_return", null: false
@@ -210,6 +211,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_17_192444) do
     t.string "encrypted_password", default: "", null: false
     t.string "first_name", default: "", null: false
     t.string "last_name", default: "", null: false
+    t.string "preferred_locale"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"

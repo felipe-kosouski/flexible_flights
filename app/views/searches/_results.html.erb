@@ -6,7 +6,7 @@
         <%= presenter.origin %> &rarr; <%= presenter.destination %>
       </h1>
       <p class="mt-1 text-sm text-gray-500">
-        <%= presenter.sample_count %> options analysed &middot;
+        <%= presenter.sample_count %> <%= t("searches.show.options_analysed") %> &middot;
         <span class="<%= presenter.confidence_color_class %>"><%= presenter.confidence_label %></span>
       </p>
       <p class="mt-1 text-xs text-gray-400">
@@ -20,7 +20,7 @@
       </p>
     </div>
     <%= link_to new_search_path, class: "text-sm text-indigo-600 hover:text-indigo-700 font-medium" do %>
-      Search again &rarr;
+      <%= t("searches.show.search_again") %> &rarr;
     <% end %>
   </div>
 
@@ -38,7 +38,7 @@
 
   <%# Ranked flights %>
   <div class="mt-8">
-    <h2 class="text-base font-semibold text-gray-700 mb-4">Ranked options</h2>
+    <h2 class="text-base font-semibold text-gray-700 mb-4"><%= t("searches.show.ranked_options") %></h2>
     <div class="space-y-3">
       <% presenter.ranked_flights.each do |flight| %>
         <%= render "searches/flight_card", flight: flight %>

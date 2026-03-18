@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require "rails_helper"
+require "spec_helper"
+require_relative "../../../../app/domain/search/models/flight_sample"
+require_relative "../../../../app/domain/search/mappers/flight_sample_mapper"
 
 RSpec.describe Search::Mappers::FlightSampleMapper do
   let(:departure_time) { Time.new(2025, 3, 1, 10, 0, 0) }
@@ -43,6 +45,12 @@ RSpec.describe Search::Mappers::FlightSampleMapper do
 
       expect(result.stay_length_days).to eq(7)
       expect(result.has_times?).to be_truthy
+    end
+
+    it "maps currency from the raw sample" do
+      hash_brl = valid_hash.merge(currency: "BRL")
+      mapped = described_class.from_hash(hash_brl)
+      expect(mapped.currency).to eq("BRL")
     end
 
     it "returns nil for non-hash input" do

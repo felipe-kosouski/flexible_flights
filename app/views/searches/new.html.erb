@@ -2,8 +2,8 @@
 
 <div class="w-full max-w-xl mx-auto">
   <div class="mb-8 text-center">
-    <h1 class="text-2xl font-semibold text-gray-900 tracking-tight">Find the best time to fly</h1>
-    <p class="mt-1.5 text-sm text-gray-500">We'll scan your travel window and tell you when to go — and whether to book now or wait.</p>
+    <h1 class="text-2xl font-semibold text-gray-900 tracking-tight"><%= t("searches.new.title") %></h1>
+    <p class="mt-1.5 text-sm text-gray-500"><%= t("searches.new.subtitle") %></p>
   </div>
 
   <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
@@ -12,7 +12,7 @@
       <%# Route %>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <%= f.label :origin_airport, "From", class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
+          <%= f.label :origin_airport, t("searches.new.from_label"), class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
           <div data-controller="airport-autocomplete" class="relative">
             <input
               type="text"
@@ -35,7 +35,7 @@
         </div>
 
         <div>
-          <%= f.label :destination_airport, "To", class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
+          <%= f.label :destination_airport, t("searches.new.to_label"), class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
           <div data-controller="airport-autocomplete" class="relative">
             <input
               type="text"
@@ -62,7 +62,7 @@
       <%# Travel window %>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <%= f.label :earliest_departure, "Earliest departure", class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
+          <%= f.label :earliest_departure, t("searches.new.earliest_departure"), class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
           <%= f.date_field :earliest_departure,
                 class: "w-full bg-white rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
           <% if @search_intent.errors[:earliest_departure].any? %>
@@ -71,7 +71,7 @@
         </div>
 
         <div>
-          <%= f.label :latest_return, "Latest return", class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
+          <%= f.label :latest_return, t("searches.new.latest_return"), class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
           <%= f.date_field :latest_return,
                 class: "w-full bg-white rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
           <% if @search_intent.errors[:latest_return].any? %>
@@ -83,7 +83,7 @@
       <%# Stay length %>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <%= f.label :min_stay_days, "Min stay (days)", class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
+          <%= f.label :min_stay_days, t("searches.new.min_stay"), class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
           <%= f.number_field :min_stay_days,
                 min: 1, placeholder: "5",
                 class: "w-full bg-white rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
@@ -93,7 +93,7 @@
         </div>
 
         <div>
-          <%= f.label :max_stay_days, "Max stay (days)", class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
+          <%= f.label :max_stay_days, t("searches.new.max_stay"), class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
           <%= f.number_field :max_stay_days,
                 min: 1, placeholder: "10",
                 class: "w-full bg-white rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
@@ -108,24 +108,34 @@
       <%# Preferences %>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <%= f.label :max_stops, "Max stops", class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
+          <%= f.label :max_stops, t("searches.new.max_stops_label"), class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
           <%= f.select :max_stops,
-                options_for_select([["Any", nil], ["Direct only", 0], ["1 stop max", 1], ["2 stops max", 2]], @search_intent.max_stops),
+                options_for_select([
+                  [t("searches.new.stops_any"), nil],
+                  [t("searches.new.stops_direct"), 0],
+                  [t("searches.new.stops_1"), 1],
+                  [t("searches.new.stops_2"), 2]
+                ], @search_intent.max_stops),
                 {},
                 class: "w-full bg-white rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
         </div>
 
         <div>
-          <%= f.label :luggage_requirement, "Luggage", class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
+          <%= f.label :luggage_requirement, t("searches.new.luggage_label"), class: "block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5" %>
           <%= f.select :luggage_requirement,
-                options_for_select([["Any", nil], ["Carry-on", "carry_on"], ["Checked bag", "checked"], ["None", "none"]], @search_intent.luggage_requirement),
+                options_for_select([
+                  [t("searches.new.luggage_any"), nil],
+                  [t("searches.new.luggage_carry_on"), "carry_on"],
+                  [t("searches.new.luggage_checked"), "checked"],
+                  [t("searches.new.luggage_none"), "none"]
+                ], @search_intent.luggage_requirement),
                 {},
                 class: "w-full bg-white rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
         </div>
       </div>
 
       <div class="pt-1">
-        <%= f.submit "Search flights",
+        <%= f.submit t("searches.new.submit"),
               class: "w-full bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold rounded-lg px-6 py-3 text-sm transition-colors cursor-pointer" %>
       </div>
 

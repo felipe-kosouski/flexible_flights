@@ -28,14 +28,15 @@ class RouteSummaryCopyService
     - Output only the narrative text, no JSON, no bullets
   TEXT
 
-  def self.call(insights:, snapshot:, intent: nil)
-    new(insights, snapshot, intent).call
+  def self.call(insights:, snapshot:, intent: nil, locale: I18n.locale.to_s)
+    new(insights, snapshot, intent, locale).call
   end
 
-  def initialize(insights, snapshot, intent)
+  def initialize(insights, snapshot, intent, locale = I18n.locale.to_s)
     @insights = insights
     @snapshot = snapshot
     @intent = intent
+    @locale = locale
   end
 
   def call
@@ -61,7 +62,7 @@ class RouteSummaryCopyService
     message = client.messages.create(
       model: MODEL,
       max_tokens: 200,
-      system: SYSTEM_PROMPT,
+      system: localized_system_prompt,
       messages: [ { role: "user", content: user_prompt } ]
     )
 
@@ -104,20 +105,24 @@ class RouteSummaryCopyService
   end
 
   def format_price(cents)
-    return "N/A" unless cents
-
-    "$#{(cents / 100.0).round}"
+    PriceFormatter.call(cents, @intent&.currency || "USD")
   end
 
   def cache_key
     wob = @insights.wait_or_book
     parts = [
       "route_summary/v2",
+      @locale,
       @snapshot.price_p50_cents,
       @snapshot.volatility,
       wob&.directive,
       wob&.price_band
     ]
     parts.join("/")
+  end
+
+  def localized_system_prompt
+    instruction = AiLocale.instruction_for(@locale)
+    instruction ? "#{SYSTEM_PROMPT}\n#{instruction}" : SYSTEM_PROMPT
   end
 end

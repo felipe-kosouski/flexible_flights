@@ -7,7 +7,7 @@ module Flights
     # Returns Array<Hash> where each hash contains the canonical flight fields:
     #   price_cents, currency, airline_codes, stops, air_time_minutes,
     #   layover_time_minutes, luggage_included, raw_provider
-    def search(origin:, destination:, departure_date:, return_date:, passengers:, cabin_class:)
+    def search(origin:, destination:, departure_date:, return_date:, passengers:, cabin_class:, currency_code: "USD")
       raise NotImplementedError, "#{self.class}#search is not implemented"
     end
   end

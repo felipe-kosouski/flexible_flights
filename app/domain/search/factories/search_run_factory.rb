@@ -16,7 +16,8 @@ module Search
           max_candidates: max_candidates,
           passengers: passengers,
           cabin_class: cabin_class,
-          provider: provider
+          provider: provider,
+          currency_code: intent.currency
         )
       end
 
@@ -27,7 +28,8 @@ module Search
           min_stay_days: intent.min_stay_days,
           max_stay_days: intent.max_stay_days,
           luggage_requirement: intent.luggage_requirement&.to_sym,
-          max_stops: intent.max_stops
+          max_stops: intent.max_stops,
+          currency: intent.currency
         )
       end
     end

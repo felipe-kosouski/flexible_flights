@@ -38,5 +38,9 @@ module FlexibleFlights
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    # i18n configuration
+    config.i18n.available_locales = %w[en pt-BR]
+    config.i18n.default_locale = :en
   end
 end

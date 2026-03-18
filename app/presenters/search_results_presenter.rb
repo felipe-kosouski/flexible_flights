@@ -13,7 +13,7 @@ class SearchResultsPresenter
 
     role_map = curated_with_roles
     @ranked_flights ||= curated_flights.map { |rf|
-      fingerprint = ExplanationCopyService.fingerprint_for(rf)
+      fingerprint = ExplanationCopyService.fingerprint_for(rf, locale: I18n.locale.to_s)
       RankedFlightPresenter.new(rf, intent: intent, total_flights: total, ai_copy: copy[fingerprint], tags: role_map[rf])
     }
   end
@@ -23,7 +23,8 @@ class SearchResultsPresenter
       @results.insights,
       route_summary: route_ai_summary,
       origin: origin,
-      destination: destination
+      destination: destination,
+      currency: @search_run.search_intent&.currency || "USD"
     )
   end
 
@@ -40,11 +41,7 @@ class SearchResultsPresenter
   end
 
   def confidence_label
-    case @results.snapshot.confidence
-    when :high then "High confidence"
-    when :medium then "Medium confidence"
-    when :low then "Low confidence"
-    end
+    I18n.t("insights.confidence.#{@results.snapshot.confidence}")
   end
 
   def confidence_color_class
@@ -66,11 +63,11 @@ class SearchResultsPresenter
   end
 
   def freshness_label
-    return "Analysis pending" unless @search_run.finished_at.present?
+    return I18n.t("insights.freshness.pending") unless @search_run.finished_at.present?
 
     days = ((Time.current - @search_run.finished_at) / 1.day).floor
-    label = "Analysed #{days} #{days == 1 ? 'day' : 'days'} ago"
-    stale? ? "#{label} · consider running again" : label
+    label = I18n.t("insights.freshness.days_ago", count: days)
+    stale? ? label + I18n.t("insights.freshness.stale_suffix") : label
   end
 
   private
@@ -106,7 +103,8 @@ class SearchResultsPresenter
     @batch_ai_copy ||= ExplanationCopyService.batch_call(
       ranked_flights: curated_flights,
       intent: @search_run.search_intent,
-      total_flights: @results.ranked_flights.size
+      total_flights: @results.ranked_flights.size,
+      locale: I18n.locale.to_s
     )
   end
 
@@ -114,7 +112,8 @@ class SearchResultsPresenter
     @route_ai_summary ||= RouteSummaryCopyService.call(
       insights: @results.insights,
       snapshot: @results.snapshot,
-      intent: @search_run.search_intent
+      intent: @search_run.search_intent,
+      locale: I18n.locale.to_s
     )
   end
 end

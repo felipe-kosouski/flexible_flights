@@ -13,7 +13,8 @@ module Search
         price_cents: nil,
         stops: nil,
         air_time_minutes: nil,
-        layover_time_minutes: nil
+        layover_time_minutes: nil,
+        currency: "USD"
       )
         @departure_datetime = departure_datetime
         @return_datetime = return_datetime
@@ -22,6 +23,7 @@ module Search
         @stops = stops
         @air_time_minutes = air_time_minutes
         @layover_time_minutes = layover_time_minutes
+        @currency = currency
       end
 
       def departure_datetime
@@ -46,6 +48,10 @@ module Search
 
       def layover_time_minutes
         @layover_time_minutes
+      end
+
+      def currency
+        @currency
       end
 
       def luggage_included?

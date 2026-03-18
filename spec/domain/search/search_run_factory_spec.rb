@@ -14,7 +14,8 @@ RSpec.describe Search::Factories::SearchRunFactory do
       min_stay_days: 5,
       max_stay_days: 10,
       luggage_requirement: :carry_on,
-      max_stops: 1
+      max_stops: 1,
+      currency: "USD"
     )
   end
 
@@ -25,6 +26,20 @@ RSpec.describe Search::Factories::SearchRunFactory do
       started_at: nil,
       finished_at: nil
     )
+  end
+
+  describe ".intent_from_record" do
+    subject(:domain_intent) { described_class.intent_from_record(search_run_record) }
+
+    it "reads currency from the search_intent record" do
+      search_intent.currency = "BRL"
+      expect(domain_intent.currency).to eq("BRL")
+    end
+
+    it "defaults to USD when the search_intent currency is USD" do
+      search_intent.currency = "USD"
+      expect(domain_intent.currency).to eq("USD")
+    end
   end
 
   describe ".from_record" do

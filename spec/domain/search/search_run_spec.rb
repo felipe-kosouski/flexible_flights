@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
-require "rails_helper"
+require "spec_helper"
+require_relative "../../../app/domain/search/sampling/date_grid"
+require_relative "../../../app/domain/search/sampling/candidate_selector"
+require_relative "../../../app/domain/search/sampling/sampler"
+require_relative "../../../app/domain/search/sampling/runner"
+require_relative "../../../app/domain/search/search_run"
 
 RSpec.describe Search::SearchRun do
   let(:origin) { "NYC" }
@@ -109,7 +114,8 @@ RSpec.describe Search::SearchRun do
         max_candidates: max_candidates,
         passengers: passengers,
         cabin_class: cabin_class,
-        provider: provider
+        provider: provider,
+        currency_code: "USD"
       )
     end
 
@@ -127,6 +133,29 @@ RSpec.describe Search::SearchRun do
 
     it "returns self" do
       expect(search_run.execute).to eq(search_run)
+    end
+
+    it "forwards currency_code to Sampling::Runner" do
+      allow(runner).to receive(:call).and_return([])
+
+      search_run_brl = described_class.new(
+        origin: origin, destination: destination,
+        earliest_departure_date: earliest_departure_date,
+        latest_departure_date: latest_departure_date,
+        min_stay_days: min_stay_days, max_stay_days: max_stay_days,
+        max_candidates: max_candidates, passengers: passengers,
+        cabin_class: cabin_class, provider: provider,
+        currency_code: "BRL"
+      )
+      search_run_brl.execute
+
+      expect(runner).to have_received(:call).with(hash_including(currency_code: "BRL"))
+    end
+
+    it "defaults currency_code to USD" do
+      allow(runner).to receive(:call).and_return([])
+      search_run.execute
+      expect(runner).to have_received(:call).with(hash_including(currency_code: "USD"))
     end
   end
 

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require "rails_helper"
+require "spec_helper"
+require_relative "../../../../app/domain/search/sampling/sampler"
 
 RSpec.describe Search::Sampling::Sampler do
   let(:departure_date) { Date.new(2025, 3, 1) }
@@ -33,7 +34,8 @@ RSpec.describe Search::Sampling::Sampler do
           ],
           passengers: 2,
           cabin_class: :business,
-          provider: provider
+          provider: provider,
+          currency_code: "EUR"
         )
 
         sampler.call
@@ -44,7 +46,8 @@ RSpec.describe Search::Sampling::Sampler do
           departure_date: departure_date,
           return_date: return_date,
           passengers: 2,
-          cabin_class: :business
+          cabin_class: :business,
+          currency_code: "EUR"
         )
 
         expect(provider).to have_received(:search).with(
@@ -53,8 +56,24 @@ RSpec.describe Search::Sampling::Sampler do
           departure_date: departure_date + 1,
           return_date: return_date + 1,
           passengers: 2,
-          cabin_class: :business
+          cabin_class: :business,
+          currency_code: "EUR"
         )
+      end
+
+      it "defaults currency_code to USD" do
+        provider = double("Provider", search: [ valid_sample ])
+
+        sampler = described_class.new(
+          origin: "NYC",
+          destination: "LON",
+          date_pairs: [ [ departure_date, return_date ] ],
+          provider: provider
+        )
+
+        sampler.call
+
+        expect(provider).to have_received(:search).with(hash_including(currency_code: "USD"))
       end
 
       it "uses default passengers and cabin_class when not provided" do

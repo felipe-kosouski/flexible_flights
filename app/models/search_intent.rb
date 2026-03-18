@@ -19,4 +19,5 @@ class SearchIntent < ApplicationRecord
   validates :max_stay_days, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :luggage_requirement, inclusion: { in: luggage_requirements.keys }, allow_nil: true
   validates :max_stops, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :currency, presence: true
 end

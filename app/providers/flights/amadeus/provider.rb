@@ -20,7 +20,7 @@ module Flights
         )
       end
 
-      def search(origin:, destination:, departure_date:, return_date:, passengers:, cabin_class:)
+      def search(origin:, destination:, departure_date:, return_date:, passengers:, cabin_class:, currency_code: "USD")
         raw = @client.flight_offers(
           originLocationCode: origin,
           destinationLocationCode: destination,
@@ -28,6 +28,7 @@ module Flights
           returnDate: return_date.iso8601,
           adults: passengers,
           travelClass: CABIN_CLASS_MAP.fetch(cabin_class),
+          currencyCode: currency_code,
           max: MAX_RESULTS
         )
 

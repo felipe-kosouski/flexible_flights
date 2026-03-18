@@ -134,27 +134,18 @@ A `SearchRunRepository.load_results` method loads the stored raw data and reruns
 
 ---
 
-## 8) Confidence Gating in Presentation
+## 8) Confidence Gating in Presentation ✅ DONE
 
 **Goal**
 
 - Surface confidence-driven behavior in the UI, not just in the domain.
 
-**Why it matters**
+**Completed**
 
-- Domain already gates insights by confidence (low → suppressed or `:insufficient_data`).
-- PRD requires confidence-aware messaging in the UI: wording, tone, visual cues must reflect confidence level.
-
-**Current gap**
-
-- Domain confidence policy is in place. Presentation layer does not yet consume or render it.
-
-**Expected output**
-
-- Explicit UI rules mapping confidence levels to message tone and visual state:
-  - `:high` → confident recommendation copy.
-  - `:medium` → hedged copy ("prices suggest…").
-  - `:low` → "not enough data" state with no recommendation shown.
+- `RouteSummaryCopyService` — AI-generated route summary (Claude Haiku). Returns `nil` for `:low` confidence, suppressing the summary entirely. Passes confidence level into the prompt with an explicit rule: medium confidence → hedged language ("appears to be", "tends to").
+- `ExplanationCopyService` — AI-generated per-flight copy (Claude Haiku). Batches all ranked flights in a single API call with 7-day caching. Supports `skip_reason` for flights that should not be recommended. Never invents statistics — uses only provided data.
+- Domain layer suppresses insights at `:low` confidence (`:insufficient_data` returned). UI renders the low-confidence state with no recommendations shown.
+- Confidence label and visual cues (color coding) rendered in the results view per confidence level.
 
 ---
 
@@ -167,7 +158,7 @@ A `SearchRunRepository.load_results` method loads the stored raw data and reruns
 5. ~~Provider base abstraction + first real provider.~~ ✅
 6. ~~Results read layer (recompute on demand from stored raw data).~~ ✅
 7. ~~Presentation layer (search form → async job → results page).~~ ✅
-8. Confidence gating in presentation (UI messaging by confidence level).
+8. ~~Confidence gating in presentation (UI messaging by confidence level).~~ ✅
 
 ---
 

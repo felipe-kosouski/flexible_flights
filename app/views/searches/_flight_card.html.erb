@@ -6,7 +6,7 @@
       <span class="text-xs font-medium text-gray-400">#<%= flight.rank %></span>
       <div class="w-12 h-12 rounded-full ring-2 flex flex-col items-center justify-center <%= flight.score_ring_class %>">
         <span class="text-base font-bold leading-none <%= flight.score_color_class %>"><%= flight.score %></span>
-        <span class="text-[9px] font-medium leading-none text-gray-400 mt-0.5">score</span>
+        <span class="text-[9px] font-medium leading-none text-gray-400 mt-0.5"><%= t("flights.labels.score") %></span>
       </div>
       <span class="text-[10px] font-medium <%= flight.score_color_class %>"><%= flight.score_label %></span>
     </div>
@@ -47,17 +47,17 @@
       <div class="mt-3 flex items-center gap-3 flex-wrap">
         <% if flight.price_score %>
           <span class="text-xs text-gray-400">
-            Price <span class="font-medium text-gray-600"><%= flight.price_score %></span>
+            <%= t("flights.score_breakdown.price") %> <span class="font-medium text-gray-600"><%= flight.price_score %></span>
           </span>
         <% end %>
         <% if flight.comfort_score %>
           <span class="text-xs text-gray-400">
-            Comfort <span class="font-medium text-gray-600"><%= flight.comfort_score %></span>
+            <%= t("flights.score_breakdown.comfort") %> <span class="font-medium text-gray-600"><%= flight.comfort_score %></span>
           </span>
         <% end %>
         <% if flight.trip_fit_score %>
           <span class="text-xs text-gray-400">
-            Trip fit <span class="font-medium text-gray-600"><%= flight.trip_fit_score %></span>
+            <%= t("flights.score_breakdown.trip_fit") %> <span class="font-medium text-gray-600"><%= flight.trip_fit_score %></span>
           </span>
         <% end %>
       </div>
@@ -87,11 +87,11 @@
       <%# Search redirect links %>
       <% if flight.search_urls %>
         <div class="mt-3 pt-3 border-t border-gray-100 flex items-center gap-4">
-          <span class="text-xs text-gray-400">Search this flight:</span>
-          <%= link_to "Google Flights", flight.search_urls.google_flights_url,
+          <span class="text-xs text-gray-400"><%= t("flights.labels.search_this_flight") %></span>
+          <%= link_to t("flights.labels.google_flights"), flight.search_urls.google_flights_url,
                 target: "_blank", rel: "noopener noreferrer",
                 class: "text-xs font-medium text-blue-600 hover:text-blue-800 hover:underline" %>
-          <%= link_to "Skyscanner", flight.search_urls.skyscanner_url,
+          <%= link_to t("flights.labels.skyscanner"), flight.search_urls.skyscanner_url,
                 target: "_blank", rel: "noopener noreferrer",
                 class: "text-xs font-medium text-cyan-600 hover:text-cyan-800 hover:underline" %>
         </div>

@@ -65,6 +65,19 @@ RSpec.describe Flights::Amadeus::Provider do
         )
       end
 
+      it "passes currencyCode to the Amadeus API" do
+        provider.search(
+          origin: "GRU", destination: "LHR",
+          departure_date: departure_date, return_date: return_date,
+          passengers: 1, cabin_class: :economy,
+          currency_code: "BRL"
+        )
+
+        expect(WebMock).to have_requested(:get, offers_url).with(
+          query: hash_including("currencyCode" => "BRL")
+        )
+      end
+
       it "produces normalized hashes that satisfy Sampler::REQUIRED_KEYS" do
         results = provider.search(
           origin: "MAD", destination: "LHR",

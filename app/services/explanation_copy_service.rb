@@ -7,7 +7,7 @@ class ExplanationCopyService
   SYSTEM_PROMPT = <<~SYSTEM.strip
     You write short, honest flight explanations for travelers that read like
     advice from a knowledgeable friend. Translate numbers into meaning. Use
-    specific dollar amounts. Avoid raw percentages for travel time — describe
+    specific monetary amounts. Avoid raw percentages for travel time — describe
     what they mean instead (e.g., "about 2 hours longer than typical" not
     "17% longer than median"). Use ONLY the numbers provided. Never invent or
     imply statistics not listed below.
@@ -33,13 +33,14 @@ class ExplanationCopyService
     - Never use em dashes (—) or semicolons (;) — rewrite the sentence instead
   TEXT
 
-  def self.call(ranked_flight:, intent:, total_flights: nil)
-    new(ranked_flight, intent, total_flights).call
+  def self.call(ranked_flight:, intent:, total_flights: nil, locale: I18n.locale.to_s)
+    new(ranked_flight, intent, total_flights, locale).call
   end
 
-  def self.fingerprint_for(ranked_flight)
+  def self.fingerprint_for(ranked_flight, locale: I18n.locale.to_s)
     baselines = ranked_flight.explanation.baselines
     [
+      locale,
       ranked_flight.rank,
       ranked_flight.flight.price_cents,
       ranked_flight.flight.departure_datetime.to_i,
@@ -49,18 +50,18 @@ class ExplanationCopyService
     ].join("/")
   end
 
-  def self.batch_call(ranked_flights:, intent:, total_flights:)
+  def self.batch_call(ranked_flights:, intent:, total_flights:, locale: I18n.locale.to_s)
     return {} if ranked_flights.empty?
 
     api_key = Rails.application.credentials.anthropic_api_key
     return {} unless api_key
 
-    fingerprints = ranked_flights.map { |rf| fingerprint_for(rf) }
+    fingerprints = ranked_flights.map { |rf| fingerprint_for(rf, locale: locale) }
     cache_key = "explanation_copy/batch/v3/#{fingerprints.sort.join('|')}"
 
     Rails.cache.fetch(cache_key, expires_in: CACHE_TTL) do
       pairs = ranked_flights.zip(fingerprints).filter_map { |rf, fp|
-        instance = new(rf, intent, total_flights)
+        instance = new(rf, intent, total_flights, locale)
         next unless instance.send(:explanation)
 
         [ instance, fp ]
@@ -69,19 +70,21 @@ class ExplanationCopyService
       next({}) if pairs.empty?
 
       sections = pairs.map { |instance, fp| instance.send(:flight_prompt_block, fp) }
-      batch_fetch_from_api(api_key, sections, pairs.size)
+      batch_fetch_from_api(api_key, sections, pairs.size, locale: locale)
     end
   rescue StandardError
     {}
   end
 
-  private_class_method def self.batch_fetch_from_api(api_key, flight_sections, count)
+  private_class_method def self.batch_fetch_from_api(api_key, flight_sections, count, locale:)
     prompt = build_batch_prompt(flight_sections)
+    instruction = AiLocale.instruction_for(locale)
+    system = instruction ? "#{SYSTEM_PROMPT}\n#{instruction}" : SYSTEM_PROMPT
     client = Anthropic::Client.new(api_key: api_key)
     message = client.messages.create(
       model: MODEL,
       max_tokens: 256 * count,
-      system: SYSTEM_PROMPT,
+      system: system,
       messages: [ { role: "user", content: prompt } ]
     )
 
@@ -125,10 +128,11 @@ class ExplanationCopyService
     {}
   end
 
-  def initialize(ranked_flight, intent, total_flights)
+  def initialize(ranked_flight, intent, total_flights, locale = I18n.locale.to_s)
     @ranked_flight = ranked_flight
     @intent = intent
     @total_flights = total_flights
+    @locale = locale
   end
 
   def call
@@ -145,7 +149,7 @@ class ExplanationCopyService
     message = client.messages.create(
       model: MODEL,
       max_tokens: 256,
-      system: SYSTEM_PROMPT,
+      system: localized_system_prompt,
       messages: [ { role: "user", content: user_prompt } ]
     )
 
@@ -167,11 +171,17 @@ class ExplanationCopyService
   def cache_key
     [
       "explanation_copy/v3",
+      @locale,
       flight.price_cents,
       flight.departure_datetime.to_i,
       baselines[:price_median_cents],
       baselines[:volatility]
     ].join("/")
+  end
+
+  def localized_system_prompt
+    instruction = AiLocale.instruction_for(@locale)
+    instruction ? "#{SYSTEM_PROMPT}\n#{instruction}" : SYSTEM_PROMPT
   end
 
   def user_prompt
@@ -216,9 +226,7 @@ class ExplanationCopyService
   end
 
   def format_price(cents)
-    return "N/A" unless cents
-
-    "$#{(cents / 100.0).round}"
+    PriceFormatter.call(cents, currency_code)
   end
 
   def price_delta_label
@@ -229,7 +237,11 @@ class ExplanationCopyService
     pct = ((delta_cents.abs.to_f / median) * 100).round
     direction = delta_cents < 0 ? "below" : "above"
     qualifier = delta_cents < 0 ? "cheaper" : "more expensive"
-    "$#{(delta_cents.abs / 100.0).round} #{direction} (#{pct}% #{qualifier})"
+    "#{PriceFormatter.call(delta_cents.abs, currency_code)} #{direction} (#{pct}% #{qualifier})"
+  end
+
+  def currency_code
+    flight.currency || "USD"
   end
 
   def format_duration(minutes)

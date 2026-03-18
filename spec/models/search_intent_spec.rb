@@ -16,6 +16,8 @@ RSpec.describe SearchIntent, type: :model do
     it { is_expected.to validate_presence_of(:min_stay_days) }
     it { is_expected.to validate_presence_of(:max_stay_days) }
 
+    it { is_expected.to validate_presence_of(:currency) }
+
     it { is_expected.to validate_numericality_of(:min_stay_days).only_integer.is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:max_stay_days).only_integer.is_greater_than_or_equal_to(0) }
     it { is_expected.to validate_numericality_of(:max_stops).only_integer.is_greater_than_or_equal_to(0).allow_nil }

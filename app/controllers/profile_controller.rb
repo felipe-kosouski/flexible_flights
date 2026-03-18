@@ -50,7 +50,7 @@ class ProfileController < ApplicationController
   end
 
   def personal_info_params
-    params.require(:user).permit(:first_name, :last_name, :email)
+    params.require(:user).permit(:first_name, :last_name, :email, :preferred_locale)
   end
 
   def password_params

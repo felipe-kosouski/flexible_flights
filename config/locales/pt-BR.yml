@@ -1,0 +1,121 @@
+pt-BR:
+  flights:
+    tags:
+      top_rated: "Melhor avaliado"
+      best_price: "Melhor preço"
+      best_comfort: "Melhor conforto"
+    stops:
+      direct: "Direto"
+      one_stop: "1 parada"
+      many_stops: "%{count} paradas"
+    score_labels:
+      excellent: "Excelente"
+      good: "Bom"
+      fair: "Regular"
+      poor: "Fraco"
+    luggage:
+      included: "Bagagem incluída"
+      carry_on_only: "Apenas bagagem de mão"
+    score_breakdown:
+      price: "Preço"
+      comfort: "Conforto"
+      trip_fit: "Adequação"
+      total: "Total"
+    labels:
+      score: "pontuação"
+      search_this_flight: "Buscar este voo:"
+      google_flights: "Google Flights"
+      skyscanner: "Skyscanner"
+  searches:
+    new:
+      title: "Encontre o melhor momento para voar"
+      subtitle: "Vamos analisar sua janela de viagem e dizer quando ir — e se você deve reservar agora ou esperar."
+      from_label: "De"
+      to_label: "Para"
+      submit: "Buscar voos"
+      earliest_departure: "Saída mais cedo"
+      latest_return: "Retorno mais tarde"
+      min_stay: "Estadia mínima (dias)"
+      max_stay: "Estadia máxima (dias)"
+      max_stops_label: "Máximo de escalas"
+      luggage_label: "Bagagem"
+      stops_any: "Qualquer"
+      stops_direct: "Somente direto"
+      stops_1: "Máximo 1 escala"
+      stops_2: "Máximo 2 escalas"
+      luggage_any: "Qualquer"
+      luggage_carry_on: "Bagagem de mão"
+      luggage_checked: "Bagagem despachada"
+      luggage_none: "Nenhuma"
+    show:
+      loading_title: "Buscando voos"
+      loading_subtitle: "Estamos analisando sua janela de viagem. Geralmente leva 15–30 segundos."
+      search_again: "Nova busca"
+      options_analysed: "opções analisadas"
+      ranked_options: "Opções classificadas"
+      failed_title: "Busca falhou"
+      failed_body: "Algo deu errado durante a busca. Por favor, tente novamente."
+      try_again: "Tentar novamente"
+    history:
+      title: "Histórico de buscas"
+      no_searches: "Nenhuma busca ainda."
+      run_search: "Fazer uma nova busca"
+      view_results: "Ver resultados"
+      run_again: "Executar novamente →"
+  insights:
+    confidence:
+      high: "Alta confiança"
+      medium: "Confiança média"
+      low: "Baixa confiança"
+    low_confidence_title: "Dados insuficientes para recomendações confiáveis"
+    low_confidence_body: "Os voos são exibidos, mas sem recomendações."
+    flights_found: "Voos encontrados"
+    recommendation_label: "Recomendação"
+    price_level_label: "Nível de preço"
+    best_time_label: "Melhor período para viajar"
+    best_value_label: "Melhor custo-benefício"
+    no_detailed_insights: "Dados insuficientes para insights detalhados."
+    wait_or_book:
+      book_now: "Reserve agora"
+      wait: "Aguarde"
+      consider_booking: "Considere reservar"
+      insufficient_data: "Dados insuficientes"
+    price_band:
+      cheap: "Preços estão baixos agora"
+      below_median: "Preços abaixo da média"
+      above_median: "Preços acima da média"
+      expensive: "Preços estão altos"
+    price_rarity:
+      rare_cheap: "Oferta rara"
+      below_median: "Abaixo da média"
+      above_median: "Acima da média"
+      expensive: "Caro"
+    date_range:
+      description_high: "Forte sinal de mercado para este período."
+      description_medium: "Com base nos dados disponíveis, este período parece favorável."
+    subtext:
+      insufficient_data: "Dados insuficientes para uma recomendação confiável para esta rota."
+      high_book_now: "Os preços estão num bom nível agora — esperar pode custar mais."
+      high_wait: "Os preços estão elevados para esta rota. Melhores opções devem surgir."
+      high_consider_booking: "As condições são razoáveis. Reservar agora é uma boa escolha."
+      medium_book_now: "Os preços sugerem que pode ser um bom momento para reservar."
+      medium_wait: "Os preços sugerem que esperar pode valer a pena nesta rota."
+      medium_consider_booking: "Os preços parecem razoáveis, mas os dados ainda não são totalmente claros."
+    price_rarity_description:
+      high_rare_cheap: "Os preços estão incomumente baixos para esta rota agora."
+      high_below_median: "Os preços estão abaixo da faixa típica para esta rota."
+      high_above_median: "Os preços estão acima da faixa típica para esta rota."
+      high_expensive: "Os preços estão altos em relação ao histórico desta rota."
+      medium_rare_cheap: "Os preços parecem mais baixos que o usual, mas os dados são limitados."
+      medium_below_median: "Os preços parecem estar abaixo da média."
+      medium_above_median: "Os preços parecem estar acima da média."
+      medium_expensive: "Os preços parecem altos, mas os dados são limitados."
+    freshness:
+      pending: "Análise pendente"
+      days_ago:
+        one: "Analisado há 1 dia"
+        other: "Analisado há %{count} dias"
+      stale_suffix: " · considere executar novamente"
+  profile:
+    locale_label: "Idioma e moeda"
+    locale_auto: "Detectar automaticamente"
