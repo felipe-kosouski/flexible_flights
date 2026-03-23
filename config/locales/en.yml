@@ -145,6 +145,8 @@ en:
         one: "Analysed 1 day ago"
         other: "Analysed %{count} days ago"
       stale_suffix: " · consider running again"
+  payments:
+    no_credits: "You need credits to run a search. Please purchase a pack."
   profile:
     locale_label: "Language & currency"
     locale_auto: "Auto-detect from browser"

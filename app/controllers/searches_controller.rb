@@ -15,6 +15,10 @@ class SearchesController < ApplicationController
   end
 
   def create
+    if current_user.search_credits < 1
+      return redirect_to new_payment_path, alert: t("payments.no_credits")
+    end
+
     @search_intent = current_user.search_intents.build(search_intent_params)
     @search_intent.currency = CurrencyResolver.for_locale(I18n.locale)
 

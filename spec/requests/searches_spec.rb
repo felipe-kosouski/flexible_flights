@@ -48,6 +48,44 @@ RSpec.describe "Searches", type: :request do
     end
   end
 
+  describe "credit gate on POST /searches" do
+    before { sign_in user }
+
+    let(:valid_params) do
+      {
+        search_intent: {
+          origin_airport: "GRU",
+          destination_airport: "JFK",
+          earliest_departure: 30.days.from_now.to_date.to_s,
+          latest_return: 60.days.from_now.to_date.to_s,
+          min_stay_days: 5,
+          max_stay_days: 10,
+          luggage_requirement: "none",
+          max_stops: 1
+        }
+      }
+    end
+
+    context "when user has 0 credits" do
+      before { user.update!(search_credits: 0) }
+
+      it "redirects to new_payment_path without enqueuing a job" do
+        expect(SearchRunJob).not_to receive(:perform_later)
+        post searches_path, params: valid_params
+        expect(response).to redirect_to(new_payment_path)
+      end
+    end
+
+    context "when user has 1 or more credits" do
+      before { user.update!(search_credits: 1) }
+
+      it "enqueues a SearchRunJob" do
+        expect(SearchRunJob).to receive(:perform_later)
+        post searches_path, params: valid_params
+      end
+    end
+  end
+
   describe "GET /searches/new with from_intent param" do
     before { sign_in user }
 

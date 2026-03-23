@@ -5,6 +5,17 @@ RSpec.describe User, type: :model do
     it { is_expected.to have_many(:search_intents) }
   end
 
+  describe "search_credits" do
+    it "defaults to 1 on creation" do
+      user = create(:user)
+      expect(user.search_credits).to eq(1)
+    end
+
+    it "has a has_many relationship with credit_purchases" do
+      is_expected.to have_many(:credit_purchases)
+    end
+  end
+
   describe "database constraints" do
     it "enforces email uniqueness" do
       create(:user, email: "dup@example.com")

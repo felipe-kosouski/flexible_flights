@@ -116,6 +116,8 @@ pt-BR:
         one: "Analisado há 1 dia"
         other: "Analisado há %{count} dias"
       stale_suffix: " · considere executar novamente"
+  payments:
+    no_credits: "Você precisa de créditos para realizar uma busca. Compre um pacote."
   profile:
     locale_label: "Idioma e moeda"
     locale_auto: "Detectar automaticamente"

@@ -18,6 +18,7 @@ gem "thruster", require: false
 gem "rspec-rails"
 gem "faraday"
 gem "anthropic"
+gem "stripe"
 gem "devise"
 gem "csv"
 

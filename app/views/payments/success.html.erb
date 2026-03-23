@@ -1,0 +1,19 @@
+<% content_for :title, "Payment Successful — Flexible Flights" %>
+
+<div class="w-full max-w-md mx-auto text-center">
+  <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-10">
+    <div class="mx-auto mb-6 w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center">
+      <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+
+    <h1 class="text-xl font-semibold text-gray-900 mb-2">Credits added!</h1>
+    <p class="text-sm text-gray-500 mb-8">Your search credits are ready to use. Go find those flights.</p>
+
+    <%= link_to "Search now", new_search_path,
+          class: "inline-block bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-sm rounded-lg px-6 py-3 transition-colors" %>
+    <%= link_to "Go to history", search_history_path,
+          class: "block mt-3 text-sm text-gray-400 hover:text-gray-600 transition-colors" %>
+  </div>
+</div>

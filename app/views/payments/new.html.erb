@@ -1,0 +1,86 @@
+<% content_for :title, "Get Search Credits — Flexible Flights" %>
+
+<div class="w-full max-w-3xl mx-auto">
+  <div class="mb-8 text-center">
+    <h1 class="text-2xl font-semibold text-gray-900 tracking-tight">Get more searches</h1>
+    <p class="mt-1.5 text-sm text-gray-500">
+      You have
+      <span class="font-semibold text-gray-700">
+        <%= current_user.search_credits %> <%= current_user.search_credits == 1 ? "credit" : "credits" %>
+      </span>
+      remaining
+    </p>
+  </div>
+
+  <% brl = I18n.locale.to_s == "pt-BR"
+     pack_meta = {
+       pack_5:  {
+         label:       "Starter",
+         description: "Try it out — a handful of searches to explore.",
+         badge:       nil,
+         highlight:   false,
+         usd:         "$2.99",
+         brl:         "R$14,90",
+         per_usd:     "$0.60 / search",
+         per_brl:     "R$2,98 / busca"
+       },
+       pack_15: {
+         label:       "Explorer",
+         description: "Great for planning a trip with flexibility.",
+         badge:       "Most Popular",
+         highlight:   true,
+         usd:         "$7.99",
+         brl:         "R$39,90",
+         per_usd:     "$0.53 / search",
+         per_brl:     "R$2,66 / busca"
+       },
+       pack_30: {
+         label:       "Frequent Flyer",
+         description: "For serious planners who search often.",
+         badge:       "Best Value",
+         highlight:   false,
+         usd:         "$14.99",
+         brl:         "R$74,90",
+         per_usd:     "$0.50 / search",
+         per_brl:     "R$2,50 / busca"
+       }
+     }
+  %>
+
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+    <% CREDIT_PACKS.each do |key, pack| %>
+      <% meta = pack_meta[key] %>
+      <div class="relative bg-white rounded-2xl border flex flex-col <%= meta[:highlight] ? "border-indigo-500 shadow-md ring-1 ring-indigo-500" : "border-gray-200 shadow-sm" %> p-6">
+
+        <% if meta[:badge] %>
+          <div class="absolute -top-3.5 left-1/2 -translate-x-1/2">
+            <span class="text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap <%= meta[:highlight] ? "bg-indigo-600 text-white" : "bg-gray-900 text-white" %>">
+              <%= meta[:badge] %>
+            </span>
+          </div>
+        <% end %>
+
+        <div class="mb-5">
+          <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2"><%= meta[:label] %></p>
+          <div class="flex items-baseline gap-1.5">
+            <span class="text-5xl font-bold tracking-tight text-gray-900"><%= pack[:credits] %></span>
+            <span class="text-sm font-medium text-gray-400">searches</span>
+          </div>
+          <p class="mt-1.5 text-xs text-gray-400"><%= brl ? meta[:per_brl] : meta[:per_usd] %></p>
+        </div>
+
+        <p class="text-sm text-gray-500 leading-relaxed flex-1 mb-6"><%= meta[:description] %></p>
+
+        <div>
+          <p class="text-2xl font-bold text-gray-900 mb-3 tabular-nums"><%= brl ? meta[:brl] : meta[:usd] %></p>
+          <%= button_to payments_path(pack_key: key), method: :post, data: { turbo: false },
+                class: "w-full text-center font-semibold text-sm rounded-lg px-4 py-2.5 transition-colors cursor-pointer #{meta[:highlight] ? "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white" : "bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-900"}" do %>
+            Buy now
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <p class="mt-6 text-center text-xs text-gray-400">Secure payment via Stripe &middot; Credits never expire</p>
+</div>

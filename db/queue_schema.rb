@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_18_022227) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_20_165846) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -26,6 +26,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_022227) do
     t.datetime "updated_at", null: false
     t.integer "volatility"
     t.index ["search_run_id"], name: "index_analysis_snapshots_on_search_run_id", unique: true
+  end
+
+  create_table "credit_purchases", force: :cascade do |t|
+    t.integer "amount_cents", null: false
+    t.datetime "created_at", null: false
+    t.integer "credits_granted", null: false
+    t.string "currency", null: false
+    t.datetime "fulfilled_at", null: false
+    t.string "pack_key", null: false
+    t.string "stripe_session_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["stripe_session_id"], name: "index_credit_purchases_on_stripe_session_id", unique: true
+    t.index ["user_id"], name: "index_credit_purchases_on_user_id"
   end
 
   create_table "flight_samples", force: :cascade do |t|
@@ -215,12 +229,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_18_022227) do
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
+    t.integer "search_credits", default: 1, null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.check_constraint "search_credits >= 0", name: "search_credits_non_negative"
   end
 
   add_foreign_key "analysis_snapshots", "search_runs"
+  add_foreign_key "credit_purchases", "users"
   add_foreign_key "flight_samples", "search_runs"
   add_foreign_key "search_intents", "users"
   add_foreign_key "search_runs", "search_intents"

@@ -32,12 +32,23 @@ class SearchRunJob < ApplicationJob
       passengers: passengers,
       cabin_class: cabin_class
     )
+
+    decrement_credit(search_run_record)
   ensure
     search_run_record&.reload
     broadcast_result(search_run_record) if search_run_record
   end
 
   private
+
+  def decrement_credit(search_run_record)
+    ActiveRecord::Base.transaction(requires_new: true) do
+      User.where(id: search_run_record.search_intent.user_id)
+          .update_all("search_credits = search_credits - 1")
+    end
+  rescue ActiveRecord::StatementInvalid => e
+    Rails.logger.warn("Credit decrement skipped (CHECK constraint): #{e.message}")
+  end
 
   def broadcast_result(search_run)
     if search_run.completed?

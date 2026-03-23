@@ -8,6 +8,7 @@ class User < ApplicationRecord
 
   has_many :search_intents, dependent: :destroy
   has_many :search_runs, through: :search_intents
+  has_many :credit_purchases, dependent: :destroy
 
   validates :preferred_locale,
     inclusion: { in: SUPPORTED_LOCALES },
