@@ -61,8 +61,8 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 
 ### Must-have for launch:
 
-1. **Payment integration** — Stripe Checkout with search packs. Buy 5 searches for $X, 20 for $Y. No subscriptions, no complexity
-2. **1 free search** — Let users feel the value before paying. This is the conversion funnel
+1. ~~**Payment integration** — Stripe Checkout with search packs. Buy 5 searches for $X, 20 for $Y. No subscriptions, no complexity~~ ✅ **Done (2026-03-20)**
+2. ~~**1 free search** — Let users feel the value before paying. This is the conversion funnel~~ ✅ **Done (2026-03-20)**
 3. **Landing page** — Explain the value prop before sign-up (keep in Rails)
 4. **Production Amadeus API key** — Integration is working with test endpoint, just needs prod credentials
 5. **Error monitoring** — Sentry free tier. Can't fix what you can't see
@@ -87,16 +87,16 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 
 ## 5. What's Missing (MVP-Scoped)
 
-| Gap                                                              | Effort | Priority |
-| ---------------------------------------------------------------- | ------ | -------- |
-| Payment system (Stripe Checkout + search packs)                  | Medium | Critical |
-| Landing page (value prop + CTA)                                  | Medium | Critical |
-| Usage metering (count searches per user)                         | Small  | Critical |
-| Results page hierarchy polish (insights hero, flights secondary) | Small  | High     |
-| Error monitoring (Sentry)                                        | Small  | High     |
-| Rate limiting (Rack::Attack)                                     | Small  | High     |
-| Production deploy setup                                          | Medium | High     |
-| Email "search ready" notification                                | Small  | Nice     |
+| Gap                                                              | Effort | Priority | Status                  |
+| ---------------------------------------------------------------- | ------ | -------- | ----------------------- |
+| ~~Payment system (Stripe Checkout + search packs)~~              | Medium | Critical | ✅ Done (2026-03-20)    |
+| ~~Usage metering (credits per user, gate at 0)~~                 | Small  | Critical | ✅ Done (2026-03-20)    |
+| Landing page (value prop + CTA)                                  | Medium | Critical | Not started             |
+| Results page hierarchy polish (insights hero, flights secondary) | Small  | High     | Not started             |
+| Error monitoring (Sentry)                                        | Small  | High     | Not started             |
+| Rate limiting (Rack::Attack)                                     | Small  | High     | Not started             |
+| Production deploy setup                                          | Medium | High     | Not started             |
+| Email "search ready" notification                                | Small  | Nice     | Not started             |
 
 **What's NOT missing (already built):**
 
@@ -111,8 +111,9 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 - Solid Queue for background jobs
 - IDOR protection
 - Airport autocomplete (7500+ airports, client-side)
+- **Payment system** — Stripe Checkout, credits model, multi-currency (USD + BRL), webhook fulfillment with idempotency, polished pricing UI (2026-03-20)
 
-The codebase is genuinely close to shippable. The gap is commercial infrastructure (payments, landing page) and operational basics (monitoring, rate limiting).
+The codebase is genuinely close to shippable. The remaining gap is the landing page (discovery + conversion) and operational basics (monitoring, rate limiting, deploy).
 
 ---
 
@@ -170,6 +171,14 @@ Start low to get users and data. Something like $2.99/5 searches, $7.99/15, $14.
 
 ## Bottom Line
 
-The product has a clear value proposition, a well-architected domain layer, and a frontend that's further along than expected (AI copy, real-time updates, i18n). The gap to market is commercial (payments, landing page) and operational (monitoring, deploy), not technical. The core intelligence engine works.
+The product has a clear value proposition, a well-architected domain layer, and a frontend that's further along than expected (AI copy, real-time updates, i18n). The payment system is now live — users can purchase search packs via Stripe Checkout, credits are granted atomically via webhook, and the gate prevents searching without credits. The remaining gap to market is the landing page (discovery + conversion) and operational basics (monitoring, rate limiting, deploy).
 
 **Biggest risk:** Making sure the first search result _feels_ worth paying for. The insights need to be the hero of the results page — a clear, definitive recommendation — not buried among flight cards.
+
+---
+
+## 8. Progress Log
+
+| Date       | What shipped                                                                                                   |
+| ---------- | -------------------------------------------------------------------------------------------------------------- |
+| 2026-03-20 | **Payment system** — Stripe Checkout (hosted), 3 credit packs (5/15/30), multi-currency (USD + BRL), webhook fulfillment with idempotency guard, atomic credit grant via `update_all`, credit gate in `SearchesController`, credit deduction on successful search completion in `SearchRunJob`, polished 3-card pricing UI |
