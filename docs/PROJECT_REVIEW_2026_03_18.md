@@ -38,7 +38,7 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 
 ## 3. Information Presentation
 
-**Verdict: The bones are strong. The AI copy layer is fully wired. Minor hierarchy adjustments recommended.**
+**Verdict: The bones are strong. The AI copy layer is fully wired. Hierarchy polished (2026-03-24) — insights are now the hero.**
 
 ### What's strong:
 
@@ -49,11 +49,12 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 - **Per-flight AI explanations are batch-generated** via `ExplanationCopyService`, wired through `SearchResultsPresenter` to each `RankedFlightPresenter`
 - External search links (Google Flights, Skyscanner) on both insight cards and flight cards reinforce the advisor positioning
 
-### What could be stronger (polish, not missing features):
+### What was polished (2026-03-24):
 
-- **Insights should be MORE prominent.** The insights ARE the product — the flights are supporting evidence. A user should land on results and immediately see a clear recommendation. The flight list is secondary
-- **The "wait or book" directive could carry more visual weight** — consider making it a hero element at the top of results rather than one card among four
-- The route summary card is understated at `text-sm text-gray-700` — given it's AI-generated synthesis, it could be more prominent
+- ✅ **Recommendation card is now the hero** — full-width, color-coded by directive (`book_now` / `consider_booking` / `wait`), with directive heading, AI route summary in a frosted box, price rarity + confidence tags, and best-time / cheapest-comfort sub-cards all inside the card
+- ✅ **Flights demoted to supporting evidence** — appear below the hero under "The flights behind this recommendation"
+- ✅ `_insights.html.erb` deleted; content inlined into `_results.html.erb`
+- ✅ `SearchResultsPresenter#search_intent_id` added; instance variable coupling removed from partials
 
 ---
 
@@ -87,16 +88,16 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 
 ## 5. What's Missing (MVP-Scoped)
 
-| Gap                                                              | Effort | Priority | Status                  |
-| ---------------------------------------------------------------- | ------ | -------- | ----------------------- |
-| ~~Payment system (Stripe Checkout + search packs)~~              | Medium | Critical | ✅ Done (2026-03-20)    |
-| ~~Usage metering (credits per user, gate at 0)~~                 | Small  | Critical | ✅ Done (2026-03-20)    |
-| Landing page (value prop + CTA)                                  | Medium | Critical | Not started             |
-| Results page hierarchy polish (insights hero, flights secondary) | Small  | High     | Not started             |
-| Error monitoring (Sentry)                                        | Small  | High     | Not started             |
-| Rate limiting (Rack::Attack)                                     | Small  | High     | Not started             |
-| Production deploy setup                                          | Medium | High     | Not started             |
-| Email "search ready" notification                                | Small  | Nice     | Not started             |
+| Gap                                                                  | Effort | Priority | Status               |
+| -------------------------------------------------------------------- | ------ | -------- | -------------------- |
+| ~~Payment system (Stripe Checkout + search packs)~~                  | Medium | Critical | ✅ Done (2026-03-20) |
+| ~~Usage metering (credits per user, gate at 0)~~                     | Small  | Critical | ✅ Done (2026-03-20) |
+| Landing page (value prop + CTA)                                      | Medium | Critical | Not started          |
+| ~~Results page hierarchy polish (insights hero, flights secondary)~~ | Small  | High     | ✅ Done (2026-03-24) |
+| Error monitoring (Sentry)                                            | Small  | High     | Not started          |
+| Rate limiting (Rack::Attack)                                         | Small  | High     | Not started          |
+| Production deploy setup                                              | Medium | High     | Not started          |
+| Email "search ready" notification                                    | Small  | Nice     | Not started          |
 
 **What's NOT missing (already built):**
 
@@ -112,6 +113,7 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 - IDOR protection
 - Airport autocomplete (7500+ airports, client-side)
 - **Payment system** — Stripe Checkout, credits model, multi-currency (USD + BRL), webhook fulfillment with idempotency, polished pricing UI (2026-03-20)
+- **Results page hierarchy** — recommendation card hero, AI route summary inlined, flights as supporting evidence (2026-03-24)
 
 The codebase is genuinely close to shippable. The remaining gap is the landing page (discovery + conversion) and operational basics (monitoring, rate limiting, deploy).
 
@@ -173,12 +175,13 @@ Start low to get users and data. Something like $2.99/5 searches, $7.99/15, $14.
 
 The product has a clear value proposition, a well-architected domain layer, and a frontend that's further along than expected (AI copy, real-time updates, i18n). The payment system is now live — users can purchase search packs via Stripe Checkout, credits are granted atomically via webhook, and the gate prevents searching without credits. The remaining gap to market is the landing page (discovery + conversion) and operational basics (monitoring, rate limiting, deploy).
 
-**Biggest risk:** Making sure the first search result _feels_ worth paying for. The insights need to be the hero of the results page — a clear, definitive recommendation — not buried among flight cards.
+**Biggest risk:** Making sure the first search result _feels_ worth paying for. ~~The insights need to be the hero of the results page — a clear, definitive recommendation — not buried among flight cards.~~ ✅ Done (2026-03-24) — the recommendation card is now the hero. Remaining risk is the landing page converting first-time visitors before they've seen a result.
 
 ---
 
 ## 8. Progress Log
 
-| Date       | What shipped                                                                                                   |
-| ---------- | -------------------------------------------------------------------------------------------------------------- |
-| 2026-03-20 | **Payment system** — Stripe Checkout (hosted), 3 credit packs (5/15/30), multi-currency (USD + BRL), webhook fulfillment with idempotency guard, atomic credit grant via `update_all`, credit gate in `SearchesController`, credit deduction on successful search completion in `SearchRunJob`, polished 3-card pricing UI |
+| Date       | What shipped                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-03-20 | **Payment system** — Stripe Checkout (hosted), 3 credit packs (5/15/30), multi-currency (USD + BRL), webhook fulfillment with idempotency guard, atomic credit grant via `update_all`, credit gate in `SearchesController`, credit deduction on successful search completion in `SearchRunJob`, polished 3-card pricing UI                                                                                            |
+| 2026-03-24 | **Results page hierarchy** — Recommendation card is now a full-width hero (directive heading, AI route summary in frosted box, rarity + confidence tags, best-time + cheapest-comfort sub-cards inside card). Flights demoted below under "The flights behind this recommendation". `_insights.html.erb` deleted. `SearchResultsPresenter#search_intent_id` added to remove instance variable coupling from partials. |

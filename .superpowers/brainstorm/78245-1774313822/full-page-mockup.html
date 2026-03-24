@@ -1,0 +1,100 @@
+<h2>Full results page — proposed layout</h2>
+<p class="subtitle">Route summary lives inside the recommendation card. Flights are framed as evidence below.</p>
+
+<div class="mockup">
+  <div class="mockup-header">searches/show — completed, high confidence</div>
+  <div class="mockup-body" style="font-family:system-ui;font-size:13px;line-height:1.5;max-width:680px;margin:0 auto;padding:24px 16px;">
+
+    <!-- Back link + page header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <a style="color:#6366f1;font-size:12px;font-weight:500;">← New search</a>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-size:12px;color:#64748b;">GRU → LIS &nbsp;·&nbsp; 42 flights sampled</span>
+        <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:2px 8px;border-radius:9999px;">High confidence</span>
+      </div>
+    </div>
+
+    <!-- ① RECOMMENDATION CARD (hero) -->
+    <div style="background:linear-gradient(135deg,#ecfdf5 0%,#d1fae5 100%);border:1.5px solid #6ee7b7;border-radius:14px;padding:20px 22px;margin-bottom:14px;">
+      <div style="font-size:10px;font-weight:700;color:#065f46;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Our recommendation</div>
+      <div style="font-size:22px;font-weight:800;color:#064e3b;margin-bottom:4px;">Book Now</div>
+      <div style="font-size:13px;color:#047857;font-weight:500;margin-bottom:12px;">Prices are 31% below the typical range — this is rare for this route.</div>
+
+      <!-- AI route summary -->
+      <div style="background:rgba(255,255,255,0.55);border-radius:8px;padding:12px 14px;font-size:12px;color:#065f46;margin-bottom:14px;line-height:1.6;">
+        GRU–LIS prices typically bottom out in late March and rise sharply through May. Current fares are sitting at the 18th percentile for the past 90 days — well below the median of $680. Volatility is low, suggesting prices are unlikely to drop further.
+      </div>
+
+      <!-- Supporting tags row -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+        <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:9999px;border:1px solid #a7f3d0;">Rare cheap</span>
+        <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:9999px;border:1px solid #a7f3d0;">High confidence</span>
+        <span style="background:#d1fae5;color:#065f46;font-size:11px;font-weight:600;padding:3px 10px;border-radius:9999px;border:1px solid #a7f3d0;">Typical fare: $680</span>
+      </div>
+
+      <!-- ② Date-range insights (2-col) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="background:rgba(255,255,255,0.65);border-radius:8px;padding:12px;">
+          <div style="font-size:10px;font-weight:700;color:#3730a3;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Best time to travel</div>
+          <div style="font-size:15px;font-weight:700;color:#1e1b4b;">Apr 3 – Apr 10</div>
+          <div style="font-size:11px;color:#4338ca;margin-top:2px;">Avg score 84 · 7 flights</div>
+          <div style="margin-top:8px;display:flex;gap:6px;">
+            <a style="font-size:10px;color:#6366f1;text-decoration:underline;">Google Flights</a>
+            <a style="font-size:10px;color:#6366f1;text-decoration:underline;">Skyscanner</a>
+          </div>
+        </div>
+        <div style="background:rgba(255,255,255,0.65);border-radius:8px;padding:12px;">
+          <div style="font-size:10px;font-weight:700;color:#6b21a8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;">Best price + comfort</div>
+          <div style="font-size:15px;font-weight:700;color:#3b0764;">Apr 5 – Apr 12</div>
+          <div style="font-size:11px;color:#7c3aed;margin-top:2px;">Avg score 79 · 5 flights</div>
+          <div style="margin-top:8px;display:flex;gap:6px;">
+            <a style="font-size:10px;color:#7c3aed;text-decoration:underline;">Google Flights</a>
+            <a style="font-size:10px;color:#7c3aed;text-decoration:underline;">Skyscanner</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ③ FLIGHTS SECTION -->
+    <div style="margin-top:24px;">
+      <h2 style="font-size:13px;font-weight:700;color:#374151;margin-bottom:12px;letter-spacing:.01em;">The flights behind this recommendation</h2>
+
+      <!-- Flight card sample -->
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;margin-bottom:10px;">
+        <div style="display:flex;align-items:flex-start;gap:14px;">
+          <div style="text-align:center;flex-shrink:0;">
+            <div style="width:42px;height:42px;border-radius:50%;background:#ecfdf5;border:2px solid #6ee7b7;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#059669;">87</div>
+            <div style="font-size:9px;color:#6b7280;margin-top:3px;">#1</div>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+              <span style="background:#eef2ff;color:#4338ca;font-size:10px;font-weight:600;padding:1px 7px;border-radius:9999px;">Top rated</span>
+              <span style="background:#ecfdf5;color:#059669;font-size:10px;font-weight:600;padding:1px 7px;border-radius:9999px;">Best price</span>
+            </div>
+            <div style="font-size:16px;font-weight:800;color:#111827;">$342 &nbsp;<span style="font-size:12px;font-weight:400;color:#6b7280;">Apr 5 – Apr 12 · 7 nights</span></div>
+            <div style="font-size:11px;color:#6b7280;margin-top:3px;">Direct · 10h 25m · Carry-on included</div>
+            <div style="background:#f8fafc;border-radius:6px;padding:8px 10px;margin-top:8px;font-size:11px;color:#374151;line-height:1.5;">
+              Best overall score. Direct flight with checked luggage at a price well below market median.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:white;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;opacity:0.75;">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="width:42px;height:42px;border-radius:50%;background:#eff6ff;border:2px solid #93c5fd;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#2563eb;flex-shrink:0;">74</div>
+          <div style="flex:1;">
+            <div style="font-size:15px;font-weight:800;color:#111827;">$371 &nbsp;<span style="font-size:12px;font-weight:400;color:#6b7280;">Apr 8 – Apr 15 · 7 nights</span></div>
+            <div style="font-size:11px;color:#6b7280;margin-top:2px;">1 stop · 13h 40m · Carry-on only</div>
+          </div>
+          <div style="font-size:11px;color:#94a3b8;">#2</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section" style="margin-top:24px;">
+  <p class="subtitle">Does this feel right? Any elements you'd change before I write the spec?</p>
+</div>

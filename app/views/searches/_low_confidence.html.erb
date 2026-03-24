@@ -14,7 +14,7 @@
         <% if presenter.stale? %>
           &middot;
           <%= link_to "Run again →",
-                new_search_path(from_intent: @search_run.search_intent_id),
+                new_search_path(from_intent: presenter.search_intent_id),
                 class: "text-indigo-500 hover:text-indigo-600" %>
         <% end %>
       </p>

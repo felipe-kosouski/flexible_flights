@@ -1,0 +1,70 @@
+<h2>Results Page Layout</h2>
+<p class="subtitle">The current page puts insights and flights at equal weight. Which structure makes insights feel like the product?</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#f8fafc;border-radius:8px;font-size:12px;line-height:1.6;">
+      <div style="background:#10b981;color:white;padding:10px 14px;border-radius:8px;font-weight:700;font-size:13px;margin-bottom:8px;">🟢 BOOK NOW — Prices are unusually low</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px;">
+        <div style="background:#e0f2fe;border-radius:6px;padding:8px;font-size:11px;text-align:center;">Price Rarity<br><strong>Rare cheap</strong></div>
+        <div style="background:#ede9fe;border-radius:6px;padding:8px;font-size:11px;text-align:center;">Best Time<br><strong>Apr 3–10</strong></div>
+        <div style="background:#fef3c7;border-radius:6px;padding:8px;font-size:11px;text-align:center;">Comfort Window<br><strong>Apr 5–12</strong></div>
+      </div>
+      <div style="background:#f1f5f9;border-radius:6px;padding:8px;font-size:11px;color:#64748b;margin-bottom:8px;">✨ AI route summary — prices on this route tend to spike in May…</div>
+      <div style="color:#94a3b8;font-size:11px;border-top:1px dashed #e2e8f0;padding-top:8px;">
+        ↓ Flight 1 &nbsp;·&nbsp; Flight 2 &nbsp;·&nbsp; Flight 3 (secondary)
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Stacked story</h3>
+      <p>Directive hero at top (full width, large). 3 supporting insights in a compact row. AI summary. Flights below, labeled as "supporting evidence".</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#f8fafc;border-radius:8px;font-size:12px;line-height:1.6;">
+      <div style="display:flex;gap:8px;height:120px;">
+        <div style="width:38%;background:#f1f5f9;border-radius:8px;padding:10px;font-size:11px;">
+          <div style="background:#10b981;color:white;padding:6px 8px;border-radius:6px;font-weight:700;margin-bottom:6px;font-size:10px;">🟢 BOOK NOW</div>
+          <div style="background:#e0f2fe;border-radius:4px;padding:5px;margin-bottom:4px;font-size:10px;">Rare cheap</div>
+          <div style="background:#ede9fe;border-radius:4px;padding:5px;margin-bottom:4px;font-size:10px;">Best: Apr 3–10</div>
+          <div style="background:#fef3c7;border-radius:4px;padding:5px;font-size:10px;">Comfort: Apr 5–12</div>
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:6px;">
+          <div style="background:white;border:1px solid #e2e8f0;border-radius:6px;padding:8px;font-size:10px;">✈ Flight 1 — $342 · Score 87</div>
+          <div style="background:white;border:1px solid #e2e8f0;border-radius:6px;padding:8px;font-size:10px;">✈ Flight 2 — $371 · Score 81</div>
+          <div style="background:white;border:1px solid #e2e8f0;border-radius:6px;padding:8px;font-size:10px;">✈ Flight 3 — $389 · Score 74</div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Split panel</h3>
+      <p>Sticky left sidebar with directive + 3 insight cards. Scrollable right column with flight list. Insights always visible while browsing.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:16px;background:#f8fafc;border-radius:8px;font-size:12px;line-height:1.6;">
+      <div style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border:1px solid #6ee7b7;border-radius:8px;padding:12px;margin-bottom:8px;">
+        <div style="font-size:10px;font-weight:700;color:#065f46;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Our recommendation</div>
+        <div style="font-size:15px;font-weight:700;color:#064e3b;margin-bottom:2px;">Book Now</div>
+        <div style="font-size:11px;color:#047857;">Prices are 31% below the typical range on this route. This is rare.</div>
+        <div style="margin-top:8px;display:flex;gap:6px;font-size:10px;">
+          <span style="background:#d1fae5;color:#065f46;padding:2px 6px;border-radius:9999px;">Rare cheap</span>
+          <span style="background:#d1fae5;color:#065f46;padding:2px 6px;border-radius:9999px;">High confidence</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px;">
+        <div style="background:#ede9fe;border-radius:6px;padding:8px;font-size:11px;">Best Time<br><strong>Apr 3–10</strong></div>
+        <div style="background:#fef3c7;border-radius:6px;padding:8px;font-size:11px;">Comfort Window<br><strong>Apr 5–12</strong></div>
+      </div>
+      <div style="color:#94a3b8;font-size:11px;border-top:1px dashed #e2e8f0;padding-top:8px;">↓ Flights (3 options)</div>
+    </div>
+    <div class="card-body">
+      <h3>C — Unified recommendation card</h3>
+      <p>Directive + price rarity merged into one large "Our recommendation" hero card. Best time + comfort window as 2-col below. Flights third.</p>
+    </div>
+  </div>
+
+</div>

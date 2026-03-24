@@ -52,6 +52,10 @@ class SearchResultsPresenter
     end
   end
 
+  def search_intent_id
+    @search_run.search_intent_id
+  end
+
   def low_confidence?
     @results.snapshot.confidence == :low
   end
