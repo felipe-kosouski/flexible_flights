@@ -39,6 +39,12 @@ module FlexibleFlights
     # Don't generate system test files.
     config.generators.system_tests = nil
 
+    # Rate limiting middleware — placed after Warden::Manager so that:
+    # 1. rack.session has the warden.user.user.key populated (for searches/user throttle)
+    # 2. Only one instance exists in the stack (move_after vs insert_after avoids duplicates
+    #    from the Rack::Attack railtie which auto-appends via middleware.use)
+    config.middleware.move_after Warden::Manager, Rack::Attack
+
     # i18n configuration
     config.i18n.available_locales = %w[en pt-BR]
     config.i18n.default_locale = :en

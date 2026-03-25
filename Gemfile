@@ -19,6 +19,7 @@ gem "rspec-rails"
 gem "faraday"
 gem "anthropic"
 gem "stripe"
+gem "rack-attack"
 gem "devise"
 gem "csv"
 

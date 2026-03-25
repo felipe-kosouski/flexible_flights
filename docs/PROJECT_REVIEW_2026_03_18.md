@@ -67,7 +67,7 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 3. **Landing page** — Explain the value prop before sign-up (keep in Rails)
 4. **Production Amadeus API key** — Integration is working with test endpoint, just needs prod credentials
 5. **Error monitoring** — Sentry free tier. Can't fix what you can't see
-6. **Basic rate limiting** — Rack::Attack with simple per-user limits to protect Amadeus API quota
+6. ~~**Basic rate limiting** — Rack::Attack with simple per-user limits to protect Amadeus API quota~~ ✅ **Done (2026-03-25)**
 7. **Deploy infrastructure** — Kamal + Hetzner or similar. Rails 8 makes this straightforward
 
 ### Nice-to-have but can wait:
@@ -95,7 +95,7 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 | Landing page (value prop + CTA)                                      | Medium | Critical | Not started          |
 | ~~Results page hierarchy polish (insights hero, flights secondary)~~ | Small  | High     | ✅ Done (2026-03-24) |
 | Error monitoring (Sentry)                                            | Small  | High     | Not started          |
-| Rate limiting (Rack::Attack)                                         | Small  | High     | Not started          |
+| ~~Rate limiting (Rack::Attack)~~                                     | Small  | High     | ✅ Done (2026-03-25) |
 | Production deploy setup                                              | Medium | High     | Not started          |
 | Email "search ready" notification                                    | Small  | Nice     | Not started          |
 
@@ -114,8 +114,9 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 - Airport autocomplete (7500+ airports, client-side)
 - **Payment system** — Stripe Checkout, credits model, multi-currency (USD + BRL), webhook fulfillment with idempotency, polished pricing UI (2026-03-20)
 - **Results page hierarchy** — recommendation card hero, AI route summary inlined, flights as supporting evidence (2026-03-24)
+- **Rate limiting** — Rack::Attack, 4 throttle rules (login/ip, login/email, signup/ip, search/user), Solid Cache backend, 30 request specs (2026-03-25)
 
-The codebase is genuinely close to shippable. The remaining gap is the landing page (discovery + conversion) and operational basics (monitoring, rate limiting, deploy).
+The codebase is genuinely close to shippable. The remaining gap is the landing page (discovery + conversion) and operational basics (monitoring, deploy).
 
 ---
 
@@ -175,7 +176,7 @@ Start low to get users and data. Something like $2.99/5 searches, $7.99/15, $14.
 
 The product has a clear value proposition, a well-architected domain layer, and a frontend that's further along than expected (AI copy, real-time updates, i18n). The payment system is now live — users can purchase search packs via Stripe Checkout, credits are granted atomically via webhook, and the gate prevents searching without credits. The remaining gap to market is the landing page (discovery + conversion) and operational basics (monitoring, rate limiting, deploy).
 
-**Biggest risk:** Making sure the first search result _feels_ worth paying for. ~~The insights need to be the hero of the results page — a clear, definitive recommendation — not buried among flight cards.~~ ✅ Done (2026-03-24) — the recommendation card is now the hero. Remaining risk is the landing page converting first-time visitors before they've seen a result.
+**Biggest risk:** Making sure the first search result _feels_ worth paying for. ~~The insights need to be the hero of the results page — a clear, definitive recommendation — not buried among flight cards.~~ ✅ Done (2026-03-24) — the recommendation card is now the hero. Remaining risk is the landing page converting first-time visitors before they've seen a result. ~~Rate limiting is unprotected.~~ ✅ Done (2026-03-25).
 
 ---
 
@@ -185,3 +186,4 @@ The product has a clear value proposition, a well-architected domain layer, and 
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-03-20 | **Payment system** — Stripe Checkout (hosted), 3 credit packs (5/15/30), multi-currency (USD + BRL), webhook fulfillment with idempotency guard, atomic credit grant via `update_all`, credit gate in `SearchesController`, credit deduction on successful search completion in `SearchRunJob`, polished 3-card pricing UI                                                                                            |
 | 2026-03-24 | **Results page hierarchy** — Recommendation card is now a full-width hero (directive heading, AI route summary in frosted box, rarity + confidence tags, best-time + cheapest-comfort sub-cards inside card). Flights demoted below under "The flights behind this recommendation". `_insights.html.erb` deleted. `SearchResultsPresenter#search_intent_id` added to remove instance variable coupling from partials. |
+| 2026-03-25 | **Rate limiting** — `rack-attack` gem, 4 throttle rules: login by IP (10/20s), login by email (5/20s), signup by IP (5/60s), search by user (3/60s). Cache backed by Solid Cache (Postgres) in production — no Redis. 30 request specs with per-example `MemoryStore` isolation. Middleware placed after `Warden::Manager` to ensure session is readable.                                                             |
