@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   devise_for :users
-  root "searches#new"
+  root "pages#home"
 
   resources :searches, only: [ :new, :create, :show ]
 

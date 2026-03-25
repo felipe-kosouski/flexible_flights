@@ -2,6 +2,12 @@
 
 @import "tailwindcss";
 
+/* ─── Dark mode variant ──────────────────────────────────────────────────────
+   Activates dark: classes when [data-theme="dark"] is on any ancestor.
+   JS sets this on <html> based on localStorage / OS preference.
+   ─────────────────────────────────────────────────────────────────────────── */
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
 @theme {
   /* ─── Typography ─────────────────────────────────────── */
   --font-heading: "Space Grotesk", sans-serif;
@@ -44,10 +50,12 @@
   --color-warm-900: #1c1814;
 
   /* ─── Dark Surfaces ──────────────────────────────────── */
-  --color-dark-bg:            #0e1219;
-  --color-dark-surface:       #151c26;
-  --color-dark-surface-muted: #1c2535;
-  --color-dark-border:        #283045;
+  --color-dark-bg:             #0e1219;
+  --color-dark-surface:        #151c26;
+  --color-dark-surface-muted:  #1c2535;
+  --color-dark-surface-raised: #1e2d3f;
+  --color-dark-border:         #283045;
+  --color-dark-border-strong:  #3a4a60;
 }
 
 @layer base {
@@ -75,4 +83,77 @@
     font-variant-numeric: tabular-nums;
     font-family: var(--font-heading);
   }
+
+  /* ─── Dark mode: base ────────────────────────────────────────────────────── */
+  [data-theme="dark"] {
+    color-scheme: dark;
+    background-color: var(--color-dark-bg);
+    color: var(--color-warm-100);
+  }
+
+  /* ─── Dark mode: background overrides ───────────────────────────────────── */
+  [data-theme="dark"] .bg-white          { background-color: var(--color-dark-surface) !important; }
+  [data-theme="dark"] .bg-warm-50        { background-color: var(--color-dark-bg) !important; }
+  [data-theme="dark"] .bg-warm-100       { background-color: var(--color-dark-surface-muted) !important; }
+  [data-theme="dark"] .bg-warm-200       { background-color: var(--color-dark-border) !important; }
+  [data-theme="dark"] .bg-gray-50        { background-color: var(--color-dark-bg) !important; }
+  [data-theme="dark"] .bg-gray-100       { background-color: var(--color-dark-surface-muted) !important; }
+  [data-theme="dark"] .bg-gray-200       { background-color: var(--color-dark-border) !important; }
+  [data-theme="dark"] .bg-brand-50       { background-color: #0e2130 !important; }
+
+  /* ─── Dark mode: text overrides ─────────────────────────────────────────── */
+  [data-theme="dark"] .text-warm-900     { color: var(--color-warm-100) !important; }
+  [data-theme="dark"] .text-warm-800     { color: #d4cfc9 !important; }
+  [data-theme="dark"] .text-warm-700     { color: var(--color-warm-300) !important; }
+  [data-theme="dark"] .text-warm-600     { color: var(--color-warm-400) !important; }
+  [data-theme="dark"] .text-warm-500     { color: var(--color-warm-500) !important; }
+  [data-theme="dark"] .text-warm-400     { color: var(--color-warm-600) !important; }
+  [data-theme="dark"] .text-gray-900     { color: var(--color-warm-100) !important; }
+  [data-theme="dark"] .text-gray-800     { color: #d4cfc9 !important; }
+  [data-theme="dark"] .text-gray-700     { color: var(--color-warm-300) !important; }
+  [data-theme="dark"] .text-gray-600     { color: var(--color-warm-400) !important; }
+  [data-theme="dark"] .text-gray-500     { color: var(--color-warm-500) !important; }
+  [data-theme="dark"] .text-gray-400     { color: var(--color-warm-600) !important; }
+  [data-theme="dark"] .text-brand-600    { color: var(--color-brand-400) !important; }
+  [data-theme="dark"] .text-brand-700    { color: var(--color-brand-400) !important; }
+
+  /* ─── Dark mode: border overrides ───────────────────────────────────────── */
+  [data-theme="dark"] .border-warm-200   { border-color: var(--color-dark-border) !important; }
+  [data-theme="dark"] .border-warm-100   { border-color: var(--color-dark-surface-raised) !important; }
+  [data-theme="dark"] .border-gray-200   { border-color: var(--color-dark-border) !important; }
+  [data-theme="dark"] .border-gray-300   { border-color: var(--color-dark-border-strong) !important; }
+  [data-theme="dark"] .border-gray-100   { border-color: var(--color-dark-surface-raised) !important; }
+  [data-theme="dark"] .border-brand-100  { border-color: #1a3a50 !important; }
+  [data-theme="dark"] .border-brand-600  { border-color: var(--color-brand-500) !important; }
+  [data-theme="dark"] .divide-warm-200   { border-color: var(--color-dark-border) !important; }
+  [data-theme="dark"] .divide-gray-100   { border-color: var(--color-dark-surface-raised) !important; }
+
+  /* ─── Dark mode: ring overrides ─────────────────────────────────────────── */
+  [data-theme="dark"] .ring-brand-600    { --tw-ring-color: var(--color-brand-500); }
+  [data-theme="dark"] .ring-1            { border-color: var(--color-dark-border-strong); }
+
+  /* ─── Dark mode: form elements ──────────────────────────────────────────── */
+  [data-theme="dark"] input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]):not([type="submit"]),
+  [data-theme="dark"] select,
+  [data-theme="dark"] textarea {
+    background-color: var(--color-dark-surface) !important;
+    color: var(--color-warm-100) !important;
+    border-color: var(--color-dark-border-strong) !important;
+    color-scheme: dark;
+  }
+
+  [data-theme="dark"] input::placeholder,
+  [data-theme="dark"] textarea::placeholder {
+    color: var(--color-warm-600) !important;
+  }
+
+  /* Autocomplete dropdown */
+  [data-theme="dark"] [data-airport-autocomplete-target="dropdown"] {
+    background-color: var(--color-dark-surface-raised) !important;
+    border-color: var(--color-dark-border) !important;
+  }
+
+  /* ─── Dark mode: shadow softening ───────────────────────────────────────── */
+  [data-theme="dark"] .shadow-sm  { box-shadow: none !important; border: 1px solid var(--color-dark-border); }
+  [data-theme="dark"] .shadow-md  { box-shadow: 0 0 0 1px var(--color-dark-border-strong) !important; }
 }

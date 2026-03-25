@@ -147,6 +147,70 @@ en:
       stale_suffix: " · consider running again"
   payments:
     no_credits: "You need credits to run a search. Please purchase a pack."
+    packs:
+      starter_description: "Try it out — a handful of searches to explore."
+      explorer_description: "Great for planning a trip with flexibility."
+      frequent_flyer_description: "For serious planners who search often."
   profile:
     locale_label: "Language & currency"
     locale_auto: "Auto-detect from browser"
+  pages:
+    home:
+      nav:
+        sign_in: "Sign in"
+        sign_up: "Get started free"
+      hero:
+        tag: "Decision intelligence for flexible travelers"
+        title: "Stop guessing when to fly."
+        subtitle: "Enter your travel window. Get a scored recommendation — the best dates to go, and whether to book now or wait."
+        cta_primary: "Get your free recommendation →"
+        cta_secondary: "See how it works"
+        free_note: "1 free search included · No credit card required"
+      trust:
+        airports: "7,500+ airports"
+        languages: "EN + PT-BR"
+        no_subscription: "No subscription"
+        free_search: "1 free search"
+      how_it_works:
+        title: "How it works"
+        step_1_number: "01"
+        step_1_title: "Tell us your window"
+        step_1_body: "Set your origin, destination, and the date range you're flexible within. Min and max stay days included."
+        step_2_number: "02"
+        step_2_title: "We score every option"
+        step_2_body: "Our engine samples prices across your window and scores each date combination on price (45%), comfort (35%), and trip fit (20%)."
+        step_3_number: "03"
+        step_3_title: "Get a clear recommendation"
+        step_3_body: "You receive a directive — Book Now, Wait, or Consider — backed by market data and a plain-English explanation."
+      insights:
+        title: "What you get"
+        subtitle: "Every search returns four decision artifacts — not just a list of flights."
+        wait_or_book_title: "Book Now or Wait?"
+        wait_or_book_body: "A clear directive with confidence level. Not a list of options — an actionable answer."
+        price_rarity_title: "Price Rarity"
+        price_rarity_body: "Is this price unusual for this route? Know if you're looking at a rare deal or everyday pricing."
+        best_time_title: "Best Time to Travel"
+        best_time_body: "The optimal departure window within your range, scored across the full market picture."
+        comfort_window_title: "Cheapest Comfort Window"
+        comfort_window_body: "Dates that balance low price with good travel conditions — not just the cheapest option."
+      pricing:
+        title: "Simple, honest pricing"
+        subtitle: "Pay per search. No subscription. Credits never expire."
+        searches: "searches"
+        buy_now: "Buy now"
+        most_popular: "Most Popular"
+        best_value: "Best Value"
+        footer_note: "Secure payment via Stripe · Credits never expire"
+      faq:
+        title: "Common questions"
+        q1: "What makes this different from Google Flights?"
+        a1: "Google Flights shows you prices. We tell you what to do with them. Our engine scores every date combination across your flexible window and gives you a single, clear recommendation with a confidence level and plain-English reasoning."
+        q2: "What is a search credit?"
+        a2: "One credit = one full analysis of your travel window. We sample prices across your date range, score each option on price, comfort, and trip fit, and return a complete recommendation — best dates, wait/book directive, price rarity context, and ranked flights."
+        q3: "What if I have fixed travel dates?"
+        a3: "This product is built for flexibility. If you have fixed dates, Google Flights or Skyscanner will serve you better. Our value is precisely in the analysis across a range of possible trips."
+        q4: "Do credits expire?"
+        a4: "No. Credits stay in your account until you use them. Buy once, search whenever."
+      footer:
+        tagline: "Fly when the moment is right."
+        copyright: "© %{year} Flexible Flights"

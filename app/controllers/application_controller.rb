@@ -5,6 +5,14 @@ class ApplicationController < ActionController::Base
 
   before_action :set_locale
 
+  def after_sign_in_path_for(_resource)
+    new_search_path
+  end
+
+  def after_sign_up_path_for(_resource)
+    new_search_path
+  end
+
   private
 
   def set_locale

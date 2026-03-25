@@ -118,6 +118,70 @@ pt-BR:
       stale_suffix: " · considere executar novamente"
   payments:
     no_credits: "Você precisa de créditos para realizar uma busca. Compre um pacote."
+    packs:
+      starter_description: "Experimente — um punhado de buscas para explorar."
+      explorer_description: "Ótimo para planejar uma viagem com flexibilidade."
+      frequent_flyer_description: "Para quem planeja com frequência e busca sempre."
   profile:
     locale_label: "Idioma e moeda"
     locale_auto: "Detectar automaticamente"
+  pages:
+    home:
+      nav:
+        sign_in: "Entrar"
+        sign_up: "Começar grátis"
+      hero:
+        tag: "Inteligência de decisão para viajantes flexíveis"
+        title: "Pare de adivinhar quando voar."
+        subtitle: "Informe sua janela de viagem. Receba uma recomendação detalhada — as melhores datas e se deve reservar agora ou esperar."
+        cta_primary: "Obter sua recomendação gratuita →"
+        cta_secondary: "Ver como funciona"
+        free_note: "1 busca gratuita incluída · Sem cartão de crédito"
+      trust:
+        airports: "7.500+ aeroportos"
+        languages: "EN + PT-BR"
+        no_subscription: "Sem assinatura"
+        free_search: "1 busca grátis"
+      how_it_works:
+        title: "Como funciona"
+        step_1_number: "01"
+        step_1_title: "Informe sua janela"
+        step_1_body: "Defina origem, destino e o intervalo de datas dentro do qual você tem flexibilidade. Estadias mínima e máxima incluídas."
+        step_2_number: "02"
+        step_2_title: "Pontuamos cada opção"
+        step_2_body: "Nosso motor analisa preços em toda a sua janela e pontua cada combinação de datas por preço (45%), conforto (35%) e adequação à viagem (20%)."
+        step_3_number: "03"
+        step_3_title: "Receba uma recomendação clara"
+        step_3_body: "Você recebe uma diretiva — Reserve Agora, Aguarde ou Considere — baseada em dados de mercado e com explicação em português claro."
+      insights:
+        title: "O que você recebe"
+        subtitle: "Cada busca retorna quatro artefatos de decisão — não apenas uma lista de voos."
+        wait_or_book_title: "Reservar Agora ou Aguardar?"
+        wait_or_book_body: "Uma diretiva clara com nível de confiança. Não uma lista de opções — uma resposta acionável."
+        price_rarity_title: "Raridade do Preço"
+        price_rarity_body: "Este preço é incomum para esta rota? Saiba se está diante de uma oferta rara ou de um preço normal."
+        best_time_title: "Melhor Momento para Viajar"
+        best_time_body: "A janela de partida ideal dentro da sua faixa, pontuada pelo panorama completo do mercado."
+        comfort_window_title: "Janela de Conforto Mais Barata"
+        comfort_window_body: "Datas que equilibram baixo preço com boas condições de viagem — não apenas a opção mais barata."
+      pricing:
+        title: "Preços simples e transparentes"
+        subtitle: "Pague por busca. Sem assinatura. Créditos nunca expiram."
+        searches: "buscas"
+        buy_now: "Comprar agora"
+        most_popular: "Mais Popular"
+        best_value: "Melhor Custo"
+        footer_note: "Pagamento seguro via Stripe · Créditos nunca expiram"
+      faq:
+        title: "Perguntas frequentes"
+        q1: "O que diferencia isso do Google Flights?"
+        a1: "O Google Flights mostra preços. Nós dizemos o que fazer com eles. Nosso motor pontua cada combinação de datas em toda a sua janela flexível e fornece uma recomendação única e clara, com nível de confiança e explicação em linguagem simples."
+        q2: "O que é um crédito de busca?"
+        a2: "Um crédito = uma análise completa da sua janela de viagem. Coletamos preços em toda a faixa de datas, pontuamos cada opção por preço, conforto e adequação, e retornamos uma recomendação completa — melhores datas, diretiva de reserva, contexto de preço e voos classificados."
+        q3: "E se eu não tiver flexibilidade de datas?"
+        a3: "Este produto foi feito para a flexibilidade. Se você tem datas fixas, o Google Flights ou o Skyscanner irão servi-lo melhor. Nosso valor está exatamente na análise de um intervalo de opções possíveis."
+        q4: "Os créditos expiram?"
+        a4: "Não. Os créditos ficam na sua conta até você usá-los. Compre uma vez, busque quando quiser."
+      footer:
+        tagline: "Voe quando o momento for certo."
+        copyright: "© %{year} Flexible Flights"

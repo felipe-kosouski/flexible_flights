@@ -9,53 +9,72 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
+    <%# Anti-FOUC: set [data-theme] on <html> before first paint to prevent flash. %>
+    <script>
+      (function() {
+        var s = localStorage.getItem("theme");
+        var d = !s && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : s;
+        if (d) document.documentElement.dataset.theme = d;
+      })();
+    </script>
+
     <%= yield :head %>
 
-    <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="min-h-screen" style="background-color: #FAFAF8; color: #1C1814; font-family: 'DM Sans', sans-serif;">
-    <nav style="background-color: #FFFFFF; border-bottom: 1px solid #E4DFD8;">
+  <body class="min-h-screen bg-warm-50 text-warm-900 font-body transition-colors duration-200">
+    <nav class="bg-white border-b border-warm-200">
       <div class="container mx-auto px-5 h-14 flex items-center justify-between">
-        <%= link_to root_path, class: "flex items-center no-underline" do %>
+        <%= link_to root_path, class: "flex items-center" do %>
           <%= render "shared/logo" %>
         <% end %>
-        <% if user_signed_in? %>
-          <div class="flex items-center gap-6">
-            <%= link_to "History", search_history_path,
-                  class: "text-sm transition-colors",
-                  style: "color: #6E6760; text-decoration: none;",
-                  onmouseover: "this.style.color='#0D4A62'",
-                  onmouseout: "this.style.color='#6E6760'" %>
-            <div class="flex items-center gap-4">
-              <%= link_to "Profile", profile_path,
-                    class: "text-sm transition-colors",
-                    style: "color: #6E6760; text-decoration: none;",
-                    onmouseover: "this.style.color='#0D4A62'",
-                    onmouseout: "this.style.color='#6E6760'" %>
-              <%= link_to "Sign out", destroy_user_session_path,
+
+        <div class="flex items-center gap-2 sm:gap-4">
+          <%# Theme toggle button %>
+          <button data-controller="theme-toggle"
+                  data-action="click->theme-toggle#toggle"
+                  class="w-9 h-9 rounded-lg flex items-center justify-center text-warm-500 hover:text-warm-900 hover:bg-warm-100 transition-colors cursor-pointer"
+                  aria-label="Toggle light/dark mode">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor"
+                 data-theme-toggle-target="icon" aria-hidden="true">
+              <%# Moon shown by default (light mode) — JS will update on connect %>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+            </svg>
+          </button>
+
+          <% if user_signed_in? %>
+            <div class="flex items-center gap-4 sm:gap-6">
+              <%= link_to t("searches.history.title"), search_history_path,
+                    class: "hidden sm:block text-sm text-warm-500 hover:text-warm-900 transition-colors" %>
+              <%= link_to t("profile.locale_label"), profile_path,
+                    class: "text-sm text-warm-500 hover:text-warm-900 transition-colors" %>
+              <%= link_to t("devise.sessions.destroy.sign_out", default: "Sign out"), destroy_user_session_path,
                     data: { turbo_method: :delete },
-                    class: "text-sm transition-colors",
-                    style: "color: #6E6760; text-decoration: none;",
-                    onmouseover: "this.style.color='#0D4A62'",
-                    onmouseout: "this.style.color='#6E6760'" %>
+                    class: "text-sm text-warm-500 hover:text-warm-900 transition-colors" %>
             </div>
-          </div>
-        <% end %>
+          <% else %>
+            <div class="flex items-center gap-3">
+              <%= link_to t("pages.home.nav.sign_in"), new_user_session_path,
+                    class: "text-sm text-warm-600 hover:text-warm-900 transition-colors" %>
+              <%= link_to t("pages.home.nav.sign_up"), new_user_registration_path,
+                    class: "text-sm font-semibold bg-accent-500 hover:bg-accent-600 text-white rounded-lg px-4 h-9 inline-flex items-center transition-colors cursor-pointer" %>
+            </div>
+          <% end %>
+        </div>
       </div>
     </nav>
+
     <% if notice.present? %>
       <div class="container mx-auto px-5 pt-4">
-        <p class="rounded-lg px-4 py-3 text-sm" style="background-color: #e8f4f9; border: 1px solid #9dd1e7; color: #0d4a62;"><%= notice %></p>
+        <p class="rounded-lg px-4 py-3 text-sm bg-brand-50 border border-brand-100 text-brand-700"><%= notice %></p>
       </div>
     <% end %>
     <% if alert.present? %>
@@ -63,7 +82,8 @@
         <p class="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-800"><%= alert %></p>
       </div>
     <% end %>
-    <main class="container mx-auto px-5 py-10 flex justify-center">
+
+    <main class="<%= content_for?(:main_class) ? yield(:main_class) : "container mx-auto px-5 py-10 flex justify-center" %>">
       <%= yield %>
     </main>
   </body>
