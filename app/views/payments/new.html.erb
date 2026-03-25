@@ -50,11 +50,11 @@
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
     <% CREDIT_PACKS.each do |key, pack| %>
       <% meta = pack_meta[key] %>
-      <div class="relative bg-white rounded-2xl border flex flex-col <%= meta[:highlight] ? "border-indigo-500 shadow-md ring-1 ring-indigo-500" : "border-gray-200 shadow-sm" %> p-6">
+      <div class="relative bg-white rounded-2xl border flex flex-col <%= meta[:highlight] ? "border-brand-500 shadow-md ring-1 ring-brand-500" : "border-gray-200 shadow-sm" %> p-6">
 
         <% if meta[:badge] %>
           <div class="absolute -top-3.5 left-1/2 -translate-x-1/2">
-            <span class="text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap <%= meta[:highlight] ? "bg-indigo-600 text-white" : "bg-gray-900 text-white" %>">
+            <span class="text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap <%= meta[:highlight] ? "bg-brand-700 text-white" : "bg-gray-900 text-white" %>">
               <%= meta[:badge] %>
             </span>
           </div>
@@ -74,7 +74,7 @@
         <div>
           <p class="text-2xl font-bold text-gray-900 mb-3 tabular-nums"><%= brl ? meta[:brl] : meta[:usd] %></p>
           <%= button_to payments_path(pack_key: key), method: :post, data: { turbo: false },
-                class: "w-full text-center font-semibold text-sm rounded-lg px-4 py-2.5 transition-colors cursor-pointer #{meta[:highlight] ? "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white" : "bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-900"}" do %>
+                class: "w-full text-center font-semibold text-sm rounded-lg px-4 py-2.5 transition-colors cursor-pointer #{meta[:highlight] ? "bg-brand-700 hover:bg-brand-800 active:bg-brand-900 text-white" : "bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-900"}" do %>
             Buy now
           <% end %>
         </div>

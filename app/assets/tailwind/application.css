@@ -1,1 +1,78 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap');
+
 @import "tailwindcss";
+
+@theme {
+  /* ─── Typography ─────────────────────────────────────── */
+  --font-heading: "Space Grotesk", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+
+  /* ─── Brand: Deep Teal ───────────────────────────────── */
+  --color-brand-50:  #e8f4f9;
+  --color-brand-100: #c5e4f1;
+  --color-brand-200: #9dd1e7;
+  --color-brand-300: #70bbd8;
+  --color-brand-400: #4b9ab8;
+  --color-brand-500: #2e7d9a;
+  --color-brand-600: #1a627c;
+  --color-brand-700: #0d4a62;
+  --color-brand-800: #0b3d52;
+  --color-brand-900: #082e3e;
+
+  /* ─── Accent: Warm Amber-Orange ──────────────────────── */
+  --color-accent-50:  #fdf2ed;
+  --color-accent-100: #fae0d1;
+  --color-accent-200: #f5c4a5;
+  --color-accent-300: #f0a47a;
+  --color-accent-400: #ec8d5e;
+  --color-accent-500: #e8784c;
+  --color-accent-600: #d4662e;
+  --color-accent-700: #b85226;
+  --color-accent-800: #8f3e1c;
+  --color-accent-900: #662c12;
+
+  /* ─── Neutral: Warm Gray ─────────────────────────────── */
+  --color-warm-50:  #fafaf8;
+  --color-warm-100: #f4f2ee;
+  --color-warm-200: #e8e4dc;
+  --color-warm-300: #d8d2c8;
+  --color-warm-400: #c0b8aa;
+  --color-warm-500: #9e9590;
+  --color-warm-600: #6e6760;
+  --color-warm-700: #4a443e;
+  --color-warm-800: #2e2924;
+  --color-warm-900: #1c1814;
+
+  /* ─── Dark Surfaces ──────────────────────────────────── */
+  --color-dark-bg:            #0e1219;
+  --color-dark-surface:       #151c26;
+  --color-dark-surface-muted: #1c2535;
+  --color-dark-border:        #283045;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--color-warm-50);
+    color: var(--color-warm-900);
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+  }
+
+  /* Tabular numbers for prices, scores, data */
+  .tabular-nums,
+  [data-numeric] {
+    font-variant-numeric: tabular-nums;
+    font-family: var(--font-heading);
+  }
+}

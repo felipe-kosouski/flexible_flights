@@ -2,7 +2,7 @@
 
 class RankedFlightPresenter
   TAG_COLOR_CLASSES = {
-    top_rated: "bg-indigo-50 text-indigo-600",
+    top_rated: "bg-brand-50 text-brand-700",
     best_price: "bg-emerald-50 text-emerald-600",
     best_comfort: "bg-blue-50 text-blue-600"
   }.freeze

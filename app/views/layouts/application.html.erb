@@ -23,20 +23,31 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-gray-50 min-h-screen">
-    <nav class="bg-white border-b border-gray-200">
+  <body class="min-h-screen" style="background-color: #FAFAF8; color: #1C1814; font-family: 'DM Sans', sans-serif;">
+    <nav style="background-color: #FFFFFF; border-bottom: 1px solid #E4DFD8;">
       <div class="container mx-auto px-5 h-14 flex items-center justify-between">
-        <%= link_to "Flexible Flights", root_path, class: "font-semibold text-gray-900 tracking-tight" %>
+        <%= link_to root_path, class: "flex items-center no-underline" do %>
+          <%= render "shared/logo" %>
+        <% end %>
         <% if user_signed_in? %>
           <div class="flex items-center gap-6">
             <%= link_to "History", search_history_path,
-                  class: "text-sm text-gray-500 hover:text-gray-700 transition-colors" %>
+                  class: "text-sm transition-colors",
+                  style: "color: #6E6760; text-decoration: none;",
+                  onmouseover: "this.style.color='#0D4A62'",
+                  onmouseout: "this.style.color='#6E6760'" %>
             <div class="flex items-center gap-4">
               <%= link_to "Profile", profile_path,
-                    class: "text-sm text-gray-500 hover:text-gray-700 transition-colors" %>
+                    class: "text-sm transition-colors",
+                    style: "color: #6E6760; text-decoration: none;",
+                    onmouseover: "this.style.color='#0D4A62'",
+                    onmouseout: "this.style.color='#6E6760'" %>
               <%= link_to "Sign out", destroy_user_session_path,
                     data: { turbo_method: :delete },
-                    class: "text-sm text-gray-500 hover:text-gray-700 transition-colors" %>
+                    class: "text-sm transition-colors",
+                    style: "color: #6E6760; text-decoration: none;",
+                    onmouseover: "this.style.color='#0D4A62'",
+                    onmouseout: "this.style.color='#6E6760'" %>
             </div>
           </div>
         <% end %>
@@ -44,7 +55,7 @@
     </nav>
     <% if notice.present? %>
       <div class="container mx-auto px-5 pt-4">
-        <p class="rounded-lg bg-emerald-50 border border-emerald-200 px-4 py-3 text-sm text-emerald-800"><%= notice %></p>
+        <p class="rounded-lg px-4 py-3 text-sm" style="background-color: #e8f4f9; border: 1px solid #9dd1e7; color: #0d4a62;"><%= notice %></p>
       </div>
     <% end %>
     <% if alert.present? %>
