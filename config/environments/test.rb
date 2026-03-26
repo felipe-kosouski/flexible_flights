@@ -42,4 +42,8 @@ Rails.application.configure do
 
   # Disable rate limiting in test environment
   Rack::Attack.enabled = false
+
+  # Required by Devise confirmable to generate URLs in mailer during tests
+  config.action_mailer.default_url_options = { host: "www.example.com" }
+  config.action_mailer.raise_delivery_errors = true
 end
