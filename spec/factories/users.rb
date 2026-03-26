@@ -4,5 +4,6 @@ FactoryBot.define do
     password { "password123" }
     first_name { "Jane" }
     last_name { "Doe" }
+    confirmed_at { Time.current }
   end
 end

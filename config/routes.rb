@@ -1,6 +1,8 @@
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users, controllers: { registrations: "users/registrations" }
   root "pages#home"
+
+  get "check-email", to: "pages#check_email", as: :check_email
 
   resources :searches, only: [ :new, :create, :show ]
 

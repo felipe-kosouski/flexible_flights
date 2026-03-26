@@ -1,0 +1,40 @@
+<%# app/views/pages/check_email.html.erb %>
+<% content_for :title, "Check your email — Flexible Flights" %>
+
+<div class="w-full max-w-md">
+  <div class="bg-white rounded-2xl border border-gray-200 px-8 py-10">
+
+    <div class="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center mb-5">
+      <svg class="w-6 h-6 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor"/>
+        <path d="m2 7 10 7 10-7"/>
+      </svg>
+    </div>
+
+    <h1 class="text-xl font-semibold text-gray-900 mb-2">Check your email</h1>
+
+    <p class="text-sm text-gray-500 leading-relaxed mb-5">
+      We sent a confirmation link to
+      <% if flash[:unconfirmed_email].present? %>
+        <strong class="text-gray-800"><%= flash[:unconfirmed_email] %></strong>.
+      <% else %>
+        your email address.
+      <% end %>
+      Click it to activate your account and use your free search.
+    </p>
+
+    <div class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 mb-5">
+      <p class="text-xs text-gray-500 leading-relaxed">
+        <strong class="text-gray-700">Didn't get it?</strong>
+        Check your spam folder. It usually arrives within a minute.
+      </p>
+    </div>
+
+    <p class="text-sm text-gray-500 text-center">
+      Still nothing?
+      <%= link_to "Resend confirmation email", new_user_confirmation_path,
+            class: "text-brand-700 hover:text-brand-800 font-medium" %>
+    </p>
+
+  </div>
+</div>
