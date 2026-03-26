@@ -9,6 +9,8 @@ class ApplicationController < ActionController::Base
     new_search_path
   end
 
+  # Unreachable while :confirmable is active — Devise calls after_inactive_sign_up_path_for instead.
+  # Kept as a safety fallback in case confirmation is ever disabled.
   def after_sign_up_path_for(_resource)
     new_search_path
   end
