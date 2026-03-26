@@ -85,6 +85,8 @@ en:
       failed_title: "Search failed"
       failed_body: "Something went wrong while searching. Please try again."
       try_again: "Try again"
+      run_again: "Run again →"
+      flights_behind_recommendation: "The flights behind this recommendation"
     history:
       title: "Search history"
       no_searches: "No searches yet."
@@ -104,6 +106,13 @@ en:
     best_time_label: "Best time to travel"
     best_value_label: "Best value window"
     no_detailed_insights: "Not enough data for detailed insights."
+    top_options_around: "top options around %{price}"
+    typical_fare: "Typical fare: %{price}"
+    avg_score: "Avg. score %{score}/100"
+    flight_options:
+      one: "1 option"
+      other: "%{count} options"
+    balances_price_comfort: "Balances price and comfort"
     wait_or_book:
       book_now: "Book Now"
       wait: "Wait"

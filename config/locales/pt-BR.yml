@@ -56,6 +56,8 @@ pt-BR:
       failed_title: "Busca falhou"
       failed_body: "Algo deu errado durante a busca. Por favor, tente novamente."
       try_again: "Tentar novamente"
+      run_again: "Executar novamente →"
+      flights_behind_recommendation: "Os voos por trás desta recomendação"
     history:
       title: "Histórico de buscas"
       no_searches: "Nenhuma busca ainda."
@@ -75,6 +77,13 @@ pt-BR:
     best_time_label: "Melhor período para viajar"
     best_value_label: "Melhor custo-benefício"
     no_detailed_insights: "Dados insuficientes para insights detalhados."
+    top_options_around: "melhores opções por %{price}"
+    typical_fare: "Tarifa típica: %{price}"
+    avg_score: "Pontuação média %{score}/100"
+    flight_options:
+      one: "1 opção"
+      other: "%{count} opções"
+    balances_price_comfort: "Equilibra preço e conforto"
     wait_or_book:
       book_now: "Reserve agora"
       wait: "Aguarde"

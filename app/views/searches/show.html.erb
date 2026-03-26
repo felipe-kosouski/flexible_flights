@@ -4,7 +4,7 @@
   <%# Back link %>
   <div class="mb-6">
     <%= link_to new_search_path, class: "inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors" do %>
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
       </svg>
       New search
@@ -14,17 +14,19 @@
   <%# Subscribe to search run updates via ActionCable %>
   <%= turbo_stream_from "search_run_#{@search_run.id}" %>
 
-  <%# Results area — replaced by Turbo Stream when the job completes.
-      Each partial owns the <div id="search_results"> wrapper so broadcast_replace_to can target it. %>
-  <% if @search_run.completed? && @presenter %>
-    <% if @presenter.low_confidence? %>
-      <%= render "low_confidence", presenter: @presenter %>
+  <%# aria-live wrapper is stable and never replaced. Turbo replaces #search_results inside it.
+      Screen readers will announce content changes when the job completes. %>
+  <div aria-live="polite" aria-atomic="true">
+    <% if @search_run.completed? && @presenter %>
+      <% if @presenter.low_confidence? %>
+        <%= render "low_confidence", presenter: @presenter %>
+      <% else %>
+        <%= render "results", presenter: @presenter %>
+      <% end %>
+    <% elsif @search_run.failed? %>
+      <%= render "failed", search_run: @search_run %>
     <% else %>
-      <%= render "results", presenter: @presenter %>
+      <%= render "loading" %>
     <% end %>
-  <% elsif @search_run.failed? %>
-    <%= render "failed", search_run: @search_run %>
-  <% else %>
-    <%= render "loading" %>
-  <% end %>
+  </div>
 </div>

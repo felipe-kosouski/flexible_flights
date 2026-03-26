@@ -91,6 +91,8 @@ The mark conveys: a flight path rising from a runway, a price chart reaching its
 
 ## Color System
 
+> **Implementation note:** Views may use Tailwind's built-in `gray-*` scale OR the custom `warm-*` scale. Both are supported — `application.css` maps `gray-*` → `warm-*` equivalents in dark mode via CSS overrides. New code should prefer `warm-*` for semantic clarity. Never mix `gray-*` and `warm-*` within the same component.
+
 ### Philosophy
 
 Two distinct modes (light and dark) built from the same underlying palette. Colors are defined as CSS custom properties on `:root` and overridden on `.dark` or `[data-theme="dark"]`.
@@ -173,6 +175,17 @@ These communicate flight score quality and booking recommendations. Do not use f
 | `fair`      | `#FEF3C7` | `#B45309`  | `#1C1505` | `#FCD34D` | Score 40–59 / Consider    |
 | `poor`      | `#FEE2E2` | `#B91C1C`  | `#1C0606` | `#F87171` | Score < 40 / Insufficient |
 
+### UI Feedback Colors (Forms & Application State)
+
+These are distinct from flight score signal colors. Use for form validation, toasts, and system messages.
+
+| State     | Light bg    | Light text  | Dark bg    | Dark text   | Use                          |
+| --------- | ----------- | ----------- | ---------- | ----------- | ---------------------------- |
+| `error`   | `red-50`    | `red-800`   | `#1c0606`  | `red-300`   | Validation errors, alerts    |
+| `success` | `green-50`  | `green-800` | `#052e16`  | `green-300` | Save confirmation, toasts    |
+
+Flash messages (notice/alert) in `application.html.erb` use `brand-50/brand-700` and `red-50/red-800` respectively — these match this table.
+
 These map exactly to the existing `RankedFlightPresenter` and `InsightsPresenter` color logic — keep in sync.
 
 ### Tailwind v4 CSS Configuration
@@ -242,6 +255,17 @@ Uses Tailwind's default 4px base grid. Custom additions:
 - Wide content: `max-w-5xl` (1024px) — landing page sections
 - Full layout: `max-w-7xl` (1280px) — with side padding
 
+**Breakpoints (mobile-first):**
+
+| Breakpoint | Min-width | Use                              |
+| ---------- | --------- | -------------------------------- |
+| `sm`       | 640px     | Two-column grids, wider nav text |
+| `md`       | 768px     | Three-column layouts             |
+| `lg`       | 1024px    | Wide content, side-by-side views |
+| `xl`       | 1280px    | Max-width containers             |
+
+Always design mobile-first: base classes target ≤639px, then layer `sm:`, `md:` up.
+
 **Border radius scale:**
 
 - `rounded-sm` (4px) — tags, badges, chips
@@ -264,6 +288,22 @@ Uses Tailwind's default 4px base grid. Custom additions:
 | Destructive | `red-600`    | white       | `red-700`     | Delete, cancel subscription  |
 
 Button height: `h-11` (44px min) for touch compliance.
+
+### Disabled States
+
+All disabled interactive elements follow this pattern:
+
+- Opacity: `opacity-50`
+- Cursor: `cursor-not-allowed`
+- Pointer events: `pointer-events-none`
+- Semantic: `disabled` attribute on the element
+
+Example:
+```erb
+<button disabled class="... opacity-50 cursor-not-allowed pointer-events-none">
+  Submit
+</button>
+```
 
 ### Cards
 
@@ -317,6 +357,21 @@ Score circles on flight cards use the semantic signal colors. Size: `w-10 h-10 r
 **Rule:** All interactive elements get `transition-colors duration-150` at minimum.
 **Rule:** Respect `prefers-reduced-motion` — never animate structural layout changes.
 
+**Implementation (`application.css`):**
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+```
+
+Or use Tailwind's `motion-reduce:` variant on individual elements:
+`motion-reduce:transition-none motion-reduce:animate-none`
+
 ---
 
 ## Dark Mode Strategy
@@ -337,7 +392,7 @@ Dark mode is supported but **not the primary design surface** — light mode is 
 
 - Body text contrast: minimum 4.5:1 (WCAG AA)
 - Large text / UI components: minimum 3:1
-- Focus rings: `ring-2 ring-brand-600/50` — always visible, never removed
+- Focus rings: `focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600` — always visible, never removed. The border provides the primary WCAG-compliant indicator (opaque); the ring is a decorative glow only.
 - Color is never the sole indicator — always pair with text or icon
 - Minimum touch target: 44×44px (`h-11 min-w-11`)
 - All interactive elements: `cursor-pointer`

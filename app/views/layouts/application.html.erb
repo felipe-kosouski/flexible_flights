@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="<%= I18n.locale %>">
   <head>
     <title><%= content_for(:title) || "Flexible Flights" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -26,6 +26,10 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet" />
+
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
@@ -41,7 +45,7 @@
           <%# Theme toggle button %>
           <button data-controller="theme-toggle"
                   data-action="click->theme-toggle#toggle"
-                  class="w-9 h-9 rounded-lg flex items-center justify-center text-warm-500 hover:text-warm-900 hover:bg-warm-100 transition-colors cursor-pointer"
+                  class="w-11 h-11 rounded-lg flex items-center justify-center text-warm-500 hover:text-warm-900 hover:bg-warm-100 transition-colors cursor-pointer"
                   aria-label="Toggle light/dark mode">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.75" stroke="currentColor"
                  data-theme-toggle-target="icon" aria-hidden="true">
@@ -83,7 +87,7 @@
       </div>
     <% end %>
 
-    <main class="<%= content_for?(:main_class) ? yield(:main_class) : "container mx-auto px-5 py-10 flex justify-center" %>">
+    <main id="main-content" class="<%= content_for?(:main_class) ? yield(:main_class) : "container mx-auto px-5 py-10 flex justify-center" %>">
       <%= yield %>
     </main>
   </body>

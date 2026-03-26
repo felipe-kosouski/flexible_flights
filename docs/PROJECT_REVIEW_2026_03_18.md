@@ -38,7 +38,7 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 
 ## 3. Information Presentation
 
-**Verdict: The bones are strong. The AI copy layer is fully wired. Hierarchy polished (2026-03-24) — insights are now the hero.**
+**Verdict: The bones are strong. The AI copy layer is fully wired. Hierarchy polished (2026-03-24) — insights are now the hero. Frontend design system fully aligned (2026-03-26).**
 
 ### What's strong:
 
@@ -56,6 +56,19 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 - ✅ `_insights.html.erb` deleted; content inlined into `_results.html.erb`
 - ✅ `SearchResultsPresenter#search_intent_id` added; instance variable coupling removed from partials
 
+### What was polished (2026-03-26):
+
+- ✅ **Accessibility** — `lang` attribute on `<html>`, `aria-hidden` on all decorative SVGs, `aria-live="polite" aria-atomic="true"` wrapper for Turbo Stream result region, `id="main-content"` on `<main>`
+- ✅ **Touch targets** — all buttons and submit elements standardized to `h-11` (44px), theme toggle enlarged to `w-11 h-11`
+- ✅ **Focus rings** — all inputs and buttons standardized to `focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600`; dark mode override added in `application.css`
+- ✅ **Button color consistency** — search submit and failed-state retry use `accent-500` (amber CTA); auth and profile submits use `brand-600` (teal)
+- ✅ **External link colors** — all Google Flights / Skyscanner links unified to `text-brand-600 hover:text-brand-700`
+- ✅ **Google Fonts performance** — moved from blocking CSS `@import url()` to `<link rel="preconnect">` + `<link rel="stylesheet">` tags in `<head>`
+- ✅ **Dark mode card hover** — `dark:hover:bg-dark-surface-raised` added to flight cards (shadow was invisible in dark mode)
+- ✅ **Tailwind v4 opacity syntax** — all `bg-opacity-*` and `border-opacity-*` replaced with `/` modifier notation
+- ✅ **CCW card colors** — purple (off-brand, no dark mode override) replaced with amber throughout the cheapest comfort window card
+- ✅ **Design system documented** — focus ring spec corrected, `prefers-reduced-motion` snippet added, UI feedback colors table, disabled state pattern, breakpoints table, gray/warm token equivalence note
+
 ---
 
 ## 4. What a Solo Entrepreneur Should Do to Ship
@@ -64,7 +77,7 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 
 1. ~~**Payment integration** — Stripe Checkout with search packs. Buy 5 searches for $X, 20 for $Y. No subscriptions, no complexity~~ ✅ **Done (2026-03-20)**
 2. ~~**1 free search** — Let users feel the value before paying. This is the conversion funnel~~ ✅ **Done (2026-03-20)**
-3. **Landing page** — Explain the value prop before sign-up (keep in Rails)
+3. ~~**Landing page** — Explain the value prop before sign-up (keep in Rails)~~ ✅ **Done (2026-03-25)**
 4. **Production Amadeus API key** — Integration is working with test endpoint, just needs prod credentials
 5. **Error monitoring** — Sentry free tier. Can't fix what you can't see
 6. ~~**Basic rate limiting** — Rack::Attack with simple per-user limits to protect Amadeus API quota~~ ✅ **Done (2026-03-25)**
@@ -92,7 +105,7 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 | -------------------------------------------------------------------- | ------ | -------- | -------------------- |
 | ~~Payment system (Stripe Checkout + search packs)~~                  | Medium | Critical | ✅ Done (2026-03-20) |
 | ~~Usage metering (credits per user, gate at 0)~~                     | Small  | Critical | ✅ Done (2026-03-20) |
-| Landing page (value prop + CTA)                                      | Medium | Critical | Not started          |
+| ~~Landing page (value prop + CTA)~~                                  | Medium | Critical | ✅ Done (2026-03-25) |
 | ~~Results page hierarchy polish (insights hero, flights secondary)~~ | Small  | High     | ✅ Done (2026-03-24) |
 | Error monitoring (Sentry)                                            | Small  | High     | Not started          |
 | ~~Rate limiting (Rack::Attack)~~                                     | Small  | High     | ✅ Done (2026-03-25) |
@@ -114,9 +127,11 @@ The confidence gating is especially smart. Saying "we don't have enough data to 
 - Airport autocomplete (7500+ airports, client-side)
 - **Payment system** — Stripe Checkout, credits model, multi-currency (USD + BRL), webhook fulfillment with idempotency, polished pricing UI (2026-03-20)
 - **Results page hierarchy** — recommendation card hero, AI route summary inlined, flights as supporting evidence (2026-03-24)
+- **Landing page** — Hero with mock result card, trust bar, how-it-works (3 steps), 4 insight cards, pricing section (reuses `CREDIT_PACKS`), FAQ, final CTA strip, footer (2026-03-25)
 - **Rate limiting** — Rack::Attack, 4 throttle rules (login/ip, login/email, signup/ip, search/user), Solid Cache backend, 30 request specs (2026-03-25)
+- **Frontend design system** — WCAG-compliant focus rings, 44px touch targets, standardized button colors (accent CTA / brand secondary), brand-colored external links, Google Fonts via `<link>` preconnect, dark mode card hover, Tailwind v4 opacity syntax, off-brand purple eliminated, design system doc updated (2026-03-26)
 
-The codebase is genuinely close to shippable. The remaining gap is the landing page (discovery + conversion) and operational basics (monitoring, deploy).
+The codebase is genuinely close to shippable. The remaining gap is operational basics (monitoring, deploy).
 
 ---
 
@@ -176,14 +191,16 @@ Start low to get users and data. Something like $2.99/5 searches, $7.99/15, $14.
 
 The product has a clear value proposition, a well-architected domain layer, and a frontend that's further along than expected (AI copy, real-time updates, i18n). The payment system is now live — users can purchase search packs via Stripe Checkout, credits are granted atomically via webhook, and the gate prevents searching without credits. The remaining gap to market is the landing page (discovery + conversion) and operational basics (monitoring, rate limiting, deploy).
 
-**Biggest risk:** Making sure the first search result _feels_ worth paying for. ~~The insights need to be the hero of the results page — a clear, definitive recommendation — not buried among flight cards.~~ ✅ Done (2026-03-24) — the recommendation card is now the hero. Remaining risk is the landing page converting first-time visitors before they've seen a result. ~~Rate limiting is unprotected.~~ ✅ Done (2026-03-25).
+**Biggest risk:** Making sure the first search result _feels_ worth paying for. ~~The insights need to be the hero of the results page — a clear, definitive recommendation — not buried among flight cards.~~ ✅ Done (2026-03-24) — the recommendation card is now the hero. ~~Remaining risk is the landing page converting first-time visitors before they've seen a result.~~ ✅ Done (2026-03-25) — landing page is live with hero, pricing, and FAQ. ~~Rate limiting is unprotected.~~ ✅ Done (2026-03-25). Remaining risk: operational basics (monitoring, deploy).
 
 ---
 
 ## 8. Progress Log
 
-| Date       | What shipped                                                                                                                                                                                                                                                                                                                                                                                                          |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-03-20 | **Payment system** — Stripe Checkout (hosted), 3 credit packs (5/15/30), multi-currency (USD + BRL), webhook fulfillment with idempotency guard, atomic credit grant via `update_all`, credit gate in `SearchesController`, credit deduction on successful search completion in `SearchRunJob`, polished 3-card pricing UI                                                                                            |
-| 2026-03-24 | **Results page hierarchy** — Recommendation card is now a full-width hero (directive heading, AI route summary in frosted box, rarity + confidence tags, best-time + cheapest-comfort sub-cards inside card). Flights demoted below under "The flights behind this recommendation". `_insights.html.erb` deleted. `SearchResultsPresenter#search_intent_id` added to remove instance variable coupling from partials. |
-| 2026-03-25 | **Rate limiting** — `rack-attack` gem, 4 throttle rules: login by IP (10/20s), login by email (5/20s), signup by IP (5/60s), search by user (3/60s). Cache backed by Solid Cache (Postgres) in production — no Redis. 30 request specs with per-example `MemoryStore` isolation. Middleware placed after `Warden::Manager` to ensure session is readable.                                                             |
+| Date       | What shipped                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-03-20 | **Payment system** — Stripe Checkout (hosted), 3 credit packs (5/15/30), multi-currency (USD + BRL), webhook fulfillment with idempotency guard, atomic credit grant via `update_all`, credit gate in `SearchesController`, credit deduction on successful search completion in `SearchRunJob`, polished 3-card pricing UI                                                                                                                                                                                                                                                                                                                                                                      |
+| 2026-03-24 | **Results page hierarchy** — Recommendation card is now a full-width hero (directive heading, AI route summary in frosted box, rarity + confidence tags, best-time + cheapest-comfort sub-cards inside card). Flights demoted below under "The flights behind this recommendation". `_insights.html.erb` deleted. `SearchResultsPresenter#search_intent_id` added to remove instance variable coupling from partials.                                                                                                                                                                                                                                                                           |
+| 2026-03-25 | **Landing page** — Hero section with mock recommendation card (shows real output format), trust bar (7500+ airports, 1 free search, i18n, no subscription), how-it-works 3-step grid, 4 insight cards (wait/book, price rarity, best time, comfort window), pricing section reusing `CREDIT_PACKS`, FAQ (4 questions), final CTA strip, footer. Unauthenticated users land here; authenticated users redirect to search.                                                                                                                                                                                                                                                                        |
+| 2026-03-25 | **Rate limiting** — `rack-attack` gem, 4 throttle rules: login by IP (10/20s), login by email (5/20s), signup by IP (5/60s), search by user (3/60s). Cache backed by Solid Cache (Postgres) in production — no Redis. 30 request specs with per-example `MemoryStore` isolation. Middleware placed after `Warden::Manager` to ensure session is readable.                                                                                                                                                                                                                                                                                                                                       |
+| 2026-03-26 | **Frontend design system alignment** — WCAG accessibility fixes (`lang`, `aria-hidden`, `aria-live`/`aria-atomic` for Turbo Stream results); all buttons standardized to 44px touch targets; focus rings unified to `focus:ring-brand-600/20 focus:border-brand-600` with dark mode CSS override; button colors: accent-500 for primary CTA, brand-600 for auth/profile; external links standardized to brand-600; Google Fonts migrated to `<link>` preconnect tags (removed blocking CSS `@import`); dark mode card hover state added; Tailwind v4 opacity `/` modifier syntax applied; purple removed from CCW card (replaced with amber); design system doc updated with 6 documented gaps. |
