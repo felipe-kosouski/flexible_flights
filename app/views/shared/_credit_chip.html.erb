@@ -1,0 +1,66 @@
+<%
+  state = credit_chip_state(current_user)
+  count = current_user.search_credits
+
+  chip_classes = case state
+                 when :healthy then "bg-brand-50 text-brand-700"
+                 when :low     then "bg-amber-100 text-amber-700"
+                 when :empty   then "bg-red-100 text-red-700"
+                 end
+
+  chip_label = case state
+               when :healthy then "#{count} #{count == 1 ? 'credit' : 'credits'}"
+               when :low     then "1 credit left"
+               when :empty   then "No credits"
+               end
+
+  dropdown_border = case state
+                    when :healthy then "border-warm-200"
+                    when :low     then "border-amber-300"
+                    when :empty   then "border-red-300"
+                    end
+
+  balance_color = case state
+                  when :healthy then "text-brand-700"
+                  when :low     then "text-amber-700"
+                  when :empty   then "text-red-700"
+                  end
+
+  explainer = if state == :empty
+                 "You're out of credits. Buy a pack to run your next Smart Search."
+               else
+                 "Each credit runs one Smart Search — one destination, flexible dates, stay-length range."
+               end
+
+  cta_label = state == :empty ? "Buy credits" : "Buy more credits"
+%>
+
+<div class="relative"
+     data-controller="credits-dropdown"
+     data-action="click@window->credits-dropdown#hide keydown.escape@window->credits-dropdown#closeOnEscape">
+
+  <button type="button"
+          class="<%= chip_classes %> text-xs font-semibold px-3 py-1 rounded-full font-heading cursor-pointer min-h-[44px] focus-visible:ring-2 focus-visible:ring-brand-600/20 focus-visible:outline-none"
+          data-action="click->credits-dropdown#toggle"
+          aria-label="<%= chip_label %> — click to manage">
+    <%= chip_label %>
+  </button>
+
+  <div data-credits-dropdown-target="dropdown"
+       class="hidden absolute right-0 top-full mt-2 w-56 bg-white rounded-xl border <%= dropdown_border %> shadow-lg z-50 p-4">
+
+    <p class="text-xs font-semibold uppercase tracking-wider text-warm-500 mb-1">Search Credits</p>
+
+    <p class="font-heading text-[28px] font-bold leading-none mb-2 <%= balance_color %>">
+      <%= count %>
+    </p>
+
+    <p class="text-sm text-warm-600 mb-4 leading-snug"><%= explainer %></p>
+
+    <%= link_to new_payment_path,
+          class: "block w-full text-center bg-accent-500 hover:bg-accent-600 text-white text-sm font-semibold py-2 rounded-lg transition-colors" do %>
+      <%= cta_label %>
+    <% end %>
+
+  </div>
+</div>

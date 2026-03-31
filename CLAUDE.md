@@ -84,6 +84,7 @@ On failure: transaction rolls back, failed state is persisted **outside** the tr
 ### Domain layer rules (non-negotiable)
 
 The domain layer MUST NEVER:
+
 - Use ActiveRecord or Rails APIs
 - Perform I/O or read/write the database
 - Call repositories
@@ -132,11 +133,11 @@ Higher-level documents prevail.
 
 Domain specs use **no database, no Rails, no mocks** — pure Ruby, deterministic, fast.
 
-| Layer       | Stub         | Real   |
-|-------------|--------------|--------|
-| Domain      | nothing      | all    |
-| Repository  | domain calls | AR     |
-| Controllers | repository   | —      |
+| Layer       | Stub         | Real |
+| ----------- | ------------ | ---- |
+| Domain      | nothing      | all  |
+| Repository  | domain calls | AR   |
+| Controllers | repository   | —    |
 
 - Do not stub domain methods in domain specs
 - Do not remove `pending` specs — they represent planned behavior
@@ -155,3 +156,8 @@ Domain specs use **no database, no Rails, no mocks** — pure Ruby, deterministi
 - Do not invent behavior not described in domain specs or docs — ask when unsure
 - `docs/` contains authoritative domain specs — consult before implementing anything in `app/domain/`
 - `docs/PRODUCT_GUIDE.md` is the single source of truth for product behavior
+- DO NOT use git add, commit or push
+- DO NOT use git worktrees
+- You can use git log, diff, stash and other git commands, but not add, commit or push
+- DO NOT commit any code
+- I'm not using branch based development, everything is under main branch

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ApplicationHelper
   # Shared pricing pack metadata used in payments/new and pages/home.
   # Keys map to CREDIT_PACKS constant symbols.
@@ -34,5 +36,13 @@ module ApplicationHelper
         per_brl:     "R$2,50"
       }
     }
+  end
+
+  def credit_chip_state(user)
+    case user.search_credits
+    when 0 then :empty
+    when 1 then :low
+    else :healthy
+    end
   end
 end

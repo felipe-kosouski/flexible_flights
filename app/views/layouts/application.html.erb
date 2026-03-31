@@ -58,6 +58,7 @@
             <div class="flex items-center gap-4 sm:gap-6">
               <%= link_to t("searches.history.title"), search_history_path,
                     class: "hidden sm:block text-sm text-warm-500 hover:text-warm-900 transition-colors" %>
+              <%= render "shared/credit_chip" %>
               <%= link_to t("profile.locale_label"), profile_path,
                     class: "text-sm text-warm-500 hover:text-warm-900 transition-colors" %>
               <%= link_to t("devise.sessions.destroy.sign_out", default: "Sign out"), destroy_user_session_path,
